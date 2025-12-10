@@ -23,7 +23,7 @@ import type { DailyReport, LaborEntry, JobDiaryEntry, PhotoAttachment, Weather }
 export function DailyReportPage() {
   const { foreman } = useAuth();
   const { addToQueue } = useSync();
-  const { selectedJobId, selectedReportId, goBack } = useNavigation();
+  const { selectedJobId, selectedReportId, copyFromReportId, goBack } = useNavigation();
 
   // Form state
   const [reportId] = useState(() => selectedReportId || generateId());
@@ -37,6 +37,7 @@ export function DailyReportPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [copiedFrom, setCopiedFrom] = useState<string | null>(null);
 
   // Get job details
   const job = useLiveQuery(async () => {
@@ -61,6 +62,44 @@ export function DailyReportPage() {
       setIsLoaded(true);
     }
   }, [existingReport, isLoaded]);
+
+  // Copy from previous report
+  useEffect(() => {
+    if (copyFromReportId && !isLoaded && !selectedReportId) {
+      copyFromPreviousReport(copyFromReportId);
+      setIsLoaded(true);
+    }
+  }, [copyFromReportId, isLoaded, selectedReportId]);
+
+  async function copyFromPreviousReport(sourceReportId: string) {
+    try {
+      const sourceReport = await db.dailyReports.get(sourceReportId);
+      if (!sourceReport) return;
+
+      // Copy weather
+      setWeather(sourceReport.weather);
+
+      // Copy labor entries with new IDs
+      const sourceLaborEntries = await db.laborEntries
+        .where('dailyReportId')
+        .equals(sourceReportId)
+        .toArray();
+
+      const copiedLaborEntries: LaborEntry[] = sourceLaborEntries.map((entry) => ({
+        ...entry,
+        id: generateId(),
+        dailyReportId: reportId,
+        airtableId: undefined,
+      }));
+
+      setLaborEntries(copiedLaborEntries);
+
+      // Set copied from date for display
+      setCopiedFrom(sourceReport.date);
+    } catch (error) {
+      console.error('Error copying from previous report:', error);
+    }
+  }
 
   async function loadReportData(id: string) {
     const [labor, diary, attachments] = await Promise.all([
@@ -293,6 +332,11 @@ export function DailyReportPage() {
             {job && (
               <p className="text-sm text-slate-300">
                 {job.jobNumber} - {job.jobName}
+              </p>
+            )}
+            {copiedFrom && (
+              <p className="text-sm text-blue-300 mt-1">
+                Copied from {new Date(copiedFrom).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
               </p>
             )}
           </div>

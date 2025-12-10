@@ -86,6 +86,7 @@ export interface LaborEntry {
   otHours: number;
   equipmentId?: string;
   costCodeIds: string[];
+  comments?: string; // Optional comments for this employee
   airtableId?: string;
 }
 

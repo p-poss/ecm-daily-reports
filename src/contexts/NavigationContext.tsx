@@ -6,9 +6,10 @@ interface NavigationContextType {
   currentPage: Page;
   selectedJobId: string | null;
   selectedReportId: string | null;
+  copyFromReportId: string | null;
   navigateToJobs: () => void;
   navigateToReports: (jobId: string) => void;
-  navigateToReportForm: (jobId: string, reportId?: string) => void;
+  navigateToReportForm: (jobId: string, reportId?: string, copyFromId?: string) => void;
   goBack: () => void;
 }
 
@@ -18,22 +19,26 @@ export function NavigationProvider({ children }: { children: ReactNode }) {
   const [currentPage, setCurrentPage] = useState<Page>('jobs');
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
   const [selectedReportId, setSelectedReportId] = useState<string | null>(null);
+  const [copyFromReportId, setCopyFromReportId] = useState<string | null>(null);
 
   function navigateToJobs() {
     setCurrentPage('jobs');
     setSelectedJobId(null);
     setSelectedReportId(null);
+    setCopyFromReportId(null);
   }
 
   function navigateToReports(jobId: string) {
     setSelectedJobId(jobId);
     setSelectedReportId(null);
+    setCopyFromReportId(null);
     setCurrentPage('reports');
   }
 
-  function navigateToReportForm(jobId: string, reportId?: string) {
+  function navigateToReportForm(jobId: string, reportId?: string, copyFromId?: string) {
     setSelectedJobId(jobId);
     setSelectedReportId(reportId || null);
+    setCopyFromReportId(copyFromId || null);
     setCurrentPage('report-form');
   }
 
@@ -41,6 +46,7 @@ export function NavigationProvider({ children }: { children: ReactNode }) {
     if (currentPage === 'report-form') {
       setCurrentPage('reports');
       setSelectedReportId(null);
+      setCopyFromReportId(null);
     } else if (currentPage === 'reports') {
       setCurrentPage('jobs');
       setSelectedJobId(null);
@@ -53,6 +59,7 @@ export function NavigationProvider({ children }: { children: ReactNode }) {
         currentPage,
         selectedJobId,
         selectedReportId,
+        copyFromReportId,
         navigateToJobs,
         navigateToReports,
         navigateToReportForm,

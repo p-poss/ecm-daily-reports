@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db, generateId } from '@/db/database';
 import { Button } from '@/components/ui/button';
@@ -11,7 +12,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Card, CardContent } from '@/components/ui/card';
-import { Plus, Trash2, Users, User, Clock, Wrench } from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea';
+import { Plus, Trash2, Users, User, Clock, Wrench, LayoutGrid, Table, MessageSquare } from 'lucide-react';
 import type { LaborEntry, Trade } from '@/types';
 
 const TRADE_CODES: { value: Trade; label: string }[] = [
@@ -32,7 +34,10 @@ interface LaborSectionProps {
   dailyReportId: string;
 }
 
+type ViewMode = 'card' | 'table';
+
 export function LaborSection({ entries, onChange, dailyReportId }: LaborSectionProps) {
+  const [viewMode, setViewMode] = useState<ViewMode>('card');
   const employees = useLiveQuery(() => db.employees.toArray());
   const equipment = useLiveQuery(() => db.equipment.toArray());
   const costCodes = useLiveQuery(() => db.costCodes.toArray());
@@ -79,14 +84,37 @@ export function LaborSection({ entries, onChange, dailyReportId }: LaborSectionP
             </span>
           )}
         </h2>
-        {entries.length > 0 && (
-          <div className="text-sm text-muted-foreground">
-            <span className="font-medium">{totalST}</span> ST / <span className="font-medium">{totalOT}</span> OT hrs
-          </div>
-        )}
+        <div className="flex items-center gap-2">
+          {entries.length > 0 && (
+            <div className="text-sm text-muted-foreground mr-2">
+              <span className="font-medium">{totalST}</span> ST / <span className="font-medium">{totalOT}</span> OT
+            </div>
+          )}
+          {/* View Toggle */}
+          {entries.length > 0 && (
+            <div className="flex border rounded-md overflow-hidden">
+              <button
+                type="button"
+                onClick={() => setViewMode('card')}
+                className={`p-1.5 ${viewMode === 'card' ? 'bg-primary text-primary-foreground' : 'bg-background hover:bg-muted'}`}
+                title="Card view"
+              >
+                <LayoutGrid className="w-4 h-4" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode('table')}
+                className={`p-1.5 ${viewMode === 'table' ? 'bg-primary text-primary-foreground' : 'bg-background hover:bg-muted'}`}
+                title="Table view"
+              >
+                <Table className="w-4 h-4" />
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* Worker Cards */}
+      {/* Empty State */}
       {entries.length === 0 ? (
         <Card>
           <CardContent className="py-8 text-center text-muted-foreground">
@@ -95,7 +123,8 @@ export function LaborSection({ entries, onChange, dailyReportId }: LaborSectionP
             <p className="text-sm">Tap "Add Worker" to begin.</p>
           </CardContent>
         </Card>
-      ) : (
+      ) : viewMode === 'card' ? (
+        /* Card View */
         entries.map((entry, index) => (
           <WorkerCard
             key={entry.id}
@@ -108,6 +137,53 @@ export function LaborSection({ entries, onChange, dailyReportId }: LaborSectionP
             onRemove={() => removeEntry(index)}
           />
         ))
+      ) : (
+        /* Table View */
+        <Card>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b bg-slate-50">
+                  <th className="text-left p-3 font-medium text-muted-foreground">#</th>
+                  <th className="text-left p-3 font-medium text-muted-foreground">Employee</th>
+                  <th className="text-left p-3 font-medium text-muted-foreground">Trade</th>
+                  <th className="text-center p-3 font-medium text-muted-foreground">ST</th>
+                  <th className="text-center p-3 font-medium text-muted-foreground">OT</th>
+                  <th className="text-left p-3 font-medium text-muted-foreground">Equipment</th>
+                  <th className="text-left p-3 font-medium text-muted-foreground">Cost Code</th>
+                  <th className="text-left p-3 font-medium text-muted-foreground">Comments</th>
+                  <th className="p-3 w-10"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {entries.map((entry, index) => (
+                  <TableRow
+                    key={entry.id}
+                    entry={entry}
+                    index={index}
+                    employees={employees || []}
+                    equipment={equipment || []}
+                    costCodes={costCodes || []}
+                    onUpdate={(updates) => updateEntry(index, updates)}
+                    onRemove={() => removeEntry(index)}
+                  />
+                ))}
+                {/* Totals Row */}
+                <tr className="border-t bg-slate-50 font-medium">
+                  <td className="p-3"></td>
+                  <td className="p-3">Totals</td>
+                  <td className="p-3"></td>
+                  <td className="p-3 text-center">{totalST}</td>
+                  <td className="p-3 text-center">{totalOT}</td>
+                  <td className="p-3"></td>
+                  <td className="p-3"></td>
+                  <td className="p-3"></td>
+                  <td className="p-3"></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </Card>
       )}
 
       {/* Add Worker Button */}
@@ -300,7 +376,167 @@ function WorkerCard({
             </SelectContent>
           </Select>
         </div>
+
+        {/* Comments */}
+        <div className="space-y-1.5">
+          <Label className="text-xs text-muted-foreground flex items-center gap-1">
+            <MessageSquare className="w-3 h-3" />
+            Comments (optional)
+          </Label>
+          <Textarea
+            value={entry.comments || ''}
+            onChange={(e) => onUpdate({ comments: e.target.value || undefined })}
+            placeholder="Add notes about this worker..."
+            rows={2}
+            className="text-sm resize-none"
+          />
+        </div>
       </CardContent>
     </Card>
+  );
+}
+
+interface TableRowProps {
+  entry: LaborEntry;
+  index: number;
+  employees: { id: string; name: string; trade: Trade }[];
+  equipment: { id: string; equipmentNumber: string; description: string }[];
+  costCodes: { id: string; code: string; description: string }[];
+  onUpdate: (updates: Partial<LaborEntry>) => void;
+  onRemove: () => void;
+}
+
+function TableRow({
+  entry,
+  index,
+  employees,
+  equipment,
+  costCodes,
+  onUpdate,
+  onRemove,
+}: TableRowProps) {
+  return (
+    <tr className="border-b hover:bg-slate-50/50">
+      <td className="p-2 text-center text-muted-foreground">{index + 1}</td>
+      <td className="p-2">
+        <Select
+          value={entry.employeeId || 'none'}
+          onValueChange={(value) => {
+            if (value === 'none') return;
+            const emp = employees.find((e) => e.id === value);
+            onUpdate({
+              employeeId: value,
+              trade: emp?.trade || entry.trade,
+            });
+          }}
+        >
+          <SelectTrigger className="h-8 text-sm min-w-[140px]">
+            <SelectValue placeholder="Select..." />
+          </SelectTrigger>
+          <SelectContent>
+            {employees.map((emp) => (
+              <SelectItem key={emp.id} value={emp.id}>
+                {emp.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </td>
+      <td className="p-2">
+        <Select
+          value={entry.trade}
+          onValueChange={(value) => onUpdate({ trade: value as Trade })}
+        >
+          <SelectTrigger className="h-8 text-sm w-[70px]">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {TRADE_CODES.map((trade) => (
+              <SelectItem key={trade.value} value={trade.value}>
+                {trade.value}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </td>
+      <td className="p-2">
+        <Input
+          type="number"
+          min="0"
+          max="24"
+          step="0.5"
+          value={entry.stHours}
+          onChange={(e) => onUpdate({ stHours: parseFloat(e.target.value) || 0 })}
+          className="h-8 text-sm text-center w-[60px]"
+        />
+      </td>
+      <td className="p-2">
+        <Input
+          type="number"
+          min="0"
+          max="24"
+          step="0.5"
+          value={entry.otHours}
+          onChange={(e) => onUpdate({ otHours: parseFloat(e.target.value) || 0 })}
+          className="h-8 text-sm text-center w-[60px]"
+        />
+      </td>
+      <td className="p-2">
+        <Select
+          value={entry.equipmentId || 'none'}
+          onValueChange={(value) => onUpdate({ equipmentId: value === 'none' ? undefined : value })}
+        >
+          <SelectTrigger className="h-8 text-sm min-w-[120px]">
+            <SelectValue placeholder="None" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="none">None</SelectItem>
+            {equipment.map((eq) => (
+              <SelectItem key={eq.id} value={eq.id}>
+                #{eq.equipmentNumber}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </td>
+      <td className="p-2">
+        <Select
+          value={entry.costCodeIds[0] || 'none'}
+          onValueChange={(value) => onUpdate({ costCodeIds: value === 'none' ? [] : [value] })}
+        >
+          <SelectTrigger className="h-8 text-sm min-w-[100px]">
+            <SelectValue placeholder="None" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="none">None</SelectItem>
+            {costCodes.map((cc) => (
+              <SelectItem key={cc.id} value={cc.id}>
+                {cc.code}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </td>
+      <td className="p-2">
+        <Input
+          type="text"
+          value={entry.comments || ''}
+          onChange={(e) => onUpdate({ comments: e.target.value || undefined })}
+          placeholder="Notes..."
+          className="h-8 text-sm min-w-[120px]"
+        />
+      </td>
+      <td className="p-2">
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+          onClick={onRemove}
+        >
+          <Trash2 className="w-4 h-4" />
+        </Button>
+      </td>
+    </tr>
   );
 }
