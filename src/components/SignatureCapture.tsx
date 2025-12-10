@@ -1,0 +1,99 @@
+import { useRef, useState } from 'react';
+import SignatureCanvas from 'react-signature-canvas';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { PenTool, RotateCcw, Check } from 'lucide-react';
+
+interface SignatureCaptureProps {
+  value?: string;
+  onChange: (signature: string) => void;
+  disabled?: boolean;
+}
+
+export function SignatureCapture({ value, onChange, disabled }: SignatureCaptureProps) {
+  const signatureRef = useRef<SignatureCanvas>(null);
+  const [isEmpty, setIsEmpty] = useState(!value);
+
+  function handleClear() {
+    signatureRef.current?.clear();
+    setIsEmpty(true);
+    onChange('');
+  }
+
+  function handleEnd() {
+    if (signatureRef.current) {
+      const dataUrl = signatureRef.current.toDataURL('image/png');
+      onChange(dataUrl);
+      setIsEmpty(signatureRef.current.isEmpty());
+    }
+  }
+
+  return (
+    <Card>
+      <CardHeader className="pb-3">
+        <CardTitle className="flex items-center gap-2 text-lg">
+          <PenTool className="w-5 h-5" />
+          Signature
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        {value && !signatureRef.current ? (
+          // Show saved signature
+          <div className="space-y-2">
+            <div className="border rounded-md bg-white p-2">
+              <img src={value} alt="Signature" className="w-full h-auto" />
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full"
+              onClick={() => onChange('')}
+              disabled={disabled}
+            >
+              <RotateCcw className="w-4 h-4 mr-2" />
+              Re-sign
+            </Button>
+          </div>
+        ) : (
+          // Signature canvas
+          <>
+            <div className="border rounded-md bg-white overflow-hidden touch-none">
+              <SignatureCanvas
+                ref={signatureRef}
+                canvasProps={{
+                  className: 'w-full h-32',
+                  style: { width: '100%', height: '128px' },
+                }}
+                onEnd={handleEnd}
+                backgroundColor="white"
+              />
+            </div>
+
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                className="flex-1"
+                onClick={handleClear}
+                disabled={isEmpty || disabled}
+              >
+                <RotateCcw className="w-4 h-4 mr-2" />
+                Clear
+              </Button>
+              {!isEmpty && (
+                <div className="flex items-center text-sm text-green-600">
+                  <Check className="w-4 h-4 mr-1" />
+                  Signed
+                </div>
+              )}
+            </div>
+
+            <p className="text-xs text-muted-foreground text-center">
+              Sign above to confirm this report
+            </p>
+          </>
+        )}
+      </CardContent>
+    </Card>
+  );
+}

@@ -1,0 +1,306 @@
+import { useLiveQuery } from 'dexie-react-hooks';
+import { db, generateId } from '@/db/database';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Card, CardContent } from '@/components/ui/card';
+import { Plus, Trash2, Users, User, Clock, Wrench } from 'lucide-react';
+import type { LaborEntry, Trade } from '@/types';
+
+const TRADE_CODES: { value: Trade; label: string }[] = [
+  { value: 'S', label: 'S - Skilled' },
+  { value: 'OE', label: 'OE - Operator' },
+  { value: 'LB', label: 'LB - Laborer' },
+  { value: 'O', label: 'O - Other' },
+  { value: 'F', label: 'F - Foreman' },
+  { value: 'GC', label: 'GC - General Contractor' },
+  { value: 'L', label: 'L - Labor' },
+  { value: 'Grd', label: 'Grd - Grade' },
+  { value: 'Supt', label: 'Supt - Superintendent' },
+];
+
+interface LaborSectionProps {
+  entries: LaborEntry[];
+  onChange: (entries: LaborEntry[]) => void;
+  dailyReportId: string;
+}
+
+export function LaborSection({ entries, onChange, dailyReportId }: LaborSectionProps) {
+  const employees = useLiveQuery(() => db.employees.toArray());
+  const equipment = useLiveQuery(() => db.equipment.toArray());
+  const costCodes = useLiveQuery(() => db.costCodes.toArray());
+
+  function addEntry() {
+    const newEntry: LaborEntry = {
+      id: generateId(),
+      dailyReportId,
+      employeeId: '',
+      trade: 'LB',
+      stHours: 8,
+      otHours: 0,
+      equipmentId: undefined,
+      costCodeIds: [],
+    };
+    onChange([...entries, newEntry]);
+  }
+
+  function updateEntry(index: number, updates: Partial<LaborEntry>) {
+    const newEntries = [...entries];
+    newEntries[index] = { ...newEntries[index], ...updates };
+    onChange(newEntries);
+  }
+
+  function removeEntry(index: number) {
+    const newEntries = entries.filter((_, i) => i !== index);
+    onChange(newEntries);
+  }
+
+  // Calculate totals
+  const totalST = entries.reduce((sum, e) => sum + e.stHours, 0);
+  const totalOT = entries.reduce((sum, e) => sum + e.otHours, 0);
+
+  return (
+    <div className="space-y-3">
+      {/* Section Header */}
+      <div className="flex items-center justify-between">
+        <h2 className="text-lg font-semibold flex items-center gap-2">
+          <Users className="w-5 h-5" />
+          Labor
+          {entries.length > 0 && (
+            <span className="text-sm font-normal text-muted-foreground">
+              ({entries.length} worker{entries.length !== 1 ? 's' : ''})
+            </span>
+          )}
+        </h2>
+        {entries.length > 0 && (
+          <div className="text-sm text-muted-foreground">
+            <span className="font-medium">{totalST}</span> ST / <span className="font-medium">{totalOT}</span> OT hrs
+          </div>
+        )}
+      </div>
+
+      {/* Worker Cards */}
+      {entries.length === 0 ? (
+        <Card>
+          <CardContent className="py-8 text-center text-muted-foreground">
+            <User className="w-10 h-10 mx-auto mb-2 opacity-50" />
+            <p>No workers added yet.</p>
+            <p className="text-sm">Tap "Add Worker" to begin.</p>
+          </CardContent>
+        </Card>
+      ) : (
+        entries.map((entry, index) => (
+          <WorkerCard
+            key={entry.id}
+            entry={entry}
+            index={index}
+            employees={employees || []}
+            equipment={equipment || []}
+            costCodes={costCodes || []}
+            onUpdate={(updates) => updateEntry(index, updates)}
+            onRemove={() => removeEntry(index)}
+          />
+        ))
+      )}
+
+      {/* Add Worker Button */}
+      <Button
+        type="button"
+        variant="outline"
+        className="w-full"
+        onClick={addEntry}
+      >
+        <Plus className="w-4 h-4 mr-2" />
+        Add Worker
+      </Button>
+    </div>
+  );
+}
+
+interface WorkerCardProps {
+  entry: LaborEntry;
+  index: number;
+  employees: { id: string; name: string; trade: Trade }[];
+  equipment: { id: string; equipmentNumber: string; description: string }[];
+  costCodes: { id: string; code: string; description: string }[];
+  onUpdate: (updates: Partial<LaborEntry>) => void;
+  onRemove: () => void;
+}
+
+function WorkerCard({
+  entry,
+  index,
+  employees,
+  equipment,
+  costCodes,
+  onUpdate,
+  onRemove,
+}: WorkerCardProps) {
+  const selectedEmployee = employees.find((e) => e.id === entry.employeeId);
+
+  return (
+    <Card className="overflow-hidden">
+      {/* Card Header with Employee Name and Delete */}
+      <div className="flex items-center justify-between px-4 py-3 bg-slate-50 border-b">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-medium">
+            {index + 1}
+          </div>
+          <div>
+            {selectedEmployee ? (
+              <span className="font-medium">{selectedEmployee.name}</span>
+            ) : (
+              <span className="text-muted-foreground italic">Select employee</span>
+            )}
+          </div>
+        </div>
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          className="text-destructive hover:text-destructive hover:bg-destructive/10"
+          onClick={onRemove}
+        >
+          <Trash2 className="w-4 h-4" />
+        </Button>
+      </div>
+
+      <CardContent className="p-4 space-y-4">
+        {/* Employee Selection */}
+        <div className="space-y-1.5">
+          <Label className="text-xs text-muted-foreground flex items-center gap-1">
+            <User className="w-3 h-3" />
+            Employee
+          </Label>
+          <Select
+            value={entry.employeeId}
+            onValueChange={(value) => {
+              const emp = employees.find((e) => e.id === value);
+              onUpdate({
+                employeeId: value,
+                trade: emp?.trade || entry.trade,
+              });
+            }}
+          >
+            <SelectTrigger className="text-base">
+              <SelectValue placeholder="Select employee" />
+            </SelectTrigger>
+            <SelectContent>
+              {employees.map((emp) => (
+                <SelectItem key={emp.id} value={emp.id}>
+                  {emp.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Trade and Hours Row */}
+        <div className="grid grid-cols-3 gap-3">
+          <div className="space-y-1.5">
+            <Label className="text-xs text-muted-foreground">Trade</Label>
+            <Select
+              value={entry.trade}
+              onValueChange={(value) => onUpdate({ trade: value as Trade })}
+            >
+              <SelectTrigger className="text-base">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {TRADE_CODES.map((trade) => (
+                  <SelectItem key={trade.value} value={trade.value}>
+                    {trade.value}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-1.5">
+            <Label className="text-xs text-muted-foreground flex items-center gap-1">
+              <Clock className="w-3 h-3" />
+              ST Hrs
+            </Label>
+            <Input
+              type="number"
+              min="0"
+              max="24"
+              step="0.5"
+              value={entry.stHours}
+              onChange={(e) => onUpdate({ stHours: parseFloat(e.target.value) || 0 })}
+              className="text-base text-center"
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <Label className="text-xs text-muted-foreground flex items-center gap-1">
+              <Clock className="w-3 h-3" />
+              OT Hrs
+            </Label>
+            <Input
+              type="number"
+              min="0"
+              max="24"
+              step="0.5"
+              value={entry.otHours}
+              onChange={(e) => onUpdate({ otHours: parseFloat(e.target.value) || 0 })}
+              className="text-base text-center"
+            />
+          </div>
+        </div>
+
+        {/* Equipment Selection */}
+        <div className="space-y-1.5">
+          <Label className="text-xs text-muted-foreground flex items-center gap-1">
+            <Wrench className="w-3 h-3" />
+            Equipment (optional)
+          </Label>
+          <Select
+            value={entry.equipmentId || 'none'}
+            onValueChange={(value) => onUpdate({ equipmentId: value === 'none' ? undefined : value })}
+          >
+            <SelectTrigger className="text-base">
+              <SelectValue placeholder="No equipment" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="none">No equipment</SelectItem>
+              {equipment.map((eq) => (
+                <SelectItem key={eq.id} value={eq.id}>
+                  #{eq.equipmentNumber} - {eq.description}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Cost Code */}
+        <div className="space-y-1.5">
+          <Label className="text-xs text-muted-foreground">Cost Code</Label>
+          <Select
+            value={entry.costCodeIds[0] || 'none'}
+            onValueChange={(value) => onUpdate({ costCodeIds: value === 'none' ? [] : [value] })}
+          >
+            <SelectTrigger className="text-base">
+              <SelectValue placeholder="Select cost code" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="none">No cost code</SelectItem>
+              {costCodes.map((cc) => (
+                <SelectItem key={cc.id} value={cc.id}>
+                  {cc.code} - {cc.description}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}

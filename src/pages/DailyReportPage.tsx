@@ -1,0 +1,411 @@
+import { useState, useEffect } from 'react';
+import { useLiveQuery } from 'dexie-react-hooks';
+import { db, generateId, now, calculateDeadlines, isDeadlinePassed } from '@/db/database';
+import { useAuth } from '@/contexts/AuthContext';
+import { useSync } from '@/contexts/SyncContext';
+import { useNavigation } from '@/contexts/NavigationContext';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import { SyncIndicator } from '@/components/SyncIndicator';
+import { WeatherSelector } from '@/components/WeatherSelector';
+import { LaborSection } from '@/components/LaborSection';
+import { JobDiarySection } from '@/components/JobDiarySection';
+import { SignatureCapture } from '@/components/SignatureCapture';
+import { PhotoAttachments } from '@/components/PhotoAttachments';
+import { DeadlineIndicator } from '@/components/DeadlineIndicator';
+import { ArrowLeft, Save, Send, FileText, Calendar } from 'lucide-react';
+import type { DailyReport, LaborEntry, JobDiaryEntry, PhotoAttachment, Weather } from '@/types';
+
+export function DailyReportPage() {
+  const { foreman } = useAuth();
+  const { addToQueue } = useSync();
+  const { selectedJobId, selectedReportId, goBack } = useNavigation();
+
+  // Form state
+  const [reportId] = useState(() => selectedReportId || generateId());
+  const [date, setDate] = useState(() => new Date().toISOString().split('T')[0]);
+  const [weather, setWeather] = useState<Weather | undefined>();
+  const [comments, setComments] = useState('');
+  const [laborEntries, setLaborEntries] = useState<LaborEntry[]>([]);
+  const [diaryEntries, setDiaryEntries] = useState<JobDiaryEntry[]>([]);
+  const [photos, setPhotos] = useState<PhotoAttachment[]>([]);
+  const [signature, setSignature] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  // Get job details
+  const job = useLiveQuery(async () => {
+    if (!selectedJobId) return null;
+    return db.jobs.get(selectedJobId);
+  }, [selectedJobId]);
+
+  // Get existing report if editing
+  const existingReport = useLiveQuery(async () => {
+    if (!selectedReportId) return null;
+    return db.dailyReports.get(selectedReportId);
+  }, [selectedReportId]);
+
+  // Load existing report data
+  useEffect(() => {
+    if (existingReport && !isLoaded) {
+      setDate(existingReport.date);
+      setWeather(existingReport.weather);
+      setComments(existingReport.comments || '');
+      setSignature(existingReport.signatureImage || '');
+      loadReportData(existingReport.id);
+      setIsLoaded(true);
+    }
+  }, [existingReport, isLoaded]);
+
+  async function loadReportData(id: string) {
+    const [labor, diary, attachments] = await Promise.all([
+      db.laborEntries.where('dailyReportId').equals(id).toArray(),
+      db.jobDiaryEntries.where('dailyReportId').equals(id).toArray(),
+      db.photoAttachments.where('dailyReportId').equals(id).toArray(),
+    ]);
+    setLaborEntries(labor);
+    setDiaryEntries(diary);
+    setPhotos(attachments);
+  }
+
+  // Calculate deadlines
+  const deadlines = calculateDeadlines(date);
+
+  // Get day of week
+  const dayOfWeek = new Date(date).toLocaleDateString('en-US', { weekday: 'long' });
+
+  async function saveDraft() {
+    if (!foreman || !selectedJobId) return;
+
+    setIsSaving(true);
+
+    try {
+      const report: DailyReport = {
+        id: existingReport?.id || reportId,
+        jobId: selectedJobId,
+        date,
+        dayOfWeek,
+        foremanId: foreman.id,
+        weather,
+        comments: comments || undefined,
+        status: 'Draft',
+        signatureImage: signature,
+        lastEditorId: foreman.id,
+        editCount: (existingReport?.editCount || 0) + 1,
+        dailyDueBy: deadlines.dailyDueBy,
+        isDailyLate: isDeadlinePassed(deadlines.dailyDueBy),
+        payrollWeekEnding: deadlines.payrollWeekEnding,
+        payrollDueBy: deadlines.payrollDueBy,
+        isPayrollLate: isDeadlinePassed(deadlines.payrollDueBy),
+        syncStatus: 'pending',
+        createdAt: existingReport?.createdAt || now(),
+        updatedAt: now(),
+      };
+
+      // Save report
+      await db.dailyReports.put(report);
+
+      // Save labor entries
+      await db.laborEntries.where('dailyReportId').equals(report.id).delete();
+      if (laborEntries.length > 0) {
+        await db.laborEntries.bulkPut(
+          laborEntries.map((e) => ({ ...e, dailyReportId: report.id }))
+        );
+      }
+
+      // Save diary entries
+      await db.jobDiaryEntries.where('dailyReportId').equals(report.id).delete();
+      if (diaryEntries.length > 0) {
+        await db.jobDiaryEntries.bulkPut(
+          diaryEntries.map((e) => ({ ...e, dailyReportId: report.id }))
+        );
+      }
+
+      // Save photos
+      await db.photoAttachments.where('dailyReportId').equals(report.id).delete();
+      if (photos.length > 0) {
+        await db.photoAttachments.bulkPut(
+          photos.map((p) => ({ ...p, dailyReportId: report.id }))
+        );
+      }
+
+      alert('Draft saved!');
+    } catch (error) {
+      console.error('Error saving draft:', error);
+      alert('Error saving draft. Please try again.');
+    } finally {
+      setIsSaving(false);
+    }
+  }
+
+  async function submitReport() {
+    if (!foreman || !selectedJobId || !signature) {
+      alert('Please sign the report before submitting');
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      // Save first
+      await saveDraftWithoutAlert();
+
+      const reportIdToSubmit = existingReport?.id || reportId;
+
+      // Update status to submitted
+      const submittedAt = now();
+      await db.dailyReports.update(reportIdToSubmit, {
+        status: 'Submitted',
+        submittedAt,
+        isDailyLate: isDeadlinePassed(deadlines.dailyDueBy),
+        isPayrollLate: isDeadlinePassed(deadlines.payrollDueBy),
+        syncStatus: 'pending',
+      });
+
+      // Add to sync queue
+      const report = await db.dailyReports.get(reportIdToSubmit);
+      if (report) {
+        await addToQueue('dailyReports', reportIdToSubmit, 'create', {
+          'Job': report.jobId,
+          'Date': report.date,
+          'Day of Week': report.dayOfWeek,
+          'Foreman': report.foremanId,
+          'Weather': report.weather,
+          'Comments': report.comments,
+          'Status': 'Submitted',
+          'Submitted At': submittedAt,
+          'Signature': report.signatureImage,
+          'Is Daily Late': report.isDailyLate,
+          'Is Payroll Late': report.isPayrollLate,
+        });
+
+        // Add labor entries to queue
+        for (const entry of laborEntries) {
+          await addToQueue('laborEntries', entry.id, 'create', {
+            'Daily Report': reportIdToSubmit,
+            'Employee': entry.employeeId,
+            'Trade': entry.trade,
+            'ST Hours': entry.stHours,
+            'OT Hours': entry.otHours,
+            'Equipment': entry.equipmentId,
+            'Cost Codes': entry.costCodeIds,
+          });
+        }
+
+        // Add diary entries to queue
+        for (const entry of diaryEntries) {
+          await addToQueue('jobDiaryEntries', entry.id, 'create', {
+            'Daily Report': reportIdToSubmit,
+            'Entry Text': entry.entryText,
+            'Cost Code': entry.costCodeId,
+            'Item Number': entry.itemNumber,
+          });
+        }
+      }
+
+      alert('Report submitted successfully!');
+      goBack();
+    } catch (error) {
+      console.error('Error submitting report:', error);
+      alert('Error submitting report. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  async function saveDraftWithoutAlert() {
+    if (!foreman || !selectedJobId) return;
+
+    const report: DailyReport = {
+      id: existingReport?.id || reportId,
+      jobId: selectedJobId,
+      date,
+      dayOfWeek,
+      foremanId: foreman.id,
+      weather,
+      comments: comments || undefined,
+      status: 'Draft',
+      signatureImage: signature,
+      lastEditorId: foreman.id,
+      editCount: (existingReport?.editCount || 0) + 1,
+      dailyDueBy: deadlines.dailyDueBy,
+      isDailyLate: isDeadlinePassed(deadlines.dailyDueBy),
+      payrollWeekEnding: deadlines.payrollWeekEnding,
+      payrollDueBy: deadlines.payrollDueBy,
+      isPayrollLate: isDeadlinePassed(deadlines.payrollDueBy),
+      syncStatus: 'pending',
+      createdAt: existingReport?.createdAt || now(),
+      updatedAt: now(),
+    };
+
+    await db.dailyReports.put(report);
+
+    await db.laborEntries.where('dailyReportId').equals(report.id).delete();
+    if (laborEntries.length > 0) {
+      await db.laborEntries.bulkPut(
+        laborEntries.map((e) => ({ ...e, dailyReportId: report.id }))
+      );
+    }
+
+    await db.jobDiaryEntries.where('dailyReportId').equals(report.id).delete();
+    if (diaryEntries.length > 0) {
+      await db.jobDiaryEntries.bulkPut(
+        diaryEntries.map((e) => ({ ...e, dailyReportId: report.id }))
+      );
+    }
+
+    await db.photoAttachments.where('dailyReportId').equals(report.id).delete();
+    if (photos.length > 0) {
+      await db.photoAttachments.bulkPut(
+        photos.map((p) => ({ ...p, dailyReportId: report.id }))
+      );
+    }
+  }
+
+  const isEditing = !!selectedReportId;
+  const currentReportId = existingReport?.id || reportId;
+
+  return (
+    <div className="min-h-screen bg-slate-100">
+      {/* Header */}
+      <header className="bg-slate-800 text-white p-4 sticky top-0 z-10">
+        <div className="max-w-2xl mx-auto">
+          <div className="flex items-center justify-between">
+            <button
+              onClick={goBack}
+              className="flex items-center gap-2 text-slate-300 hover:text-white"
+            >
+              <ArrowLeft className="w-5 h-5" />
+              <span>Reports</span>
+            </button>
+            <SyncIndicator />
+          </div>
+          <div className="mt-2">
+            <h1 className="text-lg font-bold flex items-center gap-2">
+              <FileText className="w-5 h-5" />
+              {isEditing ? 'Edit Report' : 'New Report'}
+            </h1>
+            {job && (
+              <p className="text-sm text-slate-300">
+                {job.jobNumber} - {job.jobName}
+              </p>
+            )}
+          </div>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <main className="max-w-2xl mx-auto p-4 space-y-4 pb-24">
+        {/* Date and Weather */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <Calendar className="w-5 h-5" />
+              Report Details
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Date</Label>
+                <Input
+                  type="date"
+                  value={date}
+                  onChange={(e) => setDate(e.target.value)}
+                  className="text-base"
+                  disabled={isEditing && existingReport?.status === 'Submitted'}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Day</Label>
+                <Input
+                  value={dayOfWeek}
+                  readOnly
+                  className="text-base bg-slate-50"
+                />
+              </div>
+            </div>
+
+            <WeatherSelector value={weather} onChange={setWeather} />
+
+            {/* Comments */}
+            <div className="space-y-2">
+              <Label>Comments (optional)</Label>
+              <Textarea
+                value={comments}
+                onChange={(e) => setComments(e.target.value)}
+                placeholder="Additional notes or comments..."
+                rows={3}
+                className="text-base resize-none"
+              />
+            </div>
+
+            <Separator />
+
+            <DeadlineIndicator
+              dailyDueBy={deadlines.dailyDueBy}
+              payrollDueBy={deadlines.payrollDueBy}
+              status={existingReport?.status || 'Draft'}
+              submittedAt={existingReport?.submittedAt}
+            />
+          </CardContent>
+        </Card>
+
+        {/* Labor Section */}
+        <LaborSection
+          entries={laborEntries}
+          onChange={setLaborEntries}
+          dailyReportId={currentReportId}
+        />
+
+        {/* Job Diary Section */}
+        <JobDiarySection
+          entries={diaryEntries}
+          onChange={setDiaryEntries}
+          dailyReportId={currentReportId}
+        />
+
+        {/* Photo Attachments */}
+        <PhotoAttachments
+          photos={photos}
+          onChange={setPhotos}
+          dailyReportId={currentReportId}
+        />
+
+        {/* Signature */}
+        <SignatureCapture
+          value={signature}
+          onChange={setSignature}
+        />
+      </main>
+
+      {/* Fixed Bottom Actions */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t p-4 safe-area-inset-bottom">
+        <div className="max-w-2xl mx-auto flex gap-3">
+          <Button
+            variant="outline"
+            className="flex-1"
+            onClick={saveDraft}
+            disabled={isSaving}
+          >
+            <Save className="w-4 h-4 mr-2" />
+            {isSaving ? 'Saving...' : 'Save Draft'}
+          </Button>
+          <Button
+            className="flex-1"
+            onClick={submitReport}
+            disabled={!signature || isSubmitting}
+          >
+            <Send className="w-4 h-4 mr-2" />
+            {isSubmitting ? 'Submitting...' : 'Submit Report'}
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
