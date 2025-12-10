@@ -17,7 +17,7 @@ import { JobDiarySection } from '@/components/JobDiarySection';
 import { SignatureCapture } from '@/components/SignatureCapture';
 import { PhotoAttachments } from '@/components/PhotoAttachments';
 import { DeadlineIndicator } from '@/components/DeadlineIndicator';
-import { ArrowLeft, Save, Send, FileText, Calendar } from 'lucide-react';
+import { ArrowLeft, Save, Send, Calendar } from 'lucide-react';
 import type { DailyReport, LaborEntry, JobDiaryEntry, PhotoAttachment, Weather } from '@/types';
 
 export function DailyReportPage() {
@@ -325,14 +325,15 @@ export function DailyReportPage() {
             <SyncIndicator />
           </div>
           <div className="mt-2">
-            <h1 className="text-lg font-bold flex items-center gap-2">
-              <FileText className="w-5 h-5" />
+            <h1 className="text-lg font-bold">
               {isEditing ? 'Edit Report' : 'New Report'}
             </h1>
-            {job && (
+            {job ? (
               <p className="text-sm text-slate-300">
                 {job.jobNumber} - {job.jobName}
               </p>
+            ) : (
+              <div className="h-5 w-48 bg-slate-700 rounded animate-pulse" />
             )}
             {copiedFrom && (
               <p className="text-sm text-blue-300 mt-1">

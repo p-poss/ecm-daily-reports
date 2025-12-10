@@ -141,12 +141,19 @@ export function ReportsListPage() {
             </button>
             <SyncIndicator />
           </div>
-          {job && (
-            <div className="mt-2">
-              <h1 className="text-lg font-bold">{job.jobNumber}</h1>
-              <p className="text-sm text-slate-300">{job.jobName}</p>
-            </div>
-          )}
+          <div className="mt-2">
+            {job ? (
+              <>
+                <h1 className="text-lg font-bold">{job.jobNumber}</h1>
+                <p className="text-sm text-slate-300">{job.jobName}</p>
+              </>
+            ) : (
+              <>
+                <div className="h-7 w-24 bg-slate-700 rounded animate-pulse" />
+                <div className="h-5 w-40 bg-slate-700 rounded animate-pulse mt-1" />
+              </>
+            )}
+          </div>
         </div>
       </header>
 
@@ -164,14 +171,16 @@ export function ReportsListPage() {
 
       {/* Reports List */}
       <main className="max-w-2xl mx-auto p-4 space-y-3">
-        {reports?.length === 0 ? (
-          <Card>
-            <CardContent className="py-8 text-center text-muted-foreground">
-              <FileText className="w-12 h-12 mx-auto mb-3 opacity-50" />
-              <p>No reports yet for this job.</p>
-              <p className="text-sm">Tap "Create New Report" to get started.</p>
-            </CardContent>
-          </Card>
+        {reports === undefined ? (
+          <div className="flex justify-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-600" />
+          </div>
+        ) : reports.length === 0 ? (
+          <div className="py-8 text-center text-muted-foreground">
+            <FileText className="w-12 h-12 mx-auto mb-3 opacity-50" />
+            <p>No reports yet for this job.</p>
+            <p className="text-sm">Tap "Create New Report" to get started.</p>
+          </div>
         ) : (
           reports?.map((report) => {
             const timePastDue = report.status === 'Draft' ? getTimePastDue(report.payrollDueBy) : null;

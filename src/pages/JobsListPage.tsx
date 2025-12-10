@@ -75,14 +75,16 @@ export function JobsListPage() {
 
       {/* Jobs List */}
       <main className="max-w-2xl mx-auto p-4 space-y-3">
-        {jobs?.length === 0 ? (
-          <Card>
-            <CardContent className="py-8 text-center text-muted-foreground">
-              <Briefcase className="w-12 h-12 mx-auto mb-3 opacity-50" />
-              <p>No jobs assigned to you.</p>
-              <p className="text-sm">Contact your supervisor for job assignments.</p>
-            </CardContent>
-          </Card>
+        {jobs === undefined ? (
+          <div className="flex justify-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-600" />
+          </div>
+        ) : jobs.length === 0 ? (
+          <div className="py-8 text-center text-muted-foreground">
+            <Briefcase className="w-12 h-12 mx-auto mb-3 opacity-50" />
+            <p>No jobs assigned to you.</p>
+            <p className="text-sm">Contact your supervisor for job assignments.</p>
+          </div>
         ) : (
           jobs?.map((job) => {
             const counts = reportCounts?.[job.id];
