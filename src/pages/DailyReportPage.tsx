@@ -19,7 +19,7 @@ import { JobDiarySection } from '@/components/JobDiarySection';
 import { SignatureCapture } from '@/components/SignatureCapture';
 import { PhotoAttachments } from '@/components/PhotoAttachments';
 import { DeadlineIndicator } from '@/components/DeadlineIndicator';
-import { ArrowLeft, Save, Send, Calendar as CalendarIcon } from 'lucide-react';
+import { ArrowLeft, Save, Send, Calendar as CalendarIcon, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import type { DailyReport, LaborEntry, JobDiaryEntry, PhotoAttachment, Weather } from '@/types';
@@ -369,19 +369,22 @@ export function DailyReportPage() {
                   <Button
                     variant="outline"
                     className={cn(
-                      "w-full justify-start text-left font-normal",
+                      "w-full justify-between text-left font-normal shadow-none",
                       !date && "text-muted-foreground"
                     )}
                     disabled={isEditing && existingReport?.status === 'Submitted'}
                   >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {date ? (
-                      <>
-                        {format(new Date(date + 'T00:00:00'), "MM/dd/yyyy")} - {dayOfWeek}
-                      </>
-                    ) : (
-                      <span>Pick a date</span>
-                    )}
+                    <span className="flex items-center">
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {date ? (
+                        <>
+                          {format(new Date(date + 'T00:00:00'), "MM/dd/yyyy")} - {dayOfWeek}
+                        </>
+                      ) : (
+                        <span>Pick a date</span>
+                      )}
+                    </span>
+                    <ChevronDown className="h-4 w-4 opacity-50" />
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
