@@ -88,8 +88,8 @@ export async function seedDatabase() {
       trade: 'Supt',
       isForeman: true,
       assignedJobIds: [jobs[0].id, jobs[1].id],
-      loginEmail: 'john@ecm.com',
-      passwordHash: 'password123', // In production, use proper hashing
+      loginEmail: 'test1@4ecm.com',
+      passwordHash: 'CP3456789', // In production, use proper hashing
     },
     {
       id: generateId(),
@@ -97,8 +97,8 @@ export async function seedDatabase() {
       trade: 'F',
       isForeman: true,
       assignedJobIds: [jobs[1].id, jobs[2].id],
-      loginEmail: 'mike@ecm.com',
-      passwordHash: 'password123',
+      loginEmail: 'test2@4ecm.com',
+      passwordHash: 'CP3456789',
     },
     {
       id: generateId(),
@@ -106,8 +106,8 @@ export async function seedDatabase() {
       trade: 'F',
       isForeman: true,
       assignedJobIds: [jobs[0].id],
-      loginEmail: 'carlos@ecm.com',
-      passwordHash: 'password123',
+      loginEmail: 'test3@4ecm.com',
+      passwordHash: 'CP3456789',
     },
     // Regular workers
     {
@@ -184,6 +184,6 @@ export async function seedDatabase() {
 
   console.log('Database seeded successfully!');
   console.log('Test login credentials:');
-  console.log('  Email: john@ecm.com');
-  console.log('  Password: password123');
+  console.log('  Email: test1@4ecm.com, test2@4ecm.com, or test3@4ecm.com');
+  console.log('  Password: CP3456789');
 }
