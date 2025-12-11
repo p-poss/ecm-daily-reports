@@ -361,16 +361,23 @@ export function DailyReportPage() {
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label>Date</Label>
-              <div className="relative flex items-center">
-                <Input
+              <div
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base md:text-sm cursor-pointer"
+                onClick={() => {
+                  const dateInput = document.getElementById('report-date-input') as HTMLInputElement;
+                  dateInput?.showPicker();
+                }}
+              >
+                <input
+                  id="report-date-input"
                   type="date"
                   value={date}
                   onChange={(e) => setDate(e.target.value)}
-                  className="text-base cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:inset-0 [&::-webkit-calendar-picker-indicator]:w-full [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:cursor-pointer"
+                  className="sr-only"
                   disabled={isEditing && existingReport?.status === 'Submitted'}
                 />
-                <span className="absolute left-[7.5rem] text-base text-foreground pointer-events-none">
-                  &nbsp;- {dayOfWeek}
+                <span className="text-foreground">
+                  {new Date(date + 'T00:00:00').toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' })} - {dayOfWeek}
                 </span>
               </div>
             </div>
