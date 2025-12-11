@@ -40,7 +40,7 @@ export function LoginPage() {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             {error && (
-              <div className="p-3 text-sm text-red-600 bg-red-50 rounded-md border border-red-200">
+              <div className="p-3 text-sm text-destructive bg-destructive/10 rounded-md border border-destructive/20">
                 {error}
               </div>
             )}

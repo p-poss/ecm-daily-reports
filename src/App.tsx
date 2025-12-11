@@ -1,6 +1,7 @@
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import { SyncProvider } from '@/contexts/SyncContext';
 import { NavigationProvider, useNavigation } from '@/contexts/NavigationContext';
+import { ThemeProvider } from '@/contexts/ThemeContext';
 import { LoginPage } from '@/pages/LoginPage';
 import { JobsListPage } from '@/pages/JobsListPage';
 import { ReportsListPage } from '@/pages/ReportsListPage';
@@ -39,13 +40,15 @@ function AppContent() {
 
 function App() {
   return (
-    <AuthProvider>
-      <SyncProvider>
-        <NavigationProvider>
-          <AppContent />
-        </NavigationProvider>
-      </SyncProvider>
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <SyncProvider>
+          <NavigationProvider>
+            <AppContent />
+          </NavigationProvider>
+        </SyncProvider>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
 

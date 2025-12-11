@@ -11,6 +11,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { SyncIndicator } from '@/components/SyncIndicator';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import { WeatherSelector } from '@/components/WeatherSelector';
 import { LaborSection } from '@/components/LaborSection';
 import { JobDiarySection } from '@/components/JobDiarySection';
@@ -322,7 +323,10 @@ export function DailyReportPage() {
               <ArrowLeft className="w-5 h-5" />
               <span>Reports</span>
             </button>
-            <SyncIndicator />
+            <div className="flex items-center gap-3">
+              <SyncIndicator />
+              <ThemeToggle />
+            </div>
           </div>
           <div className="mt-2">
             <h1 className="text-lg font-bold text-foreground">
@@ -345,7 +349,7 @@ export function DailyReportPage() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-2xl mx-auto p-4 space-y-4 pb-24">
+      <main className="max-w-2xl mx-auto p-4 space-y-8 pb-24">
         {/* Date and Weather */}
         <Card>
           <CardHeader className="pb-3">
@@ -401,12 +405,16 @@ export function DailyReportPage() {
           </CardContent>
         </Card>
 
+        <Separator />
+
         {/* Labor Section */}
         <LaborSection
           entries={laborEntries}
           onChange={setLaborEntries}
           dailyReportId={currentReportId}
         />
+
+        <Separator />
 
         {/* Job Diary Section */}
         <JobDiarySection
@@ -415,12 +423,16 @@ export function DailyReportPage() {
           dailyReportId={currentReportId}
         />
 
+        <Separator />
+
         {/* Photo Attachments */}
         <PhotoAttachments
           photos={photos}
           onChange={setPhotos}
           dailyReportId={currentReportId}
         />
+
+        <Separator />
 
         {/* Signature */}
         <SignatureCapture

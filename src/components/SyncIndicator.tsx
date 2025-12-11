@@ -18,7 +18,7 @@ export function SyncIndicator() {
       label: `Offline (${pendingCount} pending)`,
     },
     'error': {
-      color: 'bg-red-500',
+      color: 'bg-destructive',
       label: 'Sync Error',
     },
   };
@@ -30,7 +30,7 @@ export function SyncIndicator() {
       <div className={cn('w-2.5 h-2.5 rounded-full', config.color)} />
       <span className="text-muted-foreground">{config.label}</span>
       {syncError && (
-        <span className="text-xs text-red-600 truncate max-w-[150px]" title={syncError}>
+        <span className="text-xs text-destructive truncate max-w-[150px]" title={syncError}>
           {syncError}
         </span>
       )}

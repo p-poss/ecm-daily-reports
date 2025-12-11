@@ -7,6 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { SyncIndicator } from '@/components/SyncIndicator';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import {
   ArrowLeft,
   Plus,
@@ -139,7 +140,10 @@ export function ReportsListPage() {
               <ArrowLeft className="w-5 h-5" />
               <span>Jobs</span>
             </button>
-            <SyncIndicator />
+            <div className="flex items-center gap-3">
+              <SyncIndicator />
+              <ThemeToggle />
+            </div>
           </div>
           <div className="mt-2">
             {job ? (
@@ -160,6 +164,7 @@ export function ReportsListPage() {
       {/* Create New Report Button */}
       <div className="max-w-2xl mx-auto p-4 pb-0">
         <Button
+          variant="outline"
           className="w-full"
           size="lg"
           onClick={() => setShowNewReportModal(true)}
@@ -177,9 +182,7 @@ export function ReportsListPage() {
           </div>
         ) : reports.length === 0 ? (
           <div className="py-8 text-center text-muted-foreground">
-            <FileText className="w-12 h-12 mx-auto mb-3 opacity-50" />
             <p>No reports yet for this job.</p>
-            <p className="text-sm">Tap "Create New Report" to get started.</p>
           </div>
         ) : (
           reports?.map((report) => {
@@ -240,10 +243,10 @@ export function ReportsListPage() {
                     {/* Hard Deadline (Payroll) */}
                     <div className="flex items-center justify-between text-sm">
                       <span className="flex items-center gap-2 text-muted-foreground">
-                        <AlertTriangle className={`w-4 h-4 ${timePastDue ? 'text-red-600' : ''}`} />
+                        <AlertTriangle className={`w-4 h-4 ${timePastDue ? 'text-destructive' : ''}`} />
                         Payroll Deadline
                       </span>
-                      <span className={timePastDue ? 'text-red-600 font-medium' : ''}>
+                      <span className={timePastDue ? 'text-destructive font-medium' : ''}>
                         {formatDateTime(report.payrollDueBy)}
                       </span>
                     </div>
@@ -252,7 +255,7 @@ export function ReportsListPage() {
                     {report.status === 'Draft' && (
                       <div className="pt-2 border-t">
                         {timePastDue ? (
-                          <div className="flex items-center justify-center gap-2 text-red-600 font-medium">
+                          <div className="flex items-center justify-center gap-2 text-destructive font-medium">
                             <AlertTriangle className="w-4 h-4" />
                             {timePastDue}
                           </div>

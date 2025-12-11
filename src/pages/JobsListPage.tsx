@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { SyncIndicator } from '@/components/SyncIndicator';
 import { LogOut, Briefcase, MapPin, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 export function JobsListPage() {
   const { foreman, logout } = useAuth();
@@ -61,6 +62,8 @@ export function JobsListPage() {
           </div>
           <div className="flex items-center gap-3">
             <SyncIndicator />
+            <ThemeToggle />
+            <div data-orientation="vertical" role="none" className="shrink-0 bg-border w-[1px] mx-1 h-8" />
             <Button
               variant="ghost"
               size="icon"

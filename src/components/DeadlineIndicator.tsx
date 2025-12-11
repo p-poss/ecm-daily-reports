@@ -90,13 +90,13 @@ export function DeadlineIndicator({
       {/* Payroll Deadline */}
       <div className="flex items-center justify-between text-sm">
         <div className="flex items-center gap-2">
-          <AlertTriangle className={`w-4 h-4 ${isPayrollLate ? 'text-red-600' : 'text-muted-foreground'}`} />
-          <span className={isPayrollLate ? 'text-red-600 font-medium' : 'text-muted-foreground'}>
+          <AlertTriangle className={`w-4 h-4 ${isPayrollLate ? 'text-destructive' : 'text-muted-foreground'}`} />
+          <span className={isPayrollLate ? 'text-destructive font-medium' : 'text-muted-foreground'}>
             Payroll Deadline:
           </span>
         </div>
         <div className="flex items-center gap-2">
-          <span className={isPayrollLate ? 'text-red-600 font-medium' : ''}>
+          <span className={isPayrollLate ? 'text-destructive font-medium' : ''}>
             {formatDeadline(payrollDeadline)}
           </span>
           {isPayrollLate && (
