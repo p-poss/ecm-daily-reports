@@ -369,8 +369,8 @@ export function DailyReportPage() {
                   className="text-base cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:inset-0 [&::-webkit-calendar-picker-indicator]:w-full [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:cursor-pointer"
                   disabled={isEditing && existingReport?.status === 'Submitted'}
                 />
-                <span className="absolute left-[9.5rem] text-muted-foreground pointer-events-none">
-                  {dayOfWeek}
+                <span className="absolute left-[7.5rem] text-base text-foreground pointer-events-none">
+                  &nbsp;- {dayOfWeek}
                 </span>
               </div>
             </div>
