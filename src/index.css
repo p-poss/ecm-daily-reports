@@ -117,7 +117,21 @@
 
 * {
   border-color: var(--border);
-  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+/* Apply theme transitions only to key elements, not all elements
+   This prevents mobile browsers from staggering transitions */
+html,
+body,
+.card,
+[class*="bg-"],
+[class*="text-"],
+button,
+a,
+input,
+textarea,
+select {
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }
 
 html {
