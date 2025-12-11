@@ -9,6 +9,8 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { SyncIndicator } from '@/components/SyncIndicator';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { WeatherSelector } from '@/components/WeatherSelector';
@@ -17,7 +19,9 @@ import { JobDiarySection } from '@/components/JobDiarySection';
 import { SignatureCapture } from '@/components/SignatureCapture';
 import { PhotoAttachments } from '@/components/PhotoAttachments';
 import { DeadlineIndicator } from '@/components/DeadlineIndicator';
-import { ArrowLeft, Save, Send, Calendar } from 'lucide-react';
+import { ArrowLeft, Save, Send, Calendar as CalendarIcon } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { format } from 'date-fns';
 import type { DailyReport, LaborEntry, JobDiaryEntry, PhotoAttachment, Weather } from '@/types';
 
 export function DailyReportPage() {
@@ -353,41 +357,46 @@ export function DailyReportPage() {
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-lg">
-              <Calendar className="w-5 h-5" />
+              <CalendarIcon className="w-5 h-5" />
               Report Details
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label>Date</Label>
-              <div
-                className="flex h-10 w-full items-center rounded-md border border-input bg-background px-3 py-2 text-base md:text-sm cursor-pointer ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                tabIndex={0}
-                role="button"
-                onClick={() => {
-                  const dateInput = document.getElementById('report-date-input') as HTMLInputElement;
-                  dateInput?.showPicker();
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    const dateInput = document.getElementById('report-date-input') as HTMLInputElement;
-                    dateInput?.showPicker();
-                  }
-                }}
-              >
-                <input
-                  id="report-date-input"
-                  type="date"
-                  value={date}
-                  onChange={(e) => setDate(e.target.value)}
-                  className="sr-only"
-                  disabled={isEditing && existingReport?.status === 'Submitted'}
-                />
-                <span className="text-foreground">
-                  {new Date(date + 'T00:00:00').toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' })} - {dayOfWeek}
-                </span>
-              </div>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-full justify-start text-left font-normal",
+                      !date && "text-muted-foreground"
+                    )}
+                    disabled={isEditing && existingReport?.status === 'Submitted'}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {date ? (
+                      <>
+                        {format(new Date(date + 'T00:00:00'), "MM/dd/yyyy")} - {dayOfWeek}
+                      </>
+                    ) : (
+                      <span>Pick a date</span>
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={date ? new Date(date + 'T00:00:00') : undefined}
+                    onSelect={(selectedDate) => {
+                      if (selectedDate) {
+                        setDate(format(selectedDate, 'yyyy-MM-dd'));
+                      }
+                    }}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
             </div>
 
             <WeatherSelector value={weather} onChange={setWeather} />
