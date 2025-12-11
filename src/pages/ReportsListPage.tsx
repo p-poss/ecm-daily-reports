@@ -57,12 +57,15 @@ export function ReportsListPage() {
   }
 
   function formatDateTime(dateStr: string): string {
-    return new Date(dateStr).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      hour: 'numeric',
-      minute: '2-digit',
-    });
+    const date = new Date(dateStr);
+    const month = date.toLocaleDateString('en-US', { month: 'short' });
+    const day = date.getDate();
+    const hour = date.getHours();
+    const minute = date.getMinutes().toString().padStart(2, '0');
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    const hour12 = hour % 12 || 12;
+    // Format manually to prevent iOS date detection
+    return `${month} ${day}, ${hour12}:${minute} ${ampm}`;
   }
 
   function getTimePastDue(deadline: string): string | null {

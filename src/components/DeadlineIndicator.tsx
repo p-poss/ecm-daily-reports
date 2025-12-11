@@ -27,14 +27,15 @@ export function DeadlineIndicator({
     submittedAt && new Date(submittedAt) > payrollDeadline;
 
   function formatDeadline(date: Date): string {
-    const options: Intl.DateTimeFormatOptions = {
-      weekday: 'short',
-      month: 'short',
-      day: 'numeric',
-      hour: 'numeric',
-      minute: '2-digit',
-    };
-    return date.toLocaleDateString('en-US', options);
+    const weekday = date.toLocaleDateString('en-US', { weekday: 'short' });
+    const month = date.toLocaleDateString('en-US', { month: 'short' });
+    const day = date.getDate();
+    const hour = date.getHours();
+    const minute = date.getMinutes().toString().padStart(2, '0');
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    const hour12 = hour % 12 || 12;
+    // Use comma instead of "at" to prevent iOS date detection
+    return `${weekday}, ${month} ${day}, ${hour12}:${minute} ${ampm}`;
   }
 
   function getTimeRemaining(deadline: Date): string {
