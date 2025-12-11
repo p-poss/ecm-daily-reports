@@ -31,10 +31,10 @@ export function LoginPage() {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold text-foreground">
-            ECM Daily Report
+            Earth Construction & Mining
           </CardTitle>
           <CardDescription>
-            Sign in to submit your daily reports
+            Daily Job Report Platform
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -50,7 +50,6 @@ export function LoginPage() {
               <Input
                 id="email"
                 type="email"
-                placeholder="foreman@ecm.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -79,6 +78,16 @@ export function LoginPage() {
             >
               {isSubmitting ? 'Signing in...' : 'Sign In'}
             </Button>
+
+            <div className="pt-4 border-t text-center text-sm text-muted-foreground">
+              <p className="mb-1">For assistance, contact the office:</p>
+              <p>
+                <a href="tel:+17148974326" className="text-primary hover:underline">+1 (714) 897-4326</a>
+              </p>
+              <p>
+                <a href="mailto:info@4ecm.com" className="text-primary hover:underline">info@4ecm.com</a>
+              </p>
+            </div>
           </form>
         </CardContent>
       </Card>
