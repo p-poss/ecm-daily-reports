@@ -361,15 +361,15 @@ export function DailyReportPage() {
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label>Date</Label>
-              <div className="relative">
+              <div className="relative flex items-center">
                 <Input
                   type="date"
                   value={date}
                   onChange={(e) => setDate(e.target.value)}
-                  className="text-base w-full cursor-pointer"
+                  className="text-base cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:inset-0 [&::-webkit-calendar-picker-indicator]:w-full [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:cursor-pointer"
                   disabled={isEditing && existingReport?.status === 'Submitted'}
                 />
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none">
+                <span className="absolute left-[9.5rem] text-muted-foreground pointer-events-none">
                   {dayOfWeek}
                 </span>
               </div>
