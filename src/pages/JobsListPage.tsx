@@ -49,15 +49,15 @@ export function JobsListPage() {
   }, [jobs, foreman]);
 
   return (
-    <div className="min-h-screen bg-slate-100">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="bg-slate-800 text-white p-4 sticky top-0 z-10">
+      <header className="bg-background border-b p-4 sticky top-0 z-10">
         <div className="flex items-center justify-between max-w-2xl mx-auto">
           <div>
-            <h1 className="text-lg font-bold">
+            <h1 className="text-lg font-bold text-foreground">
               My Jobs
             </h1>
-            <p className="text-sm text-slate-300">{foreman?.name}</p>
+            <p className="text-sm text-muted-foreground">{foreman?.name}</p>
           </div>
           <div className="flex items-center gap-3">
             <SyncIndicator />
@@ -65,7 +65,7 @@ export function JobsListPage() {
               variant="ghost"
               size="icon"
               onClick={logout}
-              className="text-white hover:bg-slate-700"
+              className="text-foreground hover:bg-muted"
             >
               <LogOut className="w-5 h-5" />
             </Button>
@@ -77,7 +77,7 @@ export function JobsListPage() {
       <main className="max-w-2xl mx-auto p-4 space-y-3">
         {jobs === undefined ? (
           <div className="flex justify-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-600" />
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
           </div>
         ) : jobs.length === 0 ? (
           <div className="py-8 text-center text-muted-foreground">
@@ -91,7 +91,7 @@ export function JobsListPage() {
             return (
               <Card
                 key={job.id}
-                className="cursor-pointer hover:shadow-md transition-shadow active:bg-slate-50"
+                className="cursor-pointer hover:shadow-md transition-shadow active:bg-accent"
                 onClick={() => navigateToReports(job.id)}
               >
                 <CardContent className="p-4">
@@ -101,7 +101,7 @@ export function JobsListPage() {
                         <span className="font-bold text-lg">{job.jobNumber}</span>
                         <Badge variant="secondary">{job.status}</Badge>
                       </div>
-                      <h3 className="font-medium text-slate-800 truncate">
+                      <h3 className="font-medium text-foreground truncate">
                         {job.jobName}
                       </h3>
                       {job.address && (

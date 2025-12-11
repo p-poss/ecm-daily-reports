@@ -27,10 +27,10 @@ export function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-100 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold text-slate-800">
+          <CardTitle className="text-2xl font-bold text-foreground">
             ECM Daily Report
           </CardTitle>
           <CardDescription>

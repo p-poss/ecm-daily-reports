@@ -139,11 +139,11 @@ export function LaborSection({ entries, onChange, dailyReportId }: LaborSectionP
         ))
       ) : (
         /* Table View */
-        <Card>
+        <Card className="overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b bg-slate-50">
+                <tr className="border-b bg-muted">
                   <th className="text-left p-3 font-medium text-muted-foreground">#</th>
                   <th className="text-left p-3 font-medium text-muted-foreground">Employee</th>
                   <th className="text-left p-3 font-medium text-muted-foreground">Trade</th>
@@ -169,7 +169,7 @@ export function LaborSection({ entries, onChange, dailyReportId }: LaborSectionP
                   />
                 ))}
                 {/* Totals Row */}
-                <tr className="border-t bg-slate-50 font-medium">
+                <tr className="border-t bg-muted font-medium">
                   <td className="p-3"></td>
                   <td className="p-3">Totals</td>
                   <td className="p-3"></td>
@@ -224,7 +224,7 @@ function WorkerCard({
   return (
     <Card className="overflow-hidden">
       {/* Card Header with Employee Name and Delete */}
-      <div className="flex items-center justify-between px-4 py-3 bg-slate-50 border-b">
+      <div className="flex items-center justify-between px-4 py-3 bg-muted border-b">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-medium">
             {index + 1}
@@ -416,7 +416,7 @@ function TableRow({
   onRemove,
 }: TableRowProps) {
   return (
-    <tr className="border-b hover:bg-slate-50/50">
+    <tr className="border-b hover:bg-muted/50">
       <td className="p-2 text-center text-muted-foreground">{index + 1}</td>
       <td className="p-2">
         <Select

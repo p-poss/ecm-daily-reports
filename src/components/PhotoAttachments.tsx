@@ -79,7 +79,7 @@ export function PhotoAttachments({ photos, onChange, dailyReportId }: PhotoAttac
             {photos.map((photo) => (
               <div
                 key={photo.id}
-                className="relative group rounded-md overflow-hidden border bg-slate-50"
+                className="relative group rounded-md overflow-hidden border bg-muted"
               >
                 <img
                   src={photo.imageData}

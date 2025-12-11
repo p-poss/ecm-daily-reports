@@ -127,14 +127,14 @@ export function ReportsListPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-100">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="bg-slate-800 text-white p-4 sticky top-0 z-10">
+      <header className="bg-background border-b p-4 sticky top-0 z-10">
         <div className="max-w-2xl mx-auto">
           <div className="flex items-center justify-between">
             <button
               onClick={navigateToJobs}
-              className="flex items-center gap-2 text-slate-300 hover:text-white"
+              className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
             >
               <ArrowLeft className="w-5 h-5" />
               <span>Jobs</span>
@@ -144,13 +144,13 @@ export function ReportsListPage() {
           <div className="mt-2">
             {job ? (
               <>
-                <h1 className="text-lg font-bold">{job.jobNumber}</h1>
-                <p className="text-sm text-slate-300">{job.jobName}</p>
+                <h1 className="text-lg font-bold text-foreground">{job.jobNumber}</h1>
+                <p className="text-sm text-muted-foreground">{job.jobName}</p>
               </>
             ) : (
               <>
-                <div className="h-7 w-24 bg-slate-700 rounded animate-pulse" />
-                <div className="h-5 w-40 bg-slate-700 rounded animate-pulse mt-1" />
+                <div className="h-7 w-24 bg-muted rounded animate-pulse" />
+                <div className="h-5 w-40 bg-muted rounded animate-pulse mt-1" />
               </>
             )}
           </div>
@@ -173,7 +173,7 @@ export function ReportsListPage() {
       <main className="max-w-2xl mx-auto p-4 space-y-3">
         {reports === undefined ? (
           <div className="flex justify-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-600" />
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
           </div>
         ) : reports.length === 0 ? (
           <div className="py-8 text-center text-muted-foreground">
@@ -190,7 +190,7 @@ export function ReportsListPage() {
               <Card key={report.id} className="overflow-hidden">
                 <CardContent className="p-0">
                   {/* Report Header */}
-                  <div className="p-4 border-b bg-slate-50">
+                  <div className="p-4 border-b bg-muted">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <Calendar className="w-4 h-4 text-muted-foreground" />
@@ -383,8 +383,8 @@ export function ReportsListPage() {
                         }}
                       >
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center">
-                            <Copy className="w-4 h-4 text-slate-600" />
+                          <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">
+                            <Copy className="w-4 h-4 text-muted-foreground" />
                           </div>
                           <div className="flex-1 min-w-0">
                             <div className="font-medium flex items-center gap-2">

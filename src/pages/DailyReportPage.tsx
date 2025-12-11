@@ -310,14 +310,14 @@ export function DailyReportPage() {
   const currentReportId = existingReport?.id || reportId;
 
   return (
-    <div className="min-h-screen bg-slate-100">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="bg-slate-800 text-white p-4 sticky top-0 z-10">
+      <header className="bg-background border-b p-4 sticky top-0 z-10">
         <div className="max-w-2xl mx-auto">
           <div className="flex items-center justify-between">
             <button
               onClick={goBack}
-              className="flex items-center gap-2 text-slate-300 hover:text-white"
+              className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
             >
               <ArrowLeft className="w-5 h-5" />
               <span>Reports</span>
@@ -325,18 +325,18 @@ export function DailyReportPage() {
             <SyncIndicator />
           </div>
           <div className="mt-2">
-            <h1 className="text-lg font-bold">
+            <h1 className="text-lg font-bold text-foreground">
               {isEditing ? 'Edit Report' : 'New Report'}
             </h1>
             {job ? (
-              <p className="text-sm text-slate-300">
+              <p className="text-sm text-muted-foreground">
                 {job.jobNumber} - {job.jobName}
               </p>
             ) : (
-              <div className="h-5 w-48 bg-slate-700 rounded animate-pulse" />
+              <div className="h-5 w-48 bg-muted rounded animate-pulse" />
             )}
             {copiedFrom && (
-              <p className="text-sm text-blue-300 mt-1">
+              <p className="text-sm text-primary mt-1">
                 Copied from {new Date(copiedFrom).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
               </p>
             )}
@@ -371,7 +371,7 @@ export function DailyReportPage() {
                 <Input
                   value={dayOfWeek}
                   readOnly
-                  className="text-base bg-slate-50"
+                  className="text-base bg-muted"
                 />
               </div>
             </div>
@@ -430,7 +430,7 @@ export function DailyReportPage() {
       </main>
 
       {/* Fixed Bottom Actions */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t p-4 safe-area-inset-bottom">
+      <div className="fixed bottom-0 left-0 right-0 bg-background border-t p-4 safe-area-inset-bottom">
         <div className="max-w-2xl mx-auto flex gap-3">
           <Button
             variant="outline"
