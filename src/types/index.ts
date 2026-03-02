@@ -85,8 +85,17 @@ export interface LaborEntry {
   stHours: number;
   otHours: number;
   equipmentId?: string;
-  costCodeIds: string[];
-  comments?: string; // Optional comments for this employee
+  rentalCompany?: string;
+  // Equipment status hours (each split into ST/OT)
+  idleStHours: number;
+  idleOtHours: number;
+  downStHours: number;
+  downOtHours: number;
+  workStHours: number;
+  workOtHours: number;
+  // Cost code hours: maps cost code ID to { st, ot } hours
+  costCodeHours: Record<string, { st: number; ot: number }>;
+  comments?: string;
   airtableId?: string;
 }
 

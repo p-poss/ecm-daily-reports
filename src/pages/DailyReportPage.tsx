@@ -236,7 +236,14 @@ export function DailyReportPage() {
             'ST Hours': entry.stHours,
             'OT Hours': entry.otHours,
             'Equipment': entry.equipmentId,
-            'Cost Codes': entry.costCodeIds,
+            'Rental Company': entry.rentalCompany,
+            'Idle ST Hours': entry.idleStHours,
+            'Idle OT Hours': entry.idleOtHours,
+            'Down ST Hours': entry.downStHours,
+            'Down OT Hours': entry.downOtHours,
+            'Work ST Hours': entry.workStHours,
+            'Work OT Hours': entry.workOtHours,
+            'Cost Code Hours': entry.costCodeHours,
           });
         }
 
