@@ -324,7 +324,7 @@ export function DailyReportPage() {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="bg-background border-b p-4 sticky top-0 z-10">
-        <div className="max-w-2xl mx-auto">
+        <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between">
             <button
               onClick={goBack}
@@ -359,7 +359,7 @@ export function DailyReportPage() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-2xl mx-auto p-4 space-y-8 pb-24">
+      <main className="max-w-7xl mx-auto p-4 space-y-8 pb-24">
         {/* Date and Weather */}
         <Card>
           <CardHeader className="pb-3">
@@ -472,7 +472,7 @@ export function DailyReportPage() {
 
       {/* Fixed Bottom Actions */}
       <div className="fixed bottom-0 left-0 right-0 bg-background border-t p-4 safe-area-inset-bottom">
-        <div className="max-w-2xl mx-auto flex gap-3">
+        <div className="max-w-7xl mx-auto flex gap-3">
           <Button
             variant="outline"
             className="flex-1"

@@ -53,7 +53,7 @@ export function JobsListPage() {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="bg-background border-b p-4 sticky top-0 z-10">
-        <div className="flex items-center justify-between max-w-2xl mx-auto">
+        <div className="flex items-center justify-between max-w-7xl mx-auto">
           <div>
             <h1 className="text-lg font-bold text-foreground">
               My Jobs
@@ -77,7 +77,7 @@ export function JobsListPage() {
       </header>
 
       {/* Jobs List */}
-      <main className="max-w-2xl mx-auto p-4 space-y-3">
+      <main className="max-w-7xl mx-auto p-4 space-y-3">
         {jobs === undefined ? (
           <div className="flex justify-center py-8">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />

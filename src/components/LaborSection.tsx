@@ -45,7 +45,7 @@ function SplitHoursCell({
   onOtChange: (v: number) => void;
 }) {
   return (
-    <div className="flex items-center border rounded-md overflow-hidden h-8 min-w-[90px]">
+    <div className="flex items-center border rounded-md overflow-hidden h-8 w-[90px] mx-auto">
       <Input
         type="number"
         min="0"
@@ -53,7 +53,7 @@ function SplitHoursCell({
         step="0.5"
         value={stValue || ''}
         onChange={(e) => onStChange(parseFloat(e.target.value) || 0)}
-        className="h-8 text-sm text-center w-[45px] border-0 rounded-none focus-visible:ring-0 px-1"
+        className="h-8 text-sm text-center flex-1 min-w-0 border-0 rounded-none focus-visible:ring-0 px-1"
         placeholder="ST"
       />
       <div className="w-px h-full bg-border shrink-0" />
@@ -64,7 +64,7 @@ function SplitHoursCell({
         step="0.5"
         value={otValue || ''}
         onChange={(e) => onOtChange(parseFloat(e.target.value) || 0)}
-        className="h-8 text-sm text-center w-[45px] border-0 rounded-none focus-visible:ring-0 px-1"
+        className="h-8 text-sm text-center flex-1 min-w-0 border-0 rounded-none focus-visible:ring-0 px-1"
         placeholder="OT"
       />
     </div>
@@ -74,10 +74,10 @@ function SplitHoursCell({
 /** Split header cell showing "ST | OT" with a divider */
 function SplitHeaderLabel() {
   return (
-    <div className="flex items-center justify-center text-[10px] text-muted-foreground gap-0">
-      <span className="w-[45px] text-center">ST</span>
+    <div className="flex items-center justify-center text-[10px] text-muted-foreground w-[90px] mx-auto">
+      <span className="flex-1 text-center">ST</span>
       <span className="text-border">|</span>
-      <span className="w-[45px] text-center">OT</span>
+      <span className="flex-1 text-center">OT</span>
     </div>
   );
 }
@@ -222,7 +222,7 @@ export function LaborSection({ entries, onChange, dailyReportId }: LaborSectionP
                     );
                   })}
                   {/* Add cost code column button */}
-                  <th rowSpan={3} className="p-1 align-middle w-[120px]">
+                  <th rowSpan={3} colSpan={2} className="p-1 align-middle">
                     <Select
                       value=""
                       onValueChange={(value) => addCostCodeColumn(value)}
@@ -239,8 +239,6 @@ export function LaborSection({ entries, onChange, dailyReportId }: LaborSectionP
                       </SelectContent>
                     </Select>
                   </th>
-                  {/* Delete column */}
-                  <th rowSpan={3} className="p-1 w-8"></th>
                 </tr>
 
                 {/* Column headers row */}
@@ -301,33 +299,33 @@ export function LaborSection({ entries, onChange, dailyReportId }: LaborSectionP
                   <td className="p-2">Totals</td>
                   <td className="p-2"></td>
                   <td className="p-2 border-r">
-                    <div className="flex items-center justify-center gap-0 text-xs">
-                      <span className="w-[45px] text-center font-bold">{totalST}</span>
+                    <div className="flex items-center justify-center w-[90px] mx-auto text-xs">
+                      <span className="flex-1 text-center font-bold">{totalST}</span>
                       <span className="text-border">|</span>
-                      <span className="w-[45px] text-center font-bold">{totalOT}</span>
+                      <span className="flex-1 text-center font-bold">{totalOT}</span>
                     </div>
                   </td>
                   <td className="p-2"></td>
                   <td className="p-2"></td>
                   <td className="p-2">
-                    <div className="flex items-center justify-center gap-0 text-xs">
-                      <span className="w-[45px] text-center">{entries.reduce((s, e) => s + e.idleStHours, 0) || ''}</span>
+                    <div className="flex items-center justify-center w-[90px] mx-auto text-xs">
+                      <span className="flex-1 text-center">{entries.reduce((s, e) => s + e.idleStHours, 0) || ''}</span>
                       <span className="text-border">|</span>
-                      <span className="w-[45px] text-center">{entries.reduce((s, e) => s + e.idleOtHours, 0) || ''}</span>
+                      <span className="flex-1 text-center">{entries.reduce((s, e) => s + e.idleOtHours, 0) || ''}</span>
                     </div>
                   </td>
                   <td className="p-2">
-                    <div className="flex items-center justify-center gap-0 text-xs">
-                      <span className="w-[45px] text-center">{entries.reduce((s, e) => s + e.downStHours, 0) || ''}</span>
+                    <div className="flex items-center justify-center w-[90px] mx-auto text-xs">
+                      <span className="flex-1 text-center">{entries.reduce((s, e) => s + e.downStHours, 0) || ''}</span>
                       <span className="text-border">|</span>
-                      <span className="w-[45px] text-center">{entries.reduce((s, e) => s + e.downOtHours, 0) || ''}</span>
+                      <span className="flex-1 text-center">{entries.reduce((s, e) => s + e.downOtHours, 0) || ''}</span>
                     </div>
                   </td>
                   <td className="p-2 border-r">
-                    <div className="flex items-center justify-center gap-0 text-xs">
-                      <span className="w-[45px] text-center">{entries.reduce((s, e) => s + e.workStHours, 0) || ''}</span>
+                    <div className="flex items-center justify-center w-[90px] mx-auto text-xs">
+                      <span className="flex-1 text-center">{entries.reduce((s, e) => s + e.workStHours, 0) || ''}</span>
                       <span className="text-border">|</span>
-                      <span className="w-[45px] text-center">{entries.reduce((s, e) => s + e.workOtHours, 0) || ''}</span>
+                      <span className="flex-1 text-center">{entries.reduce((s, e) => s + e.workOtHours, 0) || ''}</span>
                     </div>
                   </td>
                   {allActiveCostCodeIds.map((ccId) => {
@@ -335,10 +333,10 @@ export function LaborSection({ entries, onChange, dailyReportId }: LaborSectionP
                     const otTotal = entries.reduce((s, e) => s + (e.costCodeHours?.[ccId]?.ot || 0), 0);
                     return (
                       <td key={ccId} className="p-2 border-r">
-                        <div className="flex items-center justify-center gap-0 text-xs">
-                          <span className="w-[45px] text-center">{stTotal || ''}</span>
+                        <div className="flex items-center justify-center w-[90px] mx-auto text-xs">
+                          <span className="flex-1 text-center">{stTotal || ''}</span>
                           <span className="text-border">|</span>
-                          <span className="w-[45px] text-center">{otTotal || ''}</span>
+                          <span className="flex-1 text-center">{otTotal || ''}</span>
                         </div>
                       </td>
                     );
@@ -453,51 +451,30 @@ function TableRow({
       </td>
       {/* Equip. # / Rental Co. */}
       <td className="p-2">
-        {entry.equipmentId ? (
-          <div className="flex items-center gap-1">
-            <Select
-              value={entry.equipmentId || 'none'}
-              onValueChange={(value) => onUpdate({ equipmentId: value === 'none' ? undefined : value })}
-            >
-              <SelectTrigger className="h-8 text-sm w-[80px]">
-                <SelectValue placeholder="None" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="none">None</SelectItem>
-                {equipment.map((eq) => (
-                  <SelectItem key={eq.id} value={eq.id}>
-                    #{eq.equipmentNumber}
-                  </SelectItem>
+        <div>
+          <Select
+            value={entry.equipmentId || 'none'}
+            onValueChange={(value) => onUpdate({ equipmentId: value === 'none' ? undefined : value })}
+          >
+            <SelectTrigger className="h-8 text-sm w-[100px]">
+              <SelectValue placeholder="Equip #" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="none">None</SelectItem>
+              {equipment.map((eq) => (
+                <SelectItem key={eq.id} value={eq.id}>
+                  #{eq.equipmentNumber}
+                </SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
-        ) : (
-          <div className="flex flex-col gap-1">
-            <Select
-              value="none"
-              onValueChange={(value) => onUpdate({ equipmentId: value === 'none' ? undefined : value })}
-            >
-              <SelectTrigger className="h-8 text-sm min-w-[100px]">
-                <SelectValue placeholder="Equip #" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="none">None</SelectItem>
-                {equipment.map((eq) => (
-                  <SelectItem key={eq.id} value={eq.id}>
-                    #{eq.equipmentNumber}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        )}
         <Input
           type="text"
           value={entry.rentalCompany || ''}
           onChange={(e) => onUpdate({ rentalCompany: e.target.value || undefined })}
           placeholder="Rental Co."
-          className="h-7 text-xs mt-1 min-w-[100px]"
+          className="h-7 text-xs mt-1 w-[100px]"
         />
       </td>
       {/* Equip. description (auto-filled) */}
@@ -545,12 +522,12 @@ function TableRow({
       {/* Add cost code spacer */}
       <td className="p-2"></td>
       {/* Delete */}
-      <td className="p-2">
+      <td className="p-2 text-right">
         <Button
           type="button"
           variant="ghost"
           size="icon"
-          className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+          className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10 ml-auto"
           onClick={onRemove}
         >
           <Trash2 className="w-4 h-4" />
