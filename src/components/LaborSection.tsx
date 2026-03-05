@@ -198,7 +198,7 @@ export function LaborSection({ entries, onChange, dailyReportId }: LaborSectionP
                     Labor
                   </th>
                   {/* EQUIPMENT section header */}
-                  <th colSpan={5} className="text-left p-2 font-bold text-xs uppercase tracking-wider border-r">
+                  <th colSpan={6} className="text-left p-2 font-bold text-xs uppercase tracking-wider border-r">
                     Equipment
                   </th>
                   {/* Cost code description labels */}
@@ -248,8 +248,9 @@ export function LaborSection({ entries, onChange, dailyReportId }: LaborSectionP
                   <th className="text-center p-2 font-medium text-muted-foreground text-xs border-r min-w-[90px]">
                     ST / OT
                   </th>
-                  <th className="text-left p-2 font-medium text-muted-foreground text-xs">Equip. # / Rental Co.</th>
-                  <th className="text-left p-2 font-medium text-muted-foreground text-xs">Equip.</th>
+                  <th className="text-left p-2 font-medium text-muted-foreground text-xs w-[110px]">Equip. #</th>
+                  <th className="text-left p-2 font-medium text-muted-foreground text-xs w-[110px]">Rental Co.</th>
+                  <th className="text-left p-2 font-medium text-muted-foreground text-xs w-[180px]">Equip.</th>
                   <th className="text-center p-2 font-medium text-muted-foreground text-xs min-w-[90px]">Idle</th>
                   <th className="text-center p-2 font-medium text-muted-foreground text-xs min-w-[90px]">Down</th>
                   <th className="text-center p-2 font-medium text-muted-foreground text-xs border-r min-w-[90px]">Work</th>
@@ -269,6 +270,7 @@ export function LaborSection({ entries, onChange, dailyReportId }: LaborSectionP
                   <th className="p-0"></th>
                   <th className="p-0"></th>
                   <th className="p-0 border-r"><SplitHeaderLabel /></th>
+                  <th className="p-0"></th>
                   <th className="p-0"></th>
                   <th className="p-0"></th>
                   <th className="p-0"><SplitHeaderLabel /></th>
@@ -305,6 +307,7 @@ export function LaborSection({ entries, onChange, dailyReportId }: LaborSectionP
                       <span className="flex-1 text-center font-bold">{totalOT}</span>
                     </div>
                   </td>
+                  <td className="p-2"></td>
                   <td className="p-2"></td>
                   <td className="p-2"></td>
                   <td className="p-2">
@@ -402,7 +405,10 @@ function TableRow({
         <Select
           value={entry.employeeId || 'none'}
           onValueChange={(value) => {
-            if (value === 'none') return;
+            if (value === 'none') {
+              onUpdate({ employeeId: '' });
+              return;
+            }
             const emp = employees.find((e) => e.id === value);
             onUpdate({
               employeeId: value,
@@ -411,9 +417,10 @@ function TableRow({
           }}
         >
           <SelectTrigger className="h-8 text-sm min-w-[130px]">
-            <SelectValue placeholder="Select..." />
+            <SelectValue placeholder="N/A" />
           </SelectTrigger>
           <SelectContent>
+            <SelectItem value="none">N/A</SelectItem>
             {employees.map((emp) => (
               <SelectItem key={emp.id} value={emp.id}>
                 {emp.name}
@@ -460,7 +467,7 @@ function TableRow({
               <SelectValue placeholder="Equip #" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="none">None</SelectItem>
+              <SelectItem value="none">N/A</SelectItem>
               {equipment.map((eq) => (
                 <SelectItem key={eq.id} value={eq.id}>
                   #{eq.equipmentNumber}
@@ -469,18 +476,25 @@ function TableRow({
               </SelectContent>
             </Select>
           </div>
-        <Input
-          type="text"
-          value={entry.rentalCompany || ''}
-          onChange={(e) => onUpdate({ rentalCompany: e.target.value || undefined })}
-          placeholder="Rental Co."
-          className="h-7 text-xs mt-1 w-[100px]"
-        />
+      </td>
+      {/* Rental Co. */}
+      <td className="p-2">
+        {entry.equipmentId ? (
+          <span className="text-xs text-muted-foreground">ECM</span>
+        ) : (
+          <Input
+            type="text"
+            value={entry.rentalCompany || ''}
+            onChange={(e) => onUpdate({ rentalCompany: e.target.value || undefined })}
+            placeholder="Rental Co."
+            className="h-8 text-sm w-[100px]"
+          />
+        )}
       </td>
       {/* Equip. description */}
       <td className="p-2">
         {entry.equipmentId ? (
-          <span className="text-xs text-muted-foreground">{selectedEquipment?.description || ''}</span>
+          <span className="text-xs text-muted-foreground whitespace-nowrap">{selectedEquipment?.description || ''}</span>
         ) : (
           <Input
             type="text"
