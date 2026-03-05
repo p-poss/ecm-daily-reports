@@ -477,9 +477,19 @@ function TableRow({
           className="h-7 text-xs mt-1 w-[100px]"
         />
       </td>
-      {/* Equip. description (auto-filled) */}
-      <td className="p-2 text-xs text-muted-foreground min-w-[80px]">
-        {selectedEquipment?.description || ''}
+      {/* Equip. description */}
+      <td className="p-2">
+        {entry.equipmentId ? (
+          <span className="text-xs text-muted-foreground">{selectedEquipment?.description || ''}</span>
+        ) : (
+          <Input
+            type="text"
+            value={entry.equipmentDescription || ''}
+            onChange={(e) => onUpdate({ equipmentDescription: e.target.value || undefined })}
+            placeholder="Equip."
+            className="h-8 text-sm min-w-[100px]"
+          />
+        )}
       </td>
       {/* Idle ST|OT */}
       <td className="p-2">

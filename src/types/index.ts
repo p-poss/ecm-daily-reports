@@ -85,6 +85,7 @@ export interface LaborEntry {
   stHours: number;
   otHours: number;
   equipmentId?: string;
+  equipmentDescription?: string;
   rentalCompany?: string;
   // Equipment status hours (each split into ST/OT)
   idleStHours: number;
