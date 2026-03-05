@@ -11,7 +11,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Card, CardContent } from '@/components/ui/card';
-import { Plus, Trash2, Users, User, X } from 'lucide-react';
+import { Plus, Trash2, HardHat, Table, X } from 'lucide-react';
 import type { LaborEntry, Trade } from '@/types';
 
 const TRADE_CODES: { value: Trade; label: string }[] = [
@@ -158,11 +158,11 @@ export function LaborSection({ entries, onChange, dailyReportId }: LaborSectionP
       {/* Section Header */}
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold flex items-center gap-2">
-          <Users className="w-5 h-5" />
-          Labor
+          <HardHat className="w-5 h-5" />
+          Labor + Equipment
           {entries.length > 0 && (
             <span className="text-sm font-normal text-muted-foreground">
-              ({entries.length} worker{entries.length !== 1 ? 's' : ''})
+              ({entries.length} row{entries.length !== 1 ? 's' : ''})
             </span>
           )}
         </h2>
@@ -179,9 +179,9 @@ export function LaborSection({ entries, onChange, dailyReportId }: LaborSectionP
       {entries.length === 0 ? (
         <Card>
           <CardContent className="py-8 text-center text-muted-foreground">
-            <User className="w-10 h-10 mx-auto mb-2 opacity-50" />
-            <p>No workers added yet.</p>
-            <p className="text-sm">Tap "Add Worker" to begin.</p>
+            <Table className="w-10 h-10 mx-auto mb-2 opacity-50" />
+            <p>No entries added yet.</p>
+            <p className="text-sm">Tap "Add Row" to begin.</p>
           </CardContent>
         </Card>
       ) : (
@@ -350,7 +350,7 @@ export function LaborSection({ entries, onChange, dailyReportId }: LaborSectionP
         </Card>
       )}
 
-      {/* Add Worker Button */}
+      {/* Add Row Button */}
       <Button
         type="button"
         variant="outline"
@@ -358,7 +358,7 @@ export function LaborSection({ entries, onChange, dailyReportId }: LaborSectionP
         onClick={addEntry}
       >
         <Plus className="w-4 h-4 mr-2" />
-        Add Worker
+        Add Row
       </Button>
     </div>
   );
