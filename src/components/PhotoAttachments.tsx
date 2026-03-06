@@ -106,7 +106,7 @@ export function PhotoAttachments({ photos, onChange, dailyReportId }: PhotoAttac
         )}
 
         {photos.length === 0 && (
-          <div className="flex flex-col items-center justify-center py-6 text-muted-foreground">
+          <div className="flex flex-col items-center justify-center py-4 text-muted-foreground">
             <p className="text-sm">No photos attached</p>
           </div>
         )}
