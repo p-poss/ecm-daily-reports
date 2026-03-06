@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { Plus, Trash2, BookOpen } from 'lucide-react';
+import { Plus, X, BookOpen } from 'lucide-react';
 import type { JobDiaryEntry } from '@/types';
 
 interface JobDiarySectionProps {
@@ -59,7 +59,7 @@ export function JobDiarySection({ entries, onChange, dailyReportId }: JobDiarySe
       <CardContent className="space-y-4">
         {entries.length === 0 ? (
           <p className="text-sm text-muted-foreground text-center py-4">
-            No diary entries. Tap "Add Entry" to document work performed.
+            No journal entries.
           </p>
         ) : (
           entries.map((entry, index) => (
@@ -115,10 +115,10 @@ function DiaryEntryForm({
           type="button"
           variant="ghost"
           size="icon"
-          className="text-destructive hover:text-destructive"
+          className="text-destructive hover:text-destructive hover:bg-destructive/10"
           onClick={onRemove}
         >
-          <Trash2 className="w-4 h-4" />
+          <X className="w-4 h-4" />
         </Button>
       </div>
 

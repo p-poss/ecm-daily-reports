@@ -11,7 +11,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Card, CardContent } from '@/components/ui/card';
-import { Plus, HardHat, Table, X } from 'lucide-react';
+import { Plus, HardHat, X } from 'lucide-react';
 import type { LaborEntry, Trade } from '@/types';
 
 const TRADE_CODES: { value: Trade; label: string }[] = [
@@ -179,9 +179,7 @@ export function LaborSection({ entries, onChange, dailyReportId }: LaborSectionP
       {entries.length === 0 ? (
         <Card>
           <CardContent className="py-8 text-center text-muted-foreground">
-            <Table className="w-10 h-10 mx-auto mb-2 opacity-50" />
-            <p>No entries added yet.</p>
-            <p className="text-sm">Tap "Add Row" to begin.</p>
+            <p className="text-sm">No labor entries.</p>
           </CardContent>
         </Card>
       ) : (
@@ -205,7 +203,7 @@ export function LaborSection({ entries, onChange, dailyReportId }: LaborSectionP
                   {allActiveCostCodeIds.map((ccId) => {
                     const cc = (costCodes || []).find((c) => c.id === ccId);
                     return (
-                      <th key={ccId} className="text-center p-2 font-bold text-xs uppercase tracking-wider border-r min-w-[280px]">
+                      <th key={ccId} className="text-center p-2 font-bold text-xs uppercase tracking-wider border-r min-w-[160px]">
                         <div className="flex items-center justify-center relative">
                           <span className="truncate" title={cc?.description}>
                             {cc?.description || ''}
@@ -260,7 +258,7 @@ export function LaborSection({ entries, onChange, dailyReportId }: LaborSectionP
                   {allActiveCostCodeIds.map((ccId) => {
                     const cc = (costCodes || []).find((c) => c.id === ccId);
                     return (
-                      <th key={ccId} className="text-center p-2 font-medium text-muted-foreground text-xs border-r min-w-[280px]">
+                      <th key={ccId} className="text-center p-2 font-medium text-muted-foreground text-xs border-r min-w-[160px]">
                         {cc?.code || ccId}
                       </th>
                     );
