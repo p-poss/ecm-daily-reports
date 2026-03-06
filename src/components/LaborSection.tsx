@@ -11,7 +11,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Card, CardContent } from '@/components/ui/card';
-import { Plus, Trash2, HardHat, Table, X } from 'lucide-react';
+import { Plus, HardHat, Table, X } from 'lucide-react';
 import type { LaborEntry, Trade } from '@/types';
 
 const TRADE_CODES: { value: Trade; label: string }[] = [
@@ -205,24 +205,26 @@ export function LaborSection({ entries, onChange, dailyReportId }: LaborSectionP
                   {allActiveCostCodeIds.map((ccId) => {
                     const cc = (costCodes || []).find((c) => c.id === ccId);
                     return (
-                      <th key={ccId} className="p-1 text-center border-r min-w-[90px]">
-                        <div className="flex items-center justify-center gap-1">
-                          <span className="text-[10px] text-muted-foreground font-normal truncate max-w-[70px]" title={cc?.description}>
+                      <th key={ccId} className="text-center p-2 font-bold text-xs uppercase tracking-wider border-r min-w-[280px]">
+                        <div className="flex items-center justify-center relative">
+                          <span className="truncate" title={cc?.description}>
                             {cc?.description || ''}
                           </span>
-                          <button
+                          <Button
                             type="button"
+                            variant="ghost"
+                            size="icon"
                             onClick={() => removeCostCodeColumn(ccId)}
-                            className="text-muted-foreground hover:text-destructive shrink-0"
+                            className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10 shrink-0 absolute right-0"
                           >
-                            <X className="w-3 h-3" />
-                          </button>
+                            <X className="w-4 h-4" />
+                          </Button>
                         </div>
                       </th>
                     );
                   })}
                   {/* Add cost code column button */}
-                  <th rowSpan={3} colSpan={2} className="p-1 align-middle">
+                  <th rowSpan={3} colSpan={2} className="p-1 align-middle min-w-[150px]">
                     <Select
                       value=""
                       onValueChange={(value) => addCostCodeColumn(value)}
@@ -243,7 +245,7 @@ export function LaborSection({ entries, onChange, dailyReportId }: LaborSectionP
 
                 {/* Column headers row */}
                 <tr className="bg-muted/70 border-b">
-                  <th className="text-left p-2 font-medium text-muted-foreground text-xs">Employee</th>
+                  <th className="text-left p-2 font-medium text-muted-foreground text-xs w-[170px]">Employee</th>
                   <th className="text-left p-2 font-medium text-muted-foreground text-xs">Trade</th>
                   <th className="text-center p-2 font-medium text-muted-foreground text-xs border-r min-w-[90px]">
                     ST / OT
@@ -258,7 +260,7 @@ export function LaborSection({ entries, onChange, dailyReportId }: LaborSectionP
                   {allActiveCostCodeIds.map((ccId) => {
                     const cc = (costCodes || []).find((c) => c.id === ccId);
                     return (
-                      <th key={ccId} className="text-center p-2 font-medium text-muted-foreground text-xs border-r min-w-[90px]">
+                      <th key={ccId} className="text-center p-2 font-medium text-muted-foreground text-xs border-r min-w-[280px]">
                         {cc?.code || ccId}
                       </th>
                     );
@@ -544,9 +546,9 @@ function TableRow({
         </td>
       ))}
       {/* Add cost code spacer */}
-      <td className="p-2"></td>
+      <td className="p-2 min-w-[110px]"></td>
       {/* Delete */}
-      <td className="p-2 text-right">
+      <td className="p-2 text-right min-w-[40px]">
         <Button
           type="button"
           variant="ghost"
@@ -554,7 +556,7 @@ function TableRow({
           className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10 ml-auto"
           onClick={onRemove}
         >
-          <Trash2 className="w-4 h-4" />
+          <X className="w-4 h-4" />
         </Button>
       </td>
     </tr>
