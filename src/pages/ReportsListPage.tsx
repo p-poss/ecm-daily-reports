@@ -19,7 +19,6 @@ import {
   Edit,
   Send,
   CheckCircle,
-  Trash2,
   Copy,
   X,
 } from 'lucide-react';
@@ -296,7 +295,7 @@ export function ReportsListPage() {
                             className="text-destructive hover:text-destructive hover:bg-destructive/10"
                             onClick={() => handleDeleteReport(report.id)}
                           >
-                            <Trash2 className="w-4 h-4" />
+                            <X className="w-4 h-4" />
                           </Button>
                         </>
                       ) : (
@@ -315,7 +314,7 @@ export function ReportsListPage() {
                             className="text-destructive hover:text-destructive hover:bg-destructive/10"
                             onClick={() => handleDeleteReport(report.id)}
                           >
-                            <Trash2 className="w-4 h-4" />
+                            <X className="w-4 h-4" />
                           </Button>
                         </>
                       )}
