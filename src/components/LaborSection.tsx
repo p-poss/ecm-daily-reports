@@ -203,9 +203,9 @@ export function LaborSection({ entries, onChange, dailyReportId }: LaborSectionP
                   {allActiveCostCodeIds.map((ccId) => {
                     const cc = (costCodes || []).find((c) => c.id === ccId);
                     return (
-                      <th key={ccId} className="text-center p-2 font-bold text-xs uppercase tracking-wider border-r min-w-[160px]">
-                        <div className="flex items-center justify-center relative">
-                          <span className="truncate" title={cc?.description}>
+                      <th key={ccId} className="text-left p-2 font-bold text-xs uppercase tracking-wider border-r w-[160px] min-w-[160px] max-w-[160px]">
+                        <div className="flex items-center justify-between overflow-hidden gap-2">
+                          <span className="truncate min-w-0" title={cc?.description}>
                             {cc?.description || ''}
                           </span>
                           <Button
@@ -213,7 +213,7 @@ export function LaborSection({ entries, onChange, dailyReportId }: LaborSectionP
                             variant="ghost"
                             size="icon"
                             onClick={() => removeCostCodeColumn(ccId)}
-                            className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10 shrink-0 absolute right-0"
+                            className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10 shrink-0"
                           >
                             <X className="w-4 h-4" />
                           </Button>
@@ -258,7 +258,7 @@ export function LaborSection({ entries, onChange, dailyReportId }: LaborSectionP
                   {allActiveCostCodeIds.map((ccId) => {
                     const cc = (costCodes || []).find((c) => c.id === ccId);
                     return (
-                      <th key={ccId} className="text-center p-2 font-medium text-muted-foreground text-xs border-r min-w-[160px]">
+                      <th key={ccId} className="text-center p-2 font-medium text-muted-foreground text-xs border-r w-[160px] min-w-[160px] max-w-[160px]">
                         {cc?.code || ccId}
                       </th>
                     );
@@ -277,7 +277,7 @@ export function LaborSection({ entries, onChange, dailyReportId }: LaborSectionP
                   <th className="p-0"><SplitHeaderLabel /></th>
                   <th className="p-0 border-r"><SplitHeaderLabel /></th>
                   {allActiveCostCodeIds.map((ccId) => (
-                    <th key={ccId} className="p-0 border-r"><SplitHeaderLabel /></th>
+                    <th key={ccId} className="p-0 border-r w-[160px] min-w-[160px] max-w-[160px]"><SplitHeaderLabel /></th>
                   ))}
                 </tr>
               </thead>
@@ -335,7 +335,7 @@ export function LaborSection({ entries, onChange, dailyReportId }: LaborSectionP
                     const stTotal = entries.reduce((s, e) => s + (e.costCodeHours?.[ccId]?.st || 0), 0);
                     const otTotal = entries.reduce((s, e) => s + (e.costCodeHours?.[ccId]?.ot || 0), 0);
                     return (
-                      <td key={ccId} className="p-2 border-r">
+                      <td key={ccId} className="p-2 border-r w-[160px] min-w-[160px] max-w-[160px]">
                         <div className="flex items-center justify-center w-[90px] mx-auto text-xs">
                           <span className="flex-1 text-center">{stTotal || ''}</span>
                           <span className="text-border">|</span>
@@ -534,7 +534,7 @@ function TableRow({
       </td>
       {/* Dynamic cost code columns */}
       {activeCostCodeIds.map((ccId) => (
-        <td key={ccId} className="p-2 border-r">
+        <td key={ccId} className="p-2 border-r w-[160px] min-w-[160px] max-w-[160px]">
           <SplitHoursCell
             stValue={entry.costCodeHours?.[ccId]?.st || 0}
             otValue={entry.costCodeHours?.[ccId]?.ot || 0}
