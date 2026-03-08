@@ -5,7 +5,7 @@ import { useNavigation } from '@/contexts/NavigationContext';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { SyncIndicator } from '@/components/SyncIndicator';
-import { LogOut, Briefcase, MapPin, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Briefcase, MapPin, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/ThemeToggle';
 
@@ -53,25 +53,22 @@ export function JobsListPage() {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="bg-background border-b p-4 sticky top-0 z-10">
-        <div className="flex items-center justify-between max-w-7xl mx-auto">
-          <div>
-            <h1 className="text-lg font-bold text-foreground">
-              My Jobs
-            </h1>
+        <div className="flex items-start max-w-7xl mx-auto relative">
+          <Button
+            variant="outline"
+            onClick={logout}
+            className="flex items-center gap-2 text-muted-foreground hover:text-foreground absolute left-0"
+          >
+            <ArrowLeft className="w-5 h-5" />
+            <span>Logout</span>
+          </Button>
+          <div className="flex-1 text-center">
+            <h1 className="text-lg font-bold text-foreground">My Jobs</h1>
             <p className="text-sm text-muted-foreground">{foreman?.name}</p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 absolute right-0">
             <SyncIndicator />
             <ThemeToggle />
-            <div data-orientation="vertical" role="none" className="shrink-0 bg-border w-[1px] mx-1 h-8" />
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={logout}
-              className="text-foreground hover:bg-muted"
-            >
-              <LogOut className="w-5 h-5" />
-            </Button>
           </div>
         </div>
       </header>

@@ -134,21 +134,16 @@ export function ReportsListPage() {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="bg-background border-b p-4 sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex items-center justify-between">
-            <button
-              onClick={navigateToJobs}
-              className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
-            >
-              <ArrowLeft className="w-5 h-5" />
-              <span>Jobs</span>
-            </button>
-            <div className="flex items-center gap-3">
-              <SyncIndicator />
-              <ThemeToggle />
-            </div>
-          </div>
-          <div className="mt-2">
+        <div className="flex items-start max-w-7xl mx-auto relative">
+          <Button
+            variant="outline"
+            onClick={navigateToJobs}
+            className="flex items-center gap-2 text-muted-foreground hover:text-foreground absolute left-0"
+          >
+            <ArrowLeft className="w-5 h-5" />
+            <span>Jobs</span>
+          </Button>
+          <div className="flex-1 text-center">
             {job ? (
               <>
                 <h1 className="text-lg font-bold text-foreground">{job.jobNumber}</h1>
@@ -156,10 +151,14 @@ export function ReportsListPage() {
               </>
             ) : (
               <>
-                <div className="h-7 w-24 bg-muted rounded animate-pulse" />
-                <div className="h-5 w-40 bg-muted rounded animate-pulse mt-1" />
+                <div className="h-7 w-24 bg-muted rounded animate-pulse mx-auto" />
+                <div className="h-5 w-40 bg-muted rounded animate-pulse mt-1 mx-auto" />
               </>
             )}
+          </div>
+          <div className="flex items-center gap-3 absolute right-0">
+            <SyncIndicator />
+            <ThemeToggle />
           </div>
         </div>
       </header>
@@ -291,7 +290,7 @@ export function ReportsListPage() {
                             Submit
                           </Button>
                           <Button
-                            variant="ghost"
+                            variant="outline"
                             size="icon"
                             className="text-destructive hover:text-destructive hover:bg-destructive/10"
                             onClick={() => handleDeleteReport(report.id)}
@@ -310,7 +309,7 @@ export function ReportsListPage() {
                             View / Edit
                           </Button>
                           <Button
-                            variant="ghost"
+                            variant="outline"
                             size="icon"
                             className="text-destructive hover:text-destructive hover:bg-destructive/10"
                             onClick={() => handleDeleteReport(report.id)}
@@ -335,7 +334,7 @@ export function ReportsListPage() {
             <div className="flex items-center justify-between p-4 border-b">
               <h2 className="text-lg font-semibold">New Report</h2>
               <Button
-                variant="ghost"
+                variant="outline"
                 size="icon"
                 onClick={() => setShowNewReportModal(false)}
               >
