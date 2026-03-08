@@ -6,6 +6,7 @@ import { useNavigation } from '@/contexts/NavigationContext';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { SelectionCard } from '@/components/ui/selection-card';
 import { SyncIndicator } from '@/components/SyncIndicator';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import {
@@ -343,25 +344,16 @@ export function ReportsListPage() {
             </div>
             <div className="p-4 space-y-3 overflow-y-auto">
               {/* Start Blank Option */}
-              <button
-                className="w-full p-3 rounded-lg border hover:border-primary hover:bg-primary/5 transition-colors text-left"
+              <SelectionCard
+                icon={<Plus className="w-4 h-4 text-primary" />}
+                iconClassName="bg-primary/10"
+                title="Start Blank"
+                description="Create a new empty report"
                 onClick={() => {
                   setShowNewReportModal(false);
                   selectedJobId && navigateToReportForm(selectedJobId);
                 }}
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                    <Plus className="w-4 h-4 text-primary" />
-                  </div>
-                  <div>
-                    <div className="font-medium">Start Blank</div>
-                    <div className="text-sm text-muted-foreground">
-                      Create a new empty report
-                    </div>
-                  </div>
-                </div>
-              </button>
+              />
 
               {/* Copy from Previous Section */}
               {reports && reports.length > 0 && (
@@ -379,31 +371,24 @@ export function ReportsListPage() {
 
                   <div className="space-y-2">
                     {reports.slice(0, 5).map((report) => (
-                      <button
+                      <SelectionCard
                         key={report.id}
-                        className="w-full p-3 rounded-lg border hover:border-primary hover:bg-primary/5 transition-colors text-left"
+                        icon={<Copy className="w-4 h-4 text-muted-foreground" />}
+                        iconClassName="bg-muted"
+                        title={
+                          <span className="flex items-center gap-2">
+                            {formatDate(report.date)}
+                            <Badge variant="secondary" className="text-xs">
+                              {report.status}
+                            </Badge>
+                          </span>
+                        }
+                        description={`${report.dayOfWeek} • Copy labor entries`}
                         onClick={() => {
                           setShowNewReportModal(false);
                           selectedJobId && navigateToReportForm(selectedJobId, undefined, report.id);
                         }}
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">
-                            <Copy className="w-4 h-4 text-muted-foreground" />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="font-medium flex items-center gap-2">
-                              {formatDate(report.date)}
-                              <Badge variant="secondary" className="text-xs">
-                                {report.status}
-                              </Badge>
-                            </div>
-                            <div className="text-sm text-muted-foreground">
-                              {report.dayOfWeek} • Copy labor entries
-                            </div>
-                          </div>
-                        </div>
-                      </button>
+                      />
                     ))}
                   </div>
                 </>
