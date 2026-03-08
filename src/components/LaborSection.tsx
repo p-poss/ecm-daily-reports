@@ -222,7 +222,7 @@ export function LaborSection({ entries, onChange, dailyReportId }: LaborSectionP
                     );
                   })}
                   {/* Add cost code column button */}
-                  <th rowSpan={3} colSpan={2} className="p-1 align-middle min-w-[150px]">
+                  <th rowSpan={3} colSpan={2} className="p-1 align-middle w-[160px] min-w-[160px] max-w-[160px]">
                     <Select
                       value=""
                       onValueChange={(value) => addCostCodeColumn(value)}
@@ -544,9 +544,9 @@ function TableRow({
         </td>
       ))}
       {/* Add cost code spacer */}
-      <td className="p-2 min-w-[110px]"></td>
+      <td className="p-2"></td>
       {/* Delete */}
-      <td className="p-2 text-right min-w-[40px]">
+      <td className="p-2 text-right">
         <Button
           type="button"
           variant="ghost"
