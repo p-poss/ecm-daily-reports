@@ -67,7 +67,7 @@ export function WeatherSelector({ value, onChange }: WeatherSelectorProps) {
     <div className="space-y-2">
       <Label>Weather</Label>
       <Select value={selectValue} onValueChange={handleSelectChange}>
-        <SelectTrigger className="w-full text-sm">
+        <SelectTrigger className="w-fit min-w-48 text-sm">
           <SelectValue placeholder="Select weather conditions" />
         </SelectTrigger>
         <SelectContent>
