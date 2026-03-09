@@ -19,7 +19,7 @@ import { JobDiarySection } from '@/components/JobDiarySection';
 import { SignatureCapture } from '@/components/SignatureCapture';
 import { PhotoAttachments } from '@/components/PhotoAttachments';
 import { DeadlineIndicator } from '@/components/DeadlineIndicator';
-import { ArrowLeft, Save, Send, Calendar as CalendarIcon, ChevronDown } from 'lucide-react';
+import { ArrowLeft, Calendar as CalendarIcon, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import type { DailyReport, LaborEntry, JobDiaryEntry, PhotoAttachment, Weather } from '@/types';
@@ -478,7 +478,6 @@ export function DailyReportPage() {
             onClick={saveDraft}
             disabled={isSaving}
           >
-            <Save className="w-4 h-4 mr-2" />
             {isSaving ? 'Saving...' : 'Save Draft'}
           </Button>
           <Button
@@ -486,7 +485,6 @@ export function DailyReportPage() {
             onClick={submitReport}
             disabled={!signature || isSubmitting}
           >
-            <Send className="w-4 h-4 mr-2" />
             {isSubmitting ? 'Submitting...' : 'Submit Report'}
           </Button>
         </div>
