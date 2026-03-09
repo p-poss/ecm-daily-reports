@@ -364,7 +364,7 @@ export function DailyReportPage() {
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-lg">
               <CalendarIcon className="w-5 h-5" />
-              Report Details
+              General
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
