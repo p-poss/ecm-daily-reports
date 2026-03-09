@@ -185,7 +185,7 @@ export function LaborSection({ entries, onChange, dailyReportId }: LaborSectionP
       ) : (
         /* Table View - PDF-matching layout */
         <Card className="overflow-hidden">
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto px-4">
             <table className="w-full text-sm border-collapse">
               {/* Description row above cost code headers */}
               <thead>
@@ -222,7 +222,7 @@ export function LaborSection({ entries, onChange, dailyReportId }: LaborSectionP
                     );
                   })}
                   {/* Add cost code column button */}
-                  <th rowSpan={3} colSpan={2} className="p-1 align-middle w-[160px] min-w-[160px] max-w-[160px]">
+                  <th rowSpan={3} colSpan={2} className="p-1 align-top w-[160px] min-w-[160px] max-w-[160px]">
                     <Select
                       value=""
                       onValueChange={(value) => addCostCodeColumn(value)}
