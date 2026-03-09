@@ -210,7 +210,7 @@ export function LaborSection({ entries, onChange, dailyReportId }: LaborSectionP
                           </span>
                           <Button
                             type="button"
-                            variant="ghost"
+                            variant="outline"
                             size="icon"
                             onClick={() => removeCostCodeColumn(ccId)}
                             className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10 shrink-0"
@@ -549,7 +549,7 @@ function TableRow({
       <td className="p-2 text-right">
         <Button
           type="button"
-          variant="ghost"
+          variant="outline"
           size="icon"
           className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10 ml-auto"
           onClick={onRemove}
