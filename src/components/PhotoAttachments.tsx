@@ -86,13 +86,15 @@ export function PhotoAttachments({ photos, onChange, dailyReportId }: PhotoAttac
                   alt={photo.caption || 'Photo'}
                   className="w-full aspect-square object-cover"
                 />
-                <button
+                <Button
                   type="button"
+                  variant="outline"
+                  size="icon"
                   onClick={() => removePhoto(photo.id)}
-                  className="absolute top-1 right-1 p-1 bg-black/50 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                  className="absolute top-1 right-1 h-6 w-6 text-destructive hover:text-destructive hover:bg-destructive/10"
                 >
-                  <X className="w-4 h-4" />
-                </button>
+                  <X className="w-3 h-3" />
+                </Button>
                 <Input
                   type="text"
                   placeholder="Add caption..."

@@ -323,7 +323,7 @@ export function DailyReportPage() {
   return (
     <div className="min-h-screen bg-muted">
       {/* Header */}
-      <header className="bg-background border-b p-4 sticky top-0 z-10">
+      <header className="bg-card border-b p-4 sticky top-0 z-10">
         <div className="flex items-start max-w-7xl mx-auto relative">
           <Button
             variant="outline"
@@ -372,7 +372,7 @@ export function DailyReportPage() {
                   <Button
                     variant="outline"
                     className={cn(
-                      "w-full justify-between text-left font-normal shadow-none",
+                      "w-full justify-between text-left font-normal",
                       !date && "text-muted-foreground"
                     )}
                     disabled={isEditing && existingReport?.status === 'Submitted'}
@@ -467,7 +467,7 @@ export function DailyReportPage() {
       </main>
 
       {/* Fixed Bottom Actions */}
-      <div className="fixed bottom-0 left-0 right-0 bg-background border-t p-4 safe-area-inset-bottom">
+      <div className="fixed bottom-0 left-0 right-0 bg-card border-t p-4 safe-area-inset-bottom">
         <div className="max-w-7xl mx-auto flex gap-3">
           <Button
             variant="outline"

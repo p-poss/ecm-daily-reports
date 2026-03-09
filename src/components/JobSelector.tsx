@@ -40,7 +40,7 @@ export function JobSelector({ value, onChange }: JobSelectorProps) {
     <div className="space-y-2">
       <Label>Job</Label>
       <Select value={value} onValueChange={onChange}>
-        <SelectTrigger className="text-base">
+        <SelectTrigger className="text-sm">
           <SelectValue placeholder="Select a job">
             {selectedJob ? (
               <span>

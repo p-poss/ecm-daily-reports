@@ -138,7 +138,7 @@ function DiaryEntryForm({
           value={entry.costCodeId || 'none'}
           onValueChange={(value) => onUpdate({ costCodeId: value === 'none' ? undefined : value })}
         >
-          <SelectTrigger className="text-base">
+          <SelectTrigger className="text-sm">
             <SelectValue placeholder="Select cost code" />
           </SelectTrigger>
           <SelectContent>

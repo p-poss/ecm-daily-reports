@@ -133,7 +133,7 @@ export function ReportsListPage() {
   return (
     <div className="min-h-screen bg-muted">
       {/* Header */}
-      <header className="bg-background border-b p-4 sticky top-0 z-10">
+      <header className="bg-card border-b p-4 sticky top-0 z-10">
         <div className="flex items-start max-w-7xl mx-auto relative">
           <Button
             variant="outline"
@@ -167,11 +167,10 @@ export function ReportsListPage() {
       <div className="max-w-7xl mx-auto p-4 pb-0">
         <Button
           variant="outline"
-          className="w-full"
-          size="lg"
+          className="w-full bg-card"
           onClick={() => setShowNewReportModal(true)}
         >
-          <Plus className="w-5 h-5 mr-2" />
+          <Plus className="w-4 h-4 mr-2" />
           Create New Report
         </Button>
       </div>
@@ -195,7 +194,7 @@ export function ReportsListPage() {
               <Card key={report.id} className="overflow-hidden">
                 <CardContent className="p-0">
                   {/* Report Header */}
-                  <div className="p-4 border-b bg-muted">
+                  <div className="p-4 border-b">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <Calendar className="w-4 h-4 text-muted-foreground" />

@@ -190,7 +190,7 @@ export function LaborSection({ entries, onChange, dailyReportId }: LaborSectionP
               {/* Description row above cost code headers */}
               <thead>
                 {/* Top row: section labels + cost code descriptions */}
-                <tr className="bg-muted border-b border-b-border">
+                <tr className="border-b border-b-border">
                   {/* LABOR section header */}
                   <th colSpan={3} className="text-left p-2 font-bold text-xs uppercase tracking-wider border-r border-r-border">
                     Labor
@@ -242,7 +242,7 @@ export function LaborSection({ entries, onChange, dailyReportId }: LaborSectionP
                 </tr>
 
                 {/* Column headers row */}
-                <tr className="bg-muted/70 border-b border-b-border">
+                <tr className="border-b border-b-border">
                   <th className="text-left p-2 font-medium text-muted-foreground text-xs w-[170px]">Employee</th>
                   <th className="text-left p-2 font-medium text-muted-foreground text-xs">Trade</th>
                   <th className="text-center p-2 font-medium text-muted-foreground text-xs border-r border-r-border min-w-[90px]">
@@ -266,7 +266,7 @@ export function LaborSection({ entries, onChange, dailyReportId }: LaborSectionP
                 </tr>
 
                 {/* ST|OT sub-header row */}
-                <tr className="bg-muted/40 border-b border-b-border">
+                <tr className="border-b border-b-border">
                   <th className="p-0"></th>
                   <th className="p-0"></th>
                   <th className="p-0 border-r border-r-border"><SplitHeaderLabel /></th>
@@ -297,7 +297,7 @@ export function LaborSection({ entries, onChange, dailyReportId }: LaborSectionP
                   />
                 ))}
                 {/* Totals Row */}
-                <tr className="border-t-2 border-t-border bg-muted font-medium">
+                <tr className="border-t-2 border-t-border font-medium">
                   <td className="p-2">Totals</td>
                   <td className="p-2"></td>
                   <td className="p-2 border-r border-r-border">
@@ -357,7 +357,7 @@ export function LaborSection({ entries, onChange, dailyReportId }: LaborSectionP
       <Button
         type="button"
         variant="outline"
-        className="w-full"
+        className="w-full bg-card"
         onClick={addEntry}
       >
         <Plus className="w-4 h-4 mr-2" />
@@ -399,7 +399,7 @@ function TableRow({
   }
 
   return (
-    <tr className="border-b border-b-border hover:bg-muted/50">
+    <tr className="border-b border-b-border">
       {/* Employee */}
       <td className="p-2">
         <Select
@@ -435,7 +435,7 @@ function TableRow({
           value={entry.trade}
           onValueChange={(value) => onUpdate({ trade: value as Trade })}
         >
-          <SelectTrigger className="h-8 text-sm w-[65px]">
+          <SelectTrigger className="h-8 text-sm w-[90px]">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
