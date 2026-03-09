@@ -372,7 +372,7 @@ export function DailyReportPage() {
                   <Button
                     variant="outline"
                     className={cn(
-                      "w-full justify-between text-left font-normal",
+                      "w-fit min-w-48 justify-between text-left font-normal",
                       !date && "text-muted-foreground"
                     )}
                     disabled={isEditing && existingReport?.status === 'Submitted'}

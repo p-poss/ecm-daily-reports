@@ -343,8 +343,8 @@ export function ReportsListPage() {
             <div className="p-4 space-y-3 overflow-y-auto">
               {/* Start Blank Option */}
               <SelectionCard
-                icon={<Plus className="w-4 h-4 text-primary" />}
-                iconClassName="bg-primary/10"
+                icon={<Plus className="w-4 h-4 text-muted-foreground" />}
+                iconClassName="bg-muted"
                 title="Start Blank"
                 description="Create a new empty report"
                 onClick={() => {
