@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { Plus, X, BookOpen } from 'lucide-react';
+import { Plus, X, List } from 'lucide-react';
 import type { JobDiaryEntry } from '@/types';
 
 interface JobDiarySectionProps {
@@ -52,7 +52,7 @@ export function JobDiarySection({ entries, onChange, dailyReportId }: JobDiarySe
     <Card>
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2 text-lg">
-          <BookOpen className="w-5 h-5" />
+          <List className="w-5 h-5" />
           Job Diary
         </CardTitle>
       </CardHeader>
