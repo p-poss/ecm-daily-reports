@@ -69,9 +69,9 @@ export function DeadlineIndicator({
   }
 
   return (
-    <div className="space-y-2">
+    <div className="divide-y">
       {/* Daily Target */}
-      <div className="flex items-center justify-between text-sm">
+      <div className="flex items-center justify-between text-sm py-3">
         <div className="flex items-center gap-2">
           <Clock className="w-4 h-4 text-muted-foreground" />
           <span className="text-muted-foreground">Daily Target:</span>
@@ -89,7 +89,7 @@ export function DeadlineIndicator({
       </div>
 
       {/* Payroll Deadline */}
-      <div className="flex items-center justify-between text-sm">
+      <div className="flex items-center justify-between text-sm py-3">
         <div className="flex items-center gap-2">
           <AlertTriangle className={`w-4 h-4 ${isPayrollLate ? 'text-destructive' : 'text-muted-foreground'}`} />
           <span className={isPayrollLate ? 'text-destructive font-medium' : 'text-muted-foreground'}>
@@ -110,7 +110,7 @@ export function DeadlineIndicator({
 
       {/* Time remaining indicator */}
       {!isPayrollLate && (
-        <p className="text-xs text-muted-foreground text-right">
+        <p className="text-xs text-muted-foreground text-right py-1">
           {getTimeRemaining(payrollDeadline)}
         </p>
       )}
