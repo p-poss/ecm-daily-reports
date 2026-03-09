@@ -7,7 +7,7 @@ import { useNavigation } from '@/contexts/NavigationContext';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -19,7 +19,7 @@ import { JobDiarySection } from '@/components/JobDiarySection';
 import { SignatureCapture } from '@/components/SignatureCapture';
 import { PhotoAttachments } from '@/components/PhotoAttachments';
 import { DeadlineIndicator } from '@/components/DeadlineIndicator';
-import { ArrowLeft, Calendar as CalendarIcon, ChevronDown } from 'lucide-react';
+import { ArrowLeft, Calendar as CalendarIcon, ChevronDown, Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import type { DailyReport, LaborEntry, JobDiaryEntry, PhotoAttachment, Weather } from '@/types';
@@ -361,7 +361,10 @@ export function DailyReportPage() {
       <main className="max-w-7xl mx-auto p-4 space-y-8 pb-24">
         {/* Date and Weather */}
         <Card>
-          <CardContent className="space-y-4 pt-6">
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-lg"><Info className="w-5 h-5" />General</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label>Date</Label>
               <Popover>
