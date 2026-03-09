@@ -15,7 +15,7 @@ const SelectionCard = React.forwardRef<HTMLButtonElement, SelectionCardProps>(
       <button
         ref={ref}
         className={cn(
-          "w-full p-3 rounded-lg border shadow-sm hover:border-primary hover:bg-primary/5 transition-colors text-left",
+          "w-full p-3 rounded-lg border shadow-sm hover:border-primary hover:bg-primary/5 transition-colors text-left cursor-pointer",
           className
         )}
         {...props}
