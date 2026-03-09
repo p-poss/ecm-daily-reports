@@ -289,9 +289,8 @@ export function ReportsListPage() {
                             Submit
                           </Button>
                           <Button
-                            variant="outline"
+                            variant="destructive"
                             size="icon"
-                            className="text-destructive hover:text-destructive hover:bg-destructive/10"
                             onClick={() => handleDeleteReport(report.id)}
                           >
                             <X className="w-4 h-4" />
@@ -308,9 +307,8 @@ export function ReportsListPage() {
                             View / Edit
                           </Button>
                           <Button
-                            variant="outline"
+                            variant="destructive"
                             size="icon"
-                            className="text-destructive hover:text-destructive hover:bg-destructive/10"
                             onClick={() => handleDeleteReport(report.id)}
                           >
                             <X className="w-4 h-4" />
