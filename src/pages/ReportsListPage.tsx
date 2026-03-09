@@ -218,10 +218,10 @@ export function ReportsListPage() {
                   </div>
 
                   {/* Report Details */}
-                  <div className="p-4 space-y-3">
+                  <div className="px-4 divide-y">
                     {/* Submitted Date */}
                     {report.submittedAt && (
-                      <div className="flex items-center justify-between text-sm">
+                      <div className="flex items-center justify-between text-sm py-3">
                         <span className="flex items-center gap-2 text-muted-foreground">
                           <CheckCircle className="w-4 h-4 text-green-600" />
                           Submitted
@@ -231,7 +231,7 @@ export function ReportsListPage() {
                     )}
 
                     {/* Daily Target (Desired Date) */}
-                    <div className="flex items-center justify-between text-sm">
+                    <div className="flex items-center justify-between text-sm py-3">
                       <span className="flex items-center gap-2 text-muted-foreground">
                         <Clock className="w-4 h-4" />
                         Daily Target
@@ -242,7 +242,7 @@ export function ReportsListPage() {
                     </div>
 
                     {/* Hard Deadline (Payroll) */}
-                    <div className="flex items-center justify-between text-sm">
+                    <div className="flex items-center justify-between text-sm py-3">
                       <span className="flex items-center gap-2 text-muted-foreground">
                         <AlertTriangle className={`w-4 h-4 ${timePastDue ? 'text-destructive' : ''}`} />
                         Payroll Deadline
@@ -327,7 +327,7 @@ export function ReportsListPage() {
       {/* New Report Modal */}
       {showNewReportModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <Card className="w-full max-w-md max-h-[80vh] overflow-hidden flex flex-col">
+          <Card className="w-full max-w-md max-h-[80dvh] overflow-hidden flex flex-col">
             <div className="flex items-center justify-between p-4 border-b">
               <h2 className="text-lg font-semibold">New Report</h2>
               <Button
