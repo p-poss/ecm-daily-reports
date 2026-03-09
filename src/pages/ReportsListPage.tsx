@@ -138,7 +138,7 @@ export function ReportsListPage() {
           <Button
             variant="outline"
             onClick={navigateToJobs}
-            className="flex items-center gap-2 text-muted-foreground hover:text-foreground absolute left-0"
+            className="flex items-center gap-2 absolute left-0"
           >
             <ArrowLeft className="w-5 h-5" />
             <span>Jobs</span>
