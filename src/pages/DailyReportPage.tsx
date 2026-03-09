@@ -20,7 +20,7 @@ import { SubcontractorsDeliveriesSection } from '@/components/SubcontractorsDeli
 import { SignatureCapture } from '@/components/SignatureCapture';
 import { PhotoAttachments } from '@/components/PhotoAttachments';
 import { DeadlineIndicator } from '@/components/DeadlineIndicator';
-import { ArrowLeft, Calendar as CalendarIcon, ChevronDown, Info } from 'lucide-react';
+import { ArrowLeft, BookOpen, Calendar as CalendarIcon, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import type { DailyReport, LaborEntry, JobDiaryEntry, SubcontractorWork, MaterialDelivered, PhotoAttachment, Weather } from '@/types';
@@ -399,7 +399,7 @@ export function DailyReportPage() {
         {/* Date and Weather */}
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-lg"><Info className="w-5 h-5" />General</CardTitle>
+            <CardTitle className="flex items-center gap-2 text-lg"><BookOpen className="w-5 h-5" />General</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
