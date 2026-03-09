@@ -192,18 +192,18 @@ export function LaborSection({ entries, onChange, dailyReportId }: LaborSectionP
                 {/* Top row: section labels + cost code descriptions */}
                 <tr className="border-b border-b-border">
                   {/* LABOR section header */}
-                  <th colSpan={3} className="text-left p-2 pl-4 font-bold text-xs uppercase tracking-wider border-r border-r-border">
+                  <th colSpan={3} className="text-left p-2 pl-4 pt-4 font-bold text-xs uppercase tracking-wider border-r border-r-border">
                     Labor
                   </th>
                   {/* EQUIPMENT section header */}
-                  <th colSpan={6} className="text-left p-2 font-bold text-xs uppercase tracking-wider border-r border-r-border">
+                  <th colSpan={6} className="text-left p-2 pt-4 font-bold text-xs uppercase tracking-wider border-r border-r-border">
                     Equipment
                   </th>
                   {/* Cost code description labels */}
                   {allActiveCostCodeIds.map((ccId) => {
                     const cc = (costCodes || []).find((c) => c.id === ccId);
                     return (
-                      <th key={ccId} className="text-left p-2 font-bold text-xs uppercase tracking-wider border-r border-r-border w-[160px] min-w-[160px] max-w-[160px]">
+                      <th key={ccId} className="text-left p-2 pt-4 font-bold text-xs uppercase tracking-wider border-r border-r-border w-[160px] min-w-[160px] max-w-[160px]">
                         <div className="flex items-center justify-between overflow-hidden gap-2">
                           <span className="truncate min-w-0" title={cc?.description}>
                             {cc?.description || ''}
@@ -222,7 +222,7 @@ export function LaborSection({ entries, onChange, dailyReportId }: LaborSectionP
                     );
                   })}
                   {/* Add cost code column button */}
-                  <th rowSpan={3} colSpan={2} className="p-1 pr-4 align-top w-[160px] min-w-[160px] max-w-[160px]">
+                  <th rowSpan={3} colSpan={2} className="p-1 pl-2 pr-4 pt-4 align-top w-[160px] min-w-[160px] max-w-[160px]">
                     <Select
                       value=""
                       onValueChange={(value) => addCostCodeColumn(value)}
@@ -243,7 +243,7 @@ export function LaborSection({ entries, onChange, dailyReportId }: LaborSectionP
 
                 {/* Column headers row */}
                 <tr className="border-b border-b-border">
-                  <th className="text-left p-2 pl-4 font-medium text-muted-foreground text-xs w-[170px]">Employee</th>
+                  <th className="text-left p-2 pl-4 font-medium text-muted-foreground text-xs min-w-[170px]">Employee</th>
                   <th className="text-left p-2 font-medium text-muted-foreground text-xs">Trade</th>
                   <th className="text-center p-2 font-medium text-muted-foreground text-xs border-r border-r-border min-w-[90px]">
                     ST / OT
@@ -298,33 +298,33 @@ export function LaborSection({ entries, onChange, dailyReportId }: LaborSectionP
                 ))}
                 {/* Totals Row */}
                 <tr className="border-t-2 border-t-border font-medium">
-                  <td className="p-2 pl-4">Totals</td>
-                  <td className="p-2"></td>
-                  <td className="p-2 border-r border-r-border">
+                  <td className="p-2 pl-4 pb-4">Totals</td>
+                  <td className="p-2 pb-4"></td>
+                  <td className="p-2 pb-4 border-r border-r-border">
                     <div className="flex items-center justify-center w-[90px] mx-auto text-xs">
                       <span className="flex-1 text-center font-bold">{totalST}</span>
                       <span className="text-border">|</span>
                       <span className="flex-1 text-center font-bold">{totalOT}</span>
                     </div>
                   </td>
-                  <td className="p-2"></td>
-                  <td className="p-2"></td>
-                  <td className="p-2"></td>
-                  <td className="p-2">
+                  <td className="p-2 pb-4"></td>
+                  <td className="p-2 pb-4"></td>
+                  <td className="p-2 pb-4"></td>
+                  <td className="p-2 pb-4">
                     <div className="flex items-center justify-center w-[90px] mx-auto text-xs">
                       <span className="flex-1 text-center">{entries.reduce((s, e) => s + e.idleStHours, 0) || ''}</span>
                       <span className="text-border">|</span>
                       <span className="flex-1 text-center">{entries.reduce((s, e) => s + e.idleOtHours, 0) || ''}</span>
                     </div>
                   </td>
-                  <td className="p-2">
+                  <td className="p-2 pb-4">
                     <div className="flex items-center justify-center w-[90px] mx-auto text-xs">
                       <span className="flex-1 text-center">{entries.reduce((s, e) => s + e.downStHours, 0) || ''}</span>
                       <span className="text-border">|</span>
                       <span className="flex-1 text-center">{entries.reduce((s, e) => s + e.downOtHours, 0) || ''}</span>
                     </div>
                   </td>
-                  <td className="p-2 border-r border-r-border">
+                  <td className="p-2 pb-4 border-r border-r-border">
                     <div className="flex items-center justify-center w-[90px] mx-auto text-xs">
                       <span className="flex-1 text-center">{entries.reduce((s, e) => s + e.workStHours, 0) || ''}</span>
                       <span className="text-border">|</span>
@@ -335,7 +335,7 @@ export function LaborSection({ entries, onChange, dailyReportId }: LaborSectionP
                     const stTotal = entries.reduce((s, e) => s + (e.costCodeHours?.[ccId]?.st || 0), 0);
                     const otTotal = entries.reduce((s, e) => s + (e.costCodeHours?.[ccId]?.ot || 0), 0);
                     return (
-                      <td key={ccId} className="p-2 border-r border-r-border w-[160px] min-w-[160px] max-w-[160px]">
+                      <td key={ccId} className="p-2 pb-4 border-r border-r-border w-[160px] min-w-[160px] max-w-[160px]">
                         <div className="flex items-center justify-center w-[90px] mx-auto text-xs">
                           <span className="flex-1 text-center">{stTotal || ''}</span>
                           <span className="text-border">|</span>
@@ -344,8 +344,8 @@ export function LaborSection({ entries, onChange, dailyReportId }: LaborSectionP
                       </td>
                     );
                   })}
-                  <td className="p-2"></td>
-                  <td className="p-2 pr-4"></td>
+                  <td className="p-2 pb-4"></td>
+                  <td className="p-2 pb-4 pr-4"></td>
                 </tr>
               </tbody>
             </table>
@@ -416,7 +416,7 @@ function TableRow({
             });
           }}
         >
-          <SelectTrigger className="h-8 text-sm min-w-[130px]">
+          <SelectTrigger className="h-8 text-sm w-full">
             <SelectValue placeholder="N/A" />
           </SelectTrigger>
           <SelectContent>
