@@ -88,10 +88,10 @@ export function PhotoAttachments({ photos, onChange, dailyReportId }: PhotoAttac
                 />
                 <Button
                   type="button"
-                  variant="outline"
+                  variant="destructive"
                   size="icon"
                   onClick={() => removePhoto(photo.id)}
-                  className="absolute top-1 right-1 h-6 w-6 text-destructive hover:text-destructive hover:bg-destructive/10"
+                  className="absolute top-1 right-1 h-6 w-6"
                 >
                   <X className="w-3 h-3" />
                 </Button>

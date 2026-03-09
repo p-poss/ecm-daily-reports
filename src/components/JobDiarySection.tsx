@@ -114,9 +114,9 @@ function DiaryEntryForm({
         </div>
         <Button
           type="button"
-          variant="outline"
+          variant="destructive"
           size="icon"
-          className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+          className="h-8 w-8"
           onClick={onRemove}
         >
           <X className="w-4 h-4" />
