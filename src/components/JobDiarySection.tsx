@@ -1,6 +1,7 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db, generateId } from '@/db/database';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import {
@@ -53,7 +54,7 @@ export function JobDiarySection({ entries, onChange, dailyReportId }: JobDiarySe
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2 text-lg">
           <List className="w-5 h-5" />
-          Job Diary
+          Job Production + Notes
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -150,6 +151,51 @@ function DiaryEntryForm({
             ))}
           </SelectContent>
         </Select>
+      </div>
+
+      {/* Loads, Yield, Total */}
+      <div className="grid grid-cols-3 gap-3">
+        <div className="space-y-1.5">
+          <Label className="text-xs text-muted-foreground">Loads</Label>
+          <Input
+            type="number"
+            inputMode="decimal"
+            value={entry.loads ?? ''}
+            onChange={(e) => {
+              const loads = e.target.value ? Number(e.target.value) : undefined;
+              const total = loads != null && entry.yield != null ? loads * entry.yield : undefined;
+              onUpdate({ loads, total });
+            }}
+            placeholder="0"
+            className="text-base"
+          />
+        </div>
+        <div className="space-y-1.5">
+          <Label className="text-xs text-muted-foreground">Yield</Label>
+          <Input
+            type="number"
+            inputMode="decimal"
+            value={entry.yield ?? ''}
+            onChange={(e) => {
+              const yieldVal = e.target.value ? Number(e.target.value) : undefined;
+              const total = entry.loads != null && yieldVal != null ? entry.loads * yieldVal : undefined;
+              onUpdate({ yield: yieldVal, total });
+            }}
+            placeholder="0"
+            className="text-base"
+          />
+        </div>
+        <div className="space-y-1.5">
+          <Label className="text-xs text-muted-foreground">Total</Label>
+          <Input
+            type="number"
+            value={entry.total ?? ''}
+            readOnly
+            tabIndex={-1}
+            placeholder="0"
+            className="text-base bg-muted"
+          />
+        </div>
       </div>
     </div>
   );

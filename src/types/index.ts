@@ -135,6 +135,9 @@ export interface JobDiaryEntry {
   dailyReportId: string;
   entryText: string;
   costCodeId?: string;
+  loads?: number;
+  yield?: number;
+  total?: number;
   itemNumber: number;
   airtableId?: string;
 }

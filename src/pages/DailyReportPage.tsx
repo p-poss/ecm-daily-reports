@@ -16,13 +16,14 @@ import { ThemeToggle } from '@/components/ThemeToggle';
 import { WeatherSelector } from '@/components/WeatherSelector';
 import { LaborSection } from '@/components/LaborSection';
 import { JobDiarySection } from '@/components/JobDiarySection';
+import { SubcontractorsDeliveriesSection } from '@/components/SubcontractorsDeliveriesSection';
 import { SignatureCapture } from '@/components/SignatureCapture';
 import { PhotoAttachments } from '@/components/PhotoAttachments';
 import { DeadlineIndicator } from '@/components/DeadlineIndicator';
 import { ArrowLeft, Calendar as CalendarIcon, ChevronDown, Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
-import type { DailyReport, LaborEntry, JobDiaryEntry, PhotoAttachment, Weather } from '@/types';
+import type { DailyReport, LaborEntry, JobDiaryEntry, SubcontractorWork, MaterialDelivered, PhotoAttachment, Weather } from '@/types';
 
 export function DailyReportPage() {
   const { foreman } = useAuth();
@@ -36,6 +37,8 @@ export function DailyReportPage() {
   const [comments, setComments] = useState('');
   const [laborEntries, setLaborEntries] = useState<LaborEntry[]>([]);
   const [diaryEntries, setDiaryEntries] = useState<JobDiaryEntry[]>([]);
+  const [subcontractorEntries, setSubcontractorEntries] = useState<SubcontractorWork[]>([]);
+  const [deliveryEntries, setDeliveryEntries] = useState<MaterialDelivered[]>([]);
   const [photos, setPhotos] = useState<PhotoAttachment[]>([]);
   const [signature, setSignature] = useState('');
   const [isSaving, setIsSaving] = useState(false);
@@ -106,13 +109,17 @@ export function DailyReportPage() {
   }
 
   async function loadReportData(id: string) {
-    const [labor, diary, attachments] = await Promise.all([
+    const [labor, diary, subs, deliveries, attachments] = await Promise.all([
       db.laborEntries.where('dailyReportId').equals(id).toArray(),
       db.jobDiaryEntries.where('dailyReportId').equals(id).toArray(),
+      db.subcontractorWork.where('dailyReportId').equals(id).toArray(),
+      db.materialsDelivered.where('dailyReportId').equals(id).toArray(),
       db.photoAttachments.where('dailyReportId').equals(id).toArray(),
     ]);
     setLaborEntries(labor);
     setDiaryEntries(diary);
+    setSubcontractorEntries(subs);
+    setDeliveryEntries(deliveries);
     setPhotos(attachments);
   }
 
@@ -166,6 +173,22 @@ export function DailyReportPage() {
       if (diaryEntries.length > 0) {
         await db.jobDiaryEntries.bulkPut(
           diaryEntries.map((e) => ({ ...e, dailyReportId: report.id }))
+        );
+      }
+
+      // Save subcontractor entries
+      await db.subcontractorWork.where('dailyReportId').equals(report.id).delete();
+      if (subcontractorEntries.length > 0) {
+        await db.subcontractorWork.bulkPut(
+          subcontractorEntries.map((e) => ({ ...e, dailyReportId: report.id }))
+        );
+      }
+
+      // Save delivery entries
+      await db.materialsDelivered.where('dailyReportId').equals(report.id).delete();
+      if (deliveryEntries.length > 0) {
+        await db.materialsDelivered.bulkPut(
+          deliveryEntries.map((e) => ({ ...e, dailyReportId: report.id }))
         );
       }
 
@@ -309,6 +332,20 @@ export function DailyReportPage() {
       );
     }
 
+    await db.subcontractorWork.where('dailyReportId').equals(report.id).delete();
+    if (subcontractorEntries.length > 0) {
+      await db.subcontractorWork.bulkPut(
+        subcontractorEntries.map((e) => ({ ...e, dailyReportId: report.id }))
+      );
+    }
+
+    await db.materialsDelivered.where('dailyReportId').equals(report.id).delete();
+    if (deliveryEntries.length > 0) {
+      await db.materialsDelivered.bulkPut(
+        deliveryEntries.map((e) => ({ ...e, dailyReportId: report.id }))
+      );
+    }
+
     await db.photoAttachments.where('dailyReportId').equals(report.id).delete();
     if (photos.length > 0) {
       await db.photoAttachments.bulkPut(
@@ -445,6 +482,17 @@ export function DailyReportPage() {
         <JobDiarySection
           entries={diaryEntries}
           onChange={setDiaryEntries}
+          dailyReportId={currentReportId}
+        />
+
+        <Separator />
+
+        {/* Subcontractors + Deliveries */}
+        <SubcontractorsDeliveriesSection
+          subcontractorEntries={subcontractorEntries}
+          deliveryEntries={deliveryEntries}
+          onSubcontractorsChange={setSubcontractorEntries}
+          onDeliveriesChange={setDeliveryEntries}
           dailyReportId={currentReportId}
         />
 
