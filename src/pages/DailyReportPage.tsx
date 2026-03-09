@@ -409,7 +409,7 @@ export function DailyReportPage() {
                   <Button
                     variant="outline"
                     className={cn(
-                      "w-fit min-w-[260px] justify-between text-left font-normal bg-input/20 border-input hover:bg-input/20 hover:text-current",
+                      "w-fit min-w-[260px] justify-between text-left font-normal text-sm md:text-xs/relaxed bg-input/20 border-input hover:bg-input/20 hover:text-current",
                       !date && "text-muted-foreground"
                     )}
                     disabled={isEditing && existingReport?.status === 'Submitted'}
