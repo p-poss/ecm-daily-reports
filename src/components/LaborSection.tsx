@@ -184,15 +184,15 @@ export function LaborSection({ entries, onChange, dailyReportId }: LaborSectionP
         </Card>
       ) : (
         /* Table View - PDF-matching layout */
-        <Card className="overflow-hidden">
-          <div className="overflow-x-auto px-4">
+        <Card className="overflow-hidden p-0">
+          <div className="overflow-x-auto">
             <table className="w-full text-sm border-collapse">
               {/* Description row above cost code headers */}
               <thead>
                 {/* Top row: section labels + cost code descriptions */}
                 <tr className="border-b border-b-border">
                   {/* LABOR section header */}
-                  <th colSpan={3} className="text-left p-2 font-bold text-xs uppercase tracking-wider border-r border-r-border">
+                  <th colSpan={3} className="text-left p-2 pl-4 font-bold text-xs uppercase tracking-wider border-r border-r-border">
                     Labor
                   </th>
                   {/* EQUIPMENT section header */}
@@ -222,7 +222,7 @@ export function LaborSection({ entries, onChange, dailyReportId }: LaborSectionP
                     );
                   })}
                   {/* Add cost code column button */}
-                  <th rowSpan={3} colSpan={2} className="p-1 align-top w-[160px] min-w-[160px] max-w-[160px]">
+                  <th rowSpan={3} colSpan={2} className="p-1 pr-4 align-top w-[160px] min-w-[160px] max-w-[160px]">
                     <Select
                       value=""
                       onValueChange={(value) => addCostCodeColumn(value)}
@@ -243,7 +243,7 @@ export function LaborSection({ entries, onChange, dailyReportId }: LaborSectionP
 
                 {/* Column headers row */}
                 <tr className="border-b border-b-border">
-                  <th className="text-left p-2 font-medium text-muted-foreground text-xs w-[170px]">Employee</th>
+                  <th className="text-left p-2 pl-4 font-medium text-muted-foreground text-xs w-[170px]">Employee</th>
                   <th className="text-left p-2 font-medium text-muted-foreground text-xs">Trade</th>
                   <th className="text-center p-2 font-medium text-muted-foreground text-xs border-r border-r-border min-w-[90px]">
                     ST / OT
@@ -267,7 +267,7 @@ export function LaborSection({ entries, onChange, dailyReportId }: LaborSectionP
 
                 {/* ST|OT sub-header row */}
                 <tr className="border-b border-b-border">
-                  <th className="p-0"></th>
+                  <th className="p-0 pl-4"></th>
                   <th className="p-0"></th>
                   <th className="p-0 border-r border-r-border"><SplitHeaderLabel /></th>
                   <th className="p-0"></th>
@@ -298,7 +298,7 @@ export function LaborSection({ entries, onChange, dailyReportId }: LaborSectionP
                 ))}
                 {/* Totals Row */}
                 <tr className="border-t-2 border-t-border font-medium">
-                  <td className="p-2">Totals</td>
+                  <td className="p-2 pl-4">Totals</td>
                   <td className="p-2"></td>
                   <td className="p-2 border-r border-r-border">
                     <div className="flex items-center justify-center w-[90px] mx-auto text-xs">
@@ -345,7 +345,7 @@ export function LaborSection({ entries, onChange, dailyReportId }: LaborSectionP
                     );
                   })}
                   <td className="p-2"></td>
-                  <td className="p-2"></td>
+                  <td className="p-2 pr-4"></td>
                 </tr>
               </tbody>
             </table>
@@ -401,7 +401,7 @@ function TableRow({
   return (
     <tr className="border-b border-b-border">
       {/* Employee */}
-      <td className="p-2">
+      <td className="p-2 pl-4">
         <Select
           value={entry.employeeId || 'none'}
           onValueChange={(value) => {
@@ -546,7 +546,7 @@ function TableRow({
       {/* Add cost code spacer */}
       <td className="p-2"></td>
       {/* Delete */}
-      <td className="p-2 text-right">
+      <td className="p-2 pr-4 text-right">
         <Button
           type="button"
           variant="destructive"
