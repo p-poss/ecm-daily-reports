@@ -402,47 +402,49 @@ export function DailyReportPage() {
             <CardTitle className="flex items-center gap-2 text-lg"><BookOpen className="w-5 h-5" />General</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label>Date</Label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className={cn(
-                      "w-fit min-w-[260px] justify-between text-left font-normal text-sm md:text-xs/relaxed bg-input/20 border-input hover:bg-input/20 hover:text-current",
-                      !date && "text-muted-foreground"
-                    )}
-                    disabled={isEditing && existingReport?.status === 'Submitted'}
-                  >
-                    <span className="flex items-center">
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {date ? (
-                        <>
-                          {format(new Date(date + 'T00:00:00'), "MM/dd/yyyy")} - {dayOfWeek}
-                        </>
-                      ) : (
-                        <span>Pick a date</span>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Date</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-between text-left font-normal text-sm md:text-xs/relaxed bg-input/20 border-input hover:bg-input/20 hover:text-current",
+                        !date && "text-muted-foreground"
                       )}
-                    </span>
-                    <ChevronDown className="h-4 w-4 opacity-50" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={date ? new Date(date + 'T00:00:00') : undefined}
-                    onSelect={(selectedDate) => {
-                      if (selectedDate) {
-                        setDate(format(selectedDate, 'yyyy-MM-dd'));
-                      }
-                    }}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
-            </div>
+                      disabled={isEditing && existingReport?.status === 'Submitted'}
+                    >
+                      <span className="flex items-center">
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {date ? (
+                          <>
+                            {format(new Date(date + 'T00:00:00'), "MM/dd/yyyy")} - {dayOfWeek}
+                          </>
+                        ) : (
+                          <span>Pick a date</span>
+                        )}
+                      </span>
+                      <ChevronDown className="h-4 w-4 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={date ? new Date(date + 'T00:00:00') : undefined}
+                      onSelect={(selectedDate) => {
+                        if (selectedDate) {
+                          setDate(format(selectedDate, 'yyyy-MM-dd'));
+                        }
+                      }}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
 
-            <WeatherSelector value={weather} onChange={setWeather} />
+              <WeatherSelector value={weather} onChange={setWeather} />
+            </div>
 
             {/* Comments */}
             <div className="space-y-2">
