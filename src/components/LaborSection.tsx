@@ -45,7 +45,7 @@ function SplitHoursCell({
   onOtChange: (v: number) => void;
 }) {
   return (
-    <div className="flex items-center border border-input rounded-md overflow-hidden h-8 w-[90px] mx-auto">
+    <div className="flex items-center border border-input rounded-none overflow-hidden h-8 w-[90px] mx-auto">
       <Input
         type="number"
         min="0"
@@ -227,7 +227,7 @@ export function LaborSection({ entries, onChange, dailyReportId }: LaborSectionP
                       value=""
                       onValueChange={(value) => addCostCodeColumn(value)}
                     >
-                      <SelectTrigger className="h-7 text-xs w-full">
+                      <SelectTrigger className="h-7 text-xs w-full bg-card">
                         <SelectValue placeholder="+ Cost Code" />
                       </SelectTrigger>
                       <SelectContent>

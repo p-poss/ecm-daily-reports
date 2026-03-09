@@ -50,7 +50,7 @@ export function JobsListPage() {
   }, [jobs, foreman]);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-muted">
       {/* Header */}
       <header className="bg-background border-b p-4 sticky top-0 z-10">
         <div className="flex items-start max-w-7xl mx-auto relative">
@@ -91,7 +91,7 @@ export function JobsListPage() {
             return (
               <Card
                 key={job.id}
-                className="cursor-pointer hover:shadow-md transition-shadow active:bg-accent"
+                className="cursor-pointer hover:bg-accent"
                 onClick={() => navigateToReports(job.id)}
               >
                 <CardContent className="p-4">
