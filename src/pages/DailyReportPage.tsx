@@ -7,7 +7,7 @@ import { useNavigation } from '@/contexts/NavigationContext';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -361,13 +361,7 @@ export function DailyReportPage() {
       <main className="max-w-7xl mx-auto p-4 space-y-8 pb-24">
         {/* Date and Weather */}
         <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <CalendarIcon className="w-5 h-5" />
-              General
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-4 pt-6">
             <div className="space-y-2">
               <Label>Date</Label>
               <Popover>

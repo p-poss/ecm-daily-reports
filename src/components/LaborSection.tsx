@@ -11,7 +11,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Card, CardContent } from '@/components/ui/card';
-import { Plus, HardHat, X } from 'lucide-react';
+import { Plus, Sheet, X } from 'lucide-react';
 import type { LaborEntry, Trade } from '@/types';
 
 const TRADE_CODES: { value: Trade; label: string }[] = [
@@ -158,7 +158,7 @@ export function LaborSection({ entries, onChange, dailyReportId }: LaborSectionP
       {/* Section Header */}
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold flex items-center gap-2">
-          <HardHat className="w-5 h-5" />
+          <Sheet className="w-5 h-5" />
           Labor + Equipment
           {entries.length > 0 && (
             <span className="text-sm font-normal text-muted-foreground">
