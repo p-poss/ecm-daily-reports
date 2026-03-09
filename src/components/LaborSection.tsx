@@ -249,7 +249,7 @@ export function LaborSection({ entries, onChange, dailyReportId }: LaborSectionP
                     ST / OT
                   </th>
                   <th className="text-left p-2 font-medium text-muted-foreground text-xs w-[110px]">Equip. #</th>
-                  <th className="text-left p-2 font-medium text-muted-foreground text-xs w-[110px]">Rental Co.</th>
+                  <th className="text-left p-2 font-medium text-muted-foreground text-xs min-w-[110px]">Rental Co.</th>
                   <th className="text-left p-2 font-medium text-muted-foreground text-xs w-[180px]">Equip.</th>
                   <th className="text-center p-2 font-medium text-muted-foreground text-xs min-w-[90px]">Idle</th>
                   <th className="text-center p-2 font-medium text-muted-foreground text-xs min-w-[90px]">Down</th>
