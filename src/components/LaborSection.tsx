@@ -45,7 +45,7 @@ function SplitHoursCell({
   onOtChange: (v: number) => void;
 }) {
   return (
-    <div className="flex items-center border rounded-md overflow-hidden h-8 w-[90px] mx-auto">
+    <div className="flex items-center border border-input rounded-md overflow-hidden h-8 w-[90px] mx-auto">
       <Input
         type="number"
         min="0"
@@ -190,20 +190,20 @@ export function LaborSection({ entries, onChange, dailyReportId }: LaborSectionP
               {/* Description row above cost code headers */}
               <thead>
                 {/* Top row: section labels + cost code descriptions */}
-                <tr className="bg-muted border-b">
+                <tr className="bg-muted border-b border-b-border">
                   {/* LABOR section header */}
-                  <th colSpan={3} className="text-left p-2 font-bold text-xs uppercase tracking-wider border-r">
+                  <th colSpan={3} className="text-left p-2 font-bold text-xs uppercase tracking-wider border-r border-r-border">
                     Labor
                   </th>
                   {/* EQUIPMENT section header */}
-                  <th colSpan={6} className="text-left p-2 font-bold text-xs uppercase tracking-wider border-r">
+                  <th colSpan={6} className="text-left p-2 font-bold text-xs uppercase tracking-wider border-r border-r-border">
                     Equipment
                   </th>
                   {/* Cost code description labels */}
                   {allActiveCostCodeIds.map((ccId) => {
                     const cc = (costCodes || []).find((c) => c.id === ccId);
                     return (
-                      <th key={ccId} className="text-left p-2 font-bold text-xs uppercase tracking-wider border-r w-[160px] min-w-[160px] max-w-[160px]">
+                      <th key={ccId} className="text-left p-2 font-bold text-xs uppercase tracking-wider border-r border-r-border w-[160px] min-w-[160px] max-w-[160px]">
                         <div className="flex items-center justify-between overflow-hidden gap-2">
                           <span className="truncate min-w-0" title={cc?.description}>
                             {cc?.description || ''}
@@ -242,10 +242,10 @@ export function LaborSection({ entries, onChange, dailyReportId }: LaborSectionP
                 </tr>
 
                 {/* Column headers row */}
-                <tr className="bg-muted/70 border-b">
+                <tr className="bg-muted/70 border-b border-b-border">
                   <th className="text-left p-2 font-medium text-muted-foreground text-xs w-[170px]">Employee</th>
                   <th className="text-left p-2 font-medium text-muted-foreground text-xs">Trade</th>
-                  <th className="text-center p-2 font-medium text-muted-foreground text-xs border-r min-w-[90px]">
+                  <th className="text-center p-2 font-medium text-muted-foreground text-xs border-r border-r-border min-w-[90px]">
                     ST / OT
                   </th>
                   <th className="text-left p-2 font-medium text-muted-foreground text-xs w-[110px]">Equip. #</th>
@@ -253,12 +253,12 @@ export function LaborSection({ entries, onChange, dailyReportId }: LaborSectionP
                   <th className="text-left p-2 font-medium text-muted-foreground text-xs w-[180px]">Equip.</th>
                   <th className="text-center p-2 font-medium text-muted-foreground text-xs min-w-[90px]">Idle</th>
                   <th className="text-center p-2 font-medium text-muted-foreground text-xs min-w-[90px]">Down</th>
-                  <th className="text-center p-2 font-medium text-muted-foreground text-xs border-r min-w-[90px]">Work</th>
+                  <th className="text-center p-2 font-medium text-muted-foreground text-xs border-r border-r-border min-w-[90px]">Work</th>
                   {/* Cost code column headers */}
                   {allActiveCostCodeIds.map((ccId) => {
                     const cc = (costCodes || []).find((c) => c.id === ccId);
                     return (
-                      <th key={ccId} className="text-center p-2 font-medium text-muted-foreground text-xs border-r w-[160px] min-w-[160px] max-w-[160px]">
+                      <th key={ccId} className="text-center p-2 font-medium text-muted-foreground text-xs border-r border-r-border w-[160px] min-w-[160px] max-w-[160px]">
                         {cc?.code || ccId}
                       </th>
                     );
@@ -266,18 +266,18 @@ export function LaborSection({ entries, onChange, dailyReportId }: LaborSectionP
                 </tr>
 
                 {/* ST|OT sub-header row */}
-                <tr className="bg-muted/40 border-b">
+                <tr className="bg-muted/40 border-b border-b-border">
                   <th className="p-0"></th>
                   <th className="p-0"></th>
-                  <th className="p-0 border-r"><SplitHeaderLabel /></th>
+                  <th className="p-0 border-r border-r-border"><SplitHeaderLabel /></th>
                   <th className="p-0"></th>
                   <th className="p-0"></th>
                   <th className="p-0"></th>
                   <th className="p-0"><SplitHeaderLabel /></th>
                   <th className="p-0"><SplitHeaderLabel /></th>
-                  <th className="p-0 border-r"><SplitHeaderLabel /></th>
+                  <th className="p-0 border-r border-r-border"><SplitHeaderLabel /></th>
                   {allActiveCostCodeIds.map((ccId) => (
-                    <th key={ccId} className="p-0 border-r w-[160px] min-w-[160px] max-w-[160px]"><SplitHeaderLabel /></th>
+                    <th key={ccId} className="p-0 border-r border-r-border w-[160px] min-w-[160px] max-w-[160px]"><SplitHeaderLabel /></th>
                   ))}
                 </tr>
               </thead>
@@ -297,10 +297,10 @@ export function LaborSection({ entries, onChange, dailyReportId }: LaborSectionP
                   />
                 ))}
                 {/* Totals Row */}
-                <tr className="border-t-2 bg-muted font-medium">
+                <tr className="border-t-2 border-t-border bg-muted font-medium">
                   <td className="p-2">Totals</td>
                   <td className="p-2"></td>
-                  <td className="p-2 border-r">
+                  <td className="p-2 border-r border-r-border">
                     <div className="flex items-center justify-center w-[90px] mx-auto text-xs">
                       <span className="flex-1 text-center font-bold">{totalST}</span>
                       <span className="text-border">|</span>
@@ -324,7 +324,7 @@ export function LaborSection({ entries, onChange, dailyReportId }: LaborSectionP
                       <span className="flex-1 text-center">{entries.reduce((s, e) => s + e.downOtHours, 0) || ''}</span>
                     </div>
                   </td>
-                  <td className="p-2 border-r">
+                  <td className="p-2 border-r border-r-border">
                     <div className="flex items-center justify-center w-[90px] mx-auto text-xs">
                       <span className="flex-1 text-center">{entries.reduce((s, e) => s + e.workStHours, 0) || ''}</span>
                       <span className="text-border">|</span>
@@ -335,7 +335,7 @@ export function LaborSection({ entries, onChange, dailyReportId }: LaborSectionP
                     const stTotal = entries.reduce((s, e) => s + (e.costCodeHours?.[ccId]?.st || 0), 0);
                     const otTotal = entries.reduce((s, e) => s + (e.costCodeHours?.[ccId]?.ot || 0), 0);
                     return (
-                      <td key={ccId} className="p-2 border-r w-[160px] min-w-[160px] max-w-[160px]">
+                      <td key={ccId} className="p-2 border-r border-r-border w-[160px] min-w-[160px] max-w-[160px]">
                         <div className="flex items-center justify-center w-[90px] mx-auto text-xs">
                           <span className="flex-1 text-center">{stTotal || ''}</span>
                           <span className="text-border">|</span>
@@ -399,7 +399,7 @@ function TableRow({
   }
 
   return (
-    <tr className="border-b hover:bg-muted/50">
+    <tr className="border-b border-b-border hover:bg-muted/50">
       {/* Employee */}
       <td className="p-2">
         <Select
@@ -448,7 +448,7 @@ function TableRow({
         </Select>
       </td>
       {/* ST | OT */}
-      <td className="p-2 border-r">
+      <td className="p-2 border-r border-r-border">
         <SplitHoursCell
           stValue={entry.stHours}
           otValue={entry.otHours}
@@ -524,7 +524,7 @@ function TableRow({
         />
       </td>
       {/* Work ST|OT */}
-      <td className="p-2 border-r">
+      <td className="p-2 border-r border-r-border">
         <SplitHoursCell
           stValue={entry.workStHours}
           otValue={entry.workOtHours}
@@ -534,7 +534,7 @@ function TableRow({
       </td>
       {/* Dynamic cost code columns */}
       {activeCostCodeIds.map((ccId) => (
-        <td key={ccId} className="p-2 border-r w-[160px] min-w-[160px] max-w-[160px]">
+        <td key={ccId} className="p-2 border-r border-r-border w-[160px] min-w-[160px] max-w-[160px]">
           <SplitHoursCell
             stValue={entry.costCodeHours?.[ccId]?.st || 0}
             otValue={entry.costCodeHours?.[ccId]?.ot || 0}
