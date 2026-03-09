@@ -74,7 +74,7 @@ function SplitHoursCell({
 /** Split header cell showing "ST | OT" with a divider */
 function SplitHeaderLabel() {
   return (
-    <div className="flex items-center justify-center text-[10px] text-muted-foreground w-[90px] mx-auto">
+    <div className="flex items-center justify-center text-xs text-muted-foreground w-[90px] mx-auto">
       <span className="flex-1 text-center">ST</span>
       <span className="text-border">|</span>
       <span className="flex-1 text-center">OT</span>

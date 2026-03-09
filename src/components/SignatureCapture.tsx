@@ -40,7 +40,7 @@ export function SignatureCapture({ value, onChange, disabled }: SignatureCapture
         {value && !signatureRef.current ? (
           // Show saved signature
           <div className="space-y-2">
-            <div className="border rounded-none bg-white p-2">
+            <div className="border rounded-s bg-white p-2">
               <img src={value} alt="Signature" className="w-full h-auto" />
             </div>
             <Button
@@ -57,7 +57,7 @@ export function SignatureCapture({ value, onChange, disabled }: SignatureCapture
         ) : (
           // Signature canvas
           <>
-            <div className="border rounded-none bg-white overflow-hidden touch-none">
+            <div className="border rounded-s bg-white overflow-hidden touch-none">
               <SignatureCanvas
                 ref={signatureRef}
                 canvasProps={{
