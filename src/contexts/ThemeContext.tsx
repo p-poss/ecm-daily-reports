@@ -34,7 +34,16 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   }, [theme]);
 
   function toggleTheme() {
+    // Temporarily disable transitions to prevent flicker during theme switch
+    const root = document.documentElement;
+    root.classList.add('no-transitions');
     setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
+    // Re-enable after the browser has painted the new theme
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        root.classList.remove('no-transitions');
+      });
+    });
   }
 
   return (
