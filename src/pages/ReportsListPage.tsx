@@ -133,7 +133,7 @@ export function ReportsListPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="bg-card border-b p-4 sticky top-0 z-10">
+      <header className="bg-background border-b p-4 sticky top-0 z-10">
         <div className="flex items-start max-w-7xl mx-auto relative">
           <Button
             variant="outline"
@@ -376,7 +376,7 @@ export function ReportsListPage() {
                         title={
                           <span className="flex items-center gap-2">
                             {formatDate(report.date)}
-                            <Badge variant="secondary" className="text-xs">
+                            <Badge variant="success">
                               {report.status}
                             </Badge>
                           </span>

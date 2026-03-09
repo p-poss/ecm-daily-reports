@@ -227,7 +227,7 @@ export function LaborSection({ entries, onChange, dailyReportId }: LaborSectionP
                       value=""
                       onValueChange={(value) => addCostCodeColumn(value)}
                     >
-                      <SelectTrigger className="h-7 text-xs w-full bg-card">
+                      <SelectTrigger className="h-7 text-xs w-full">
                         <SelectValue placeholder="+ Cost Code" />
                       </SelectTrigger>
                       <SelectContent>
