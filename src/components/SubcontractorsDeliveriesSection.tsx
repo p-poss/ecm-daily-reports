@@ -168,7 +168,7 @@ export function SubcontractorsDeliveriesSection({
                           })
                         }
                       >
-                        <SelectTrigger className="w-fit min-w-[260px] text-sm">
+                        <SelectTrigger className="w-full text-sm">
                           <SelectValue placeholder="Select cost code" />
                         </SelectTrigger>
                         <SelectContent>
