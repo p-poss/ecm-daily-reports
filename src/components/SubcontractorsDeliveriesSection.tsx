@@ -243,28 +243,30 @@ export function SubcontractorsDeliveriesSection({
                     />
                   </div>
 
-                  <div className="space-y-1.5">
-                    <Label className="text-xs text-muted-foreground">Material</Label>
-                    <Input
-                      value={entry.material}
-                      onChange={(e) =>
-                        updateDeliveryEntry(index, { material: e.target.value })
-                      }
-                      placeholder="Material description..."
-                      className="text-base"
-                    />
-                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <Label className="text-xs text-muted-foreground">Material</Label>
+                      <Input
+                        value={entry.material}
+                        onChange={(e) =>
+                          updateDeliveryEntry(index, { material: e.target.value })
+                        }
+                        placeholder="Material description..."
+                        className="text-base"
+                      />
+                    </div>
 
-                  <div className="space-y-1.5">
-                    <Label className="text-xs text-muted-foreground">Quantity</Label>
-                    <Input
-                      value={entry.quantity}
-                      onChange={(e) =>
-                        updateDeliveryEntry(index, { quantity: e.target.value })
-                      }
-                      placeholder="e.g. 10 CY, 500 LF"
-                      className="text-base"
-                    />
+                    <div className="space-y-1.5">
+                      <Label className="text-xs text-muted-foreground">Quantity</Label>
+                      <Input
+                        value={entry.quantity}
+                        onChange={(e) =>
+                          updateDeliveryEntry(index, { quantity: e.target.value })
+                        }
+                        placeholder="e.g. 10 CY, 500 LF"
+                        className="text-base"
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
