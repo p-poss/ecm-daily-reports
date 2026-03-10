@@ -191,8 +191,10 @@ export function LaborSection({ entries, onChange, dailyReportId }: LaborSectionP
               <thead>
                 {/* Top row: section labels + cost code descriptions */}
                 <tr className="border-b border-b-border">
+                  {/* Employee column spacer */}
+                  <th className="p-2 pl-4 pt-4 sticky left-0 z-[1] bg-card shadow-[inset_-2px_0_0_0_var(--border)]"></th>
                   {/* LABOR section header */}
-                  <th colSpan={3} className="text-left p-2 pl-4 pt-4 font-bold text-xs uppercase tracking-wider border-r border-r-border">
+                  <th colSpan={2} className="text-left p-2 pt-4 font-bold text-xs uppercase tracking-wider border-r border-r-border">
                     Labor
                   </th>
                   {/* EQUIPMENT section header */}
@@ -298,8 +300,8 @@ export function LaborSection({ entries, onChange, dailyReportId }: LaborSectionP
                 ))}
                 {/* Totals Row */}
                 <tr className="border-t-2 border-t-border font-medium">
-                  <td className="p-2 pl-4 pb-4">Totals</td>
-                  <td className="p-2 pb-4"></td>
+                  <td className="p-2 pl-4 pb-4 sticky left-0 z-[1] bg-card shadow-[inset_-2px_0_0_0_var(--border)]"></td>
+                  <td className="p-2 pb-4">Totals</td>
                   <td className="p-2 pb-4 border-r border-r-border">
                     <div className="flex items-center justify-center w-[90px] mx-auto text-xs">
                       <span className="flex-1 text-center font-bold">{totalST}</span>
