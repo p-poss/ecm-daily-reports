@@ -243,7 +243,7 @@ export function LaborSection({ entries, onChange, dailyReportId }: LaborSectionP
 
                 {/* Column headers row */}
                 <tr className="border-b border-b-border">
-                  <th className="text-left p-2 pl-4 font-medium text-muted-foreground text-xs min-w-[170px]">Employee</th>
+                  <th className="text-left p-2 pl-4 font-medium text-muted-foreground text-xs min-w-[170px] sticky left-0 z-[1] bg-card shadow-[inset_-2px_0_0_0_var(--border)]">Employee</th>
                   <th className="text-left p-2 font-medium text-muted-foreground text-xs">Trade</th>
                   <th className="text-center p-2 font-medium text-muted-foreground text-xs border-r border-r-border min-w-[90px]">
                     ST / OT
@@ -267,7 +267,7 @@ export function LaborSection({ entries, onChange, dailyReportId }: LaborSectionP
 
                 {/* ST|OT sub-header row */}
                 <tr className="border-b border-b-border">
-                  <th className="p-0 pl-4"></th>
+                  <th className="p-0 pl-4 sticky left-0 z-[1] bg-card shadow-[inset_-2px_0_0_0_var(--border)]"></th>
                   <th className="p-0"></th>
                   <th className="p-0 border-r border-r-border"><SplitHeaderLabel /></th>
                   <th className="p-0"></th>
@@ -401,7 +401,7 @@ function TableRow({
   return (
     <tr className="border-b border-b-border">
       {/* Employee */}
-      <td className="p-2 pl-4">
+      <td className="p-2 pl-4 sticky left-0 z-[1] bg-card shadow-[inset_-2px_0_0_0_var(--border)]">
         <Select
           value={entry.employeeId || 'none'}
           onValueChange={(value) => {
