@@ -12,8 +12,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
-import { Plus, X, Truck } from 'lucide-react';
+import { Plus, X, HardHat, Truck } from 'lucide-react';
 import type { SubcontractorWork, MaterialDelivered } from '@/types';
 
 interface SubcontractorsDeliveriesSectionProps {
@@ -76,111 +75,106 @@ export function SubcontractorsDeliveriesSection({
   }
 
   return (
-    <Card>
-      <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2 text-lg">
-          <Truck className="w-5 h-5" />
-          Subcontractors + Deliveries
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        {/* Subcontractors */}
-        <div className="space-y-4">
-          <Label className="text-sm font-medium">Subcontractors</Label>
-
+    <>
+      {/* Subcontractors */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <HardHat className="w-5 h-5" />
+            Subcontractors
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
           {subcontractorEntries.length === 0 ? (
             <p className="text-sm text-muted-foreground text-center py-4">
               No subcontractor entries.
             </p>
           ) : (
             subcontractorEntries.map((entry, index) => (
-              <div key={entry.id}>
-                {index > 0 && <Separator className="my-4" />}
-                <div className="space-y-3">
-                  <div className="flex justify-between items-start">
-                    <div className="flex items-center gap-2">
-                      <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-medium">
-                        {index + 1}
-                      </span>
-                      <Label className="text-sm font-medium">Subcontractor</Label>
-                    </div>
-                    <Button
-                      type="button"
-                      variant="destructive"
-                      size="icon"
-                      className="h-8 w-8"
-                      onClick={() => removeSubcontractorEntry(index)}
-                    >
-                      <X className="w-4 h-4" />
-                    </Button>
+              <div key={entry.id} className="space-y-3">
+                <div className="flex justify-between items-start">
+                  <div className="flex items-center gap-2">
+                    <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-medium">
+                      {index + 1}
+                    </span>
+                    <Label className="text-sm font-medium">Subcontractor</Label>
                   </div>
-
-                  <Select
-                    value={entry.contractorId || 'none'}
-                    onValueChange={(value) =>
-                      updateSubcontractorEntry(index, {
-                        contractorId: value === 'none' ? '' : value,
-                      })
-                    }
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="icon"
+                    className="h-8 w-8"
+                    onClick={() => removeSubcontractorEntry(index)}
                   >
-                    <SelectTrigger className="w-full text-sm">
-                      <SelectValue placeholder="Select subcontractor" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="none">Select subcontractor</SelectItem>
-                      {(subcontractors || []).map((sub) => (
-                        <SelectItem key={sub.id} value={sub.id}>
-                          {sub.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                    <X className="w-4 h-4" />
+                  </Button>
+                </div>
 
-                  <Textarea
-                    value={entry.itemsWorked}
-                    onChange={(e) =>
-                      updateSubcontractorEntry(index, { itemsWorked: e.target.value })
-                    }
-                    placeholder="Items worked on..."
-                    rows={2}
-                    className="text-base resize-none"
-                  />
+                <Select
+                  value={entry.contractorId || 'none'}
+                  onValueChange={(value) =>
+                    updateSubcontractorEntry(index, {
+                      contractorId: value === 'none' ? '' : value,
+                    })
+                  }
+                >
+                  <SelectTrigger className="w-full text-sm">
+                    <SelectValue placeholder="Select subcontractor" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">Select subcontractor</SelectItem>
+                    {(subcontractors || []).map((sub) => (
+                      <SelectItem key={sub.id} value={sub.id}>
+                        {sub.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
 
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="space-y-1.5">
-                      <Label className="text-xs text-muted-foreground">Production (optional)</Label>
-                      <Input
-                        value={entry.production || ''}
-                        onChange={(e) =>
-                          updateSubcontractorEntry(index, { production: e.target.value })
-                        }
-                        placeholder="e.g. 200 LF"
-                        className="text-base"
-                      />
-                    </div>
-                    <div className="space-y-1.5">
-                      <Label className="text-xs text-muted-foreground">Cost Code (optional)</Label>
-                      <Select
-                        value={entry.costCodeId || 'none'}
-                        onValueChange={(value) =>
-                          updateSubcontractorEntry(index, {
-                            costCodeId: value === 'none' ? undefined : value,
-                          })
-                        }
-                      >
-                        <SelectTrigger className="w-full text-sm">
-                          <SelectValue placeholder="Select cost code" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="none">No cost code</SelectItem>
-                          {(costCodes || []).map((cc) => (
-                            <SelectItem key={cc.id} value={cc.id}>
-                              {cc.code} - {cc.description}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
+                <Textarea
+                  value={entry.itemsWorked}
+                  onChange={(e) =>
+                    updateSubcontractorEntry(index, { itemsWorked: e.target.value })
+                  }
+                  placeholder="Items worked on..."
+                  rows={2}
+                  className="text-base resize-none"
+                />
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1.5">
+                    <Label className="text-xs text-muted-foreground">Production (optional)</Label>
+                    <Input
+                      value={entry.production || ''}
+                      onChange={(e) =>
+                        updateSubcontractorEntry(index, { production: e.target.value })
+                      }
+                      placeholder="e.g. 200 LF"
+                      className="text-base"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-xs text-muted-foreground">Cost Code (optional)</Label>
+                    <Select
+                      value={entry.costCodeId || 'none'}
+                      onValueChange={(value) =>
+                        updateSubcontractorEntry(index, {
+                          costCodeId: value === 'none' ? undefined : value,
+                        })
+                      }
+                    >
+                      <SelectTrigger className="w-full text-sm">
+                        <SelectValue placeholder="Select cost code" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">No cost code</SelectItem>
+                        {(costCodes || []).map((cc) => (
+                          <SelectItem key={cc.id} value={cc.id}>
+                            {cc.code} - {cc.description}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
               </div>
@@ -196,77 +190,78 @@ export function SubcontractorsDeliveriesSection({
             <Plus className="w-4 h-4 mr-2" />
             Add Subcontractor
           </Button>
-        </div>
+        </CardContent>
+      </Card>
 
-        <Separator />
-
-        {/* Deliveries */}
-        <div className="space-y-4">
-          <Label className="text-sm font-medium">Deliveries</Label>
-
+      {/* Deliveries */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <Truck className="w-5 h-5" />
+            Deliveries
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
           {deliveryEntries.length === 0 ? (
             <p className="text-sm text-muted-foreground text-center py-4">
               No delivery entries.
             </p>
           ) : (
             deliveryEntries.map((entry, index) => (
-              <div key={entry.id}>
-                {index > 0 && <Separator className="my-4" />}
-                <div className="space-y-3">
-                  <div className="flex justify-between items-start">
-                    <div className="flex items-center gap-2">
-                      <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-medium">
-                        {index + 1}
-                      </span>
-                      <Label className="text-sm font-medium">Delivery</Label>
-                    </div>
-                    <Button
-                      type="button"
-                      variant="destructive"
-                      size="icon"
-                      className="h-8 w-8"
-                      onClick={() => removeDeliveryEntry(index)}
-                    >
-                      <X className="w-4 h-4" />
-                    </Button>
+              <div key={entry.id} className="space-y-3">
+                <div className="flex justify-between items-start">
+                  <div className="flex items-center gap-2">
+                    <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-medium">
+                      {index + 1}
+                    </span>
+                    <Label className="text-sm font-medium">Delivery</Label>
                   </div>
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="icon"
+                    className="h-8 w-8"
+                    onClick={() => removeDeliveryEntry(index)}
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                </div>
 
+                <div className="space-y-1.5">
+                  <Label className="text-xs text-muted-foreground">Supplier</Label>
+                  <Input
+                    value={entry.supplier}
+                    onChange={(e) =>
+                      updateDeliveryEntry(index, { supplier: e.target.value })
+                    }
+                    placeholder="Supplier name..."
+                    className="text-base"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1.5">
-                    <Label className="text-xs text-muted-foreground">Supplier</Label>
+                    <Label className="text-xs text-muted-foreground">Material</Label>
                     <Input
-                      value={entry.supplier}
+                      value={entry.material}
                       onChange={(e) =>
-                        updateDeliveryEntry(index, { supplier: e.target.value })
+                        updateDeliveryEntry(index, { material: e.target.value })
                       }
-                      placeholder="Supplier name..."
+                      placeholder="Material description..."
                       className="text-base"
                     />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-1.5">
-                      <Label className="text-xs text-muted-foreground">Material</Label>
-                      <Input
-                        value={entry.material}
-                        onChange={(e) =>
-                          updateDeliveryEntry(index, { material: e.target.value })
-                        }
-                        placeholder="Material description..."
-                        className="text-base"
-                      />
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <Label className="text-xs text-muted-foreground">Quantity</Label>
-                      <Input
-                        value={entry.quantity}
-                        onChange={(e) =>
-                          updateDeliveryEntry(index, { quantity: e.target.value })
-                        }
-                        placeholder="e.g. 10 CY, 500 LF"
-                        className="text-base"
-                      />
-                    </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-xs text-muted-foreground">Quantity</Label>
+                    <Input
+                      value={entry.quantity}
+                      onChange={(e) =>
+                        updateDeliveryEntry(index, { quantity: e.target.value })
+                      }
+                      placeholder="e.g. 10 CY, 500 LF"
+                      className="text-base"
+                    />
                   </div>
                 </div>
               </div>
@@ -282,8 +277,8 @@ export function SubcontractorsDeliveriesSection({
             <Plus className="w-4 h-4 mr-2" />
             Add Delivery
           </Button>
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </>
   );
 }
