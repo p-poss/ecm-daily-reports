@@ -20,9 +20,11 @@ import { SubcontractorsDeliveriesSection } from '@/components/SubcontractorsDeli
 import { SignatureCapture } from '@/components/SignatureCapture';
 import { PhotoAttachments } from '@/components/PhotoAttachments';
 import { DeadlineIndicator } from '@/components/DeadlineIndicator';
+import { AIAssistant } from '@/components/AIAssistant';
 import { ArrowLeft, BookOpen, Calendar as CalendarIcon, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
+import type { ReportContext } from '@/lib/ai-assistant';
 import type { DailyReport, LaborEntry, JobDiaryEntry, SubcontractorWork, MaterialDelivered, PhotoAttachment, Weather } from '@/types';
 
 export function DailyReportPage() {
@@ -57,6 +59,12 @@ export function DailyReportPage() {
     if (!selectedReportId) return null;
     return db.dailyReports.get(selectedReportId);
   }, [selectedReportId]);
+
+  // Reference data for AI assistant
+  const employees = useLiveQuery(() => db.employees.toArray());
+  const equipment = useLiveQuery(() => db.equipment.toArray());
+  const costCodes = useLiveQuery(() => db.costCodes.toArray());
+  const subcontractors = useLiveQuery(() => db.subcontractors.toArray());
 
   // Load existing report data
   useEffect(() => {
@@ -357,6 +365,182 @@ export function DailyReportPage() {
   const isEditing = !!selectedReportId;
   const currentReportId = existingReport?.id || reportId;
 
+  // AI Assistant context
+  const aiContext: ReportContext = {
+    jobNumber: job?.jobNumber || '',
+    jobName: job?.jobName || '',
+    date,
+    weather,
+    comments,
+    laborEntries: laborEntries.map((e, i) => ({
+      index: i,
+      employeeName: (employees || []).find((emp) => emp.id === e.employeeId)?.name || 'Unknown',
+      employeeId: e.employeeId,
+      trade: e.trade,
+      stHours: e.stHours,
+      otHours: e.otHours,
+      equipmentId: e.equipmentId,
+      equipmentNumber: (equipment || []).find((eq) => eq.id === e.equipmentId)?.equipmentNumber,
+      rentalCompany: e.rentalCompany,
+      equipmentDescription: e.equipmentDescription,
+    })),
+    diaryEntries: diaryEntries.map((e, i) => ({
+      index: i,
+      entryText: e.entryText,
+      costCode: e.costCodeId ? (costCodes || []).find((c) => c.id === e.costCodeId)?.code : undefined,
+      loads: e.loads,
+      yield: e.yield,
+      total: e.total,
+    })),
+    subcontractorEntries: subcontractorEntries.map((e, i) => ({
+      index: i,
+      contractorName: (subcontractors || []).find((s) => s.id === e.contractorId)?.name || 'Unknown',
+      contractorId: e.contractorId,
+      itemsWorked: e.itemsWorked,
+      production: e.production,
+      costCode: e.costCodeId ? (costCodes || []).find((c) => c.id === e.costCodeId)?.code : undefined,
+    })),
+    deliveryEntries: deliveryEntries.map((e, i) => ({
+      index: i,
+      supplier: e.supplier,
+      material: e.material,
+      quantity: e.quantity,
+    })),
+    availableEmployees: (employees || []).map((e) => ({ id: e.id, name: e.name, trade: e.trade })),
+    availableEquipment: (equipment || []).map((e) => ({ id: e.id, equipmentNumber: e.equipmentNumber, description: e.description })),
+    availableCostCodes: (costCodes || []).map((c) => ({ id: c.id, code: c.code, description: c.description })),
+    availableSubcontractors: (subcontractors || []).map((s) => ({ id: s.id, name: s.name })),
+  };
+
+  function handleAIToolCall(name: string, input: Record<string, unknown>) {
+    switch (name) {
+      case 'set_date':
+        setDate(input.date as string);
+        break;
+      case 'set_weather':
+        setWeather(input.weather as Weather);
+        break;
+      case 'set_comments':
+        setComments(input.comments as string);
+        break;
+      case 'add_labor_entry': {
+        const emp = (employees || []).find((e) => e.id === input.employeeId);
+        const newEntry: LaborEntry = {
+          id: generateId(),
+          dailyReportId: currentReportId,
+          employeeId: (input.employeeId as string) || '',
+          trade: (input.trade as string) || emp?.trade || 'LB',
+          stHours: (input.stHours as number) ?? 8,
+          otHours: (input.otHours as number) ?? 0,
+          equipmentId: input.equipmentId as string | undefined,
+          rentalCompany: input.rentalCompany as string | undefined,
+          equipmentDescription: input.equipmentDescription as string | undefined,
+          idleStHours: 0,
+          idleOtHours: 0,
+          downStHours: 0,
+          downOtHours: 0,
+          workStHours: 0,
+          workOtHours: 0,
+          costCodeHours: {},
+        };
+        setLaborEntries((prev) => [...prev, newEntry]);
+        break;
+      }
+      case 'update_labor_entry': {
+        const idx = input.index as number;
+        setLaborEntries((prev) => {
+          const updated = [...prev];
+          if (updated[idx]) {
+            const updates: Partial<LaborEntry> = {};
+            if (input.employeeId !== undefined) updates.employeeId = input.employeeId as string;
+            if (input.trade !== undefined) updates.trade = input.trade as string;
+            if (input.stHours !== undefined) updates.stHours = input.stHours as number;
+            if (input.otHours !== undefined) updates.otHours = input.otHours as number;
+            if (input.equipmentId !== undefined) updates.equipmentId = input.equipmentId as string;
+            if (input.rentalCompany !== undefined) updates.rentalCompany = input.rentalCompany as string;
+            if (input.equipmentDescription !== undefined) updates.equipmentDescription = input.equipmentDescription as string;
+            updated[idx] = { ...updated[idx], ...updates };
+          }
+          return updated;
+        });
+        break;
+      }
+      case 'remove_labor_entry': {
+        const idx = input.index as number;
+        setLaborEntries((prev) => prev.filter((_, i) => i !== idx));
+        break;
+      }
+      case 'add_diary_entry': {
+        const newEntry: JobDiaryEntry = {
+          id: generateId(),
+          dailyReportId: currentReportId,
+          entryText: (input.entryText as string) || '',
+          costCodeId: input.costCodeId as string | undefined,
+          loads: input.loads as number | undefined,
+          yield: input.yield as number | undefined,
+          total: input.loads && input.yield ? (input.loads as number) * (input.yield as number) : undefined,
+          itemNumber: diaryEntries.length + 1,
+        };
+        setDiaryEntries((prev) => [...prev, newEntry]);
+        break;
+      }
+      case 'update_diary_entry': {
+        const idx = input.index as number;
+        setDiaryEntries((prev) => {
+          const updated = [...prev];
+          if (updated[idx]) {
+            const updates: Partial<JobDiaryEntry> = {};
+            if (input.entryText !== undefined) updates.entryText = input.entryText as string;
+            if (input.costCodeId !== undefined) updates.costCodeId = input.costCodeId as string;
+            if (input.loads !== undefined) updates.loads = input.loads as number;
+            if (input.yield !== undefined) updates.yield = input.yield as number;
+            updated[idx] = { ...updated[idx], ...updates };
+          }
+          return updated;
+        });
+        break;
+      }
+      case 'remove_diary_entry': {
+        const idx = input.index as number;
+        setDiaryEntries((prev) => prev.filter((_, i) => i !== idx));
+        break;
+      }
+      case 'add_subcontractor_entry': {
+        const newEntry: SubcontractorWork = {
+          id: generateId(),
+          dailyReportId: currentReportId,
+          contractorId: (input.contractorId as string) || '',
+          itemsWorked: (input.itemsWorked as string) || '',
+          production: input.production as string | undefined,
+          costCodeId: input.costCodeId as string | undefined,
+        };
+        setSubcontractorEntries((prev) => [...prev, newEntry]);
+        break;
+      }
+      case 'remove_subcontractor_entry': {
+        const idx = input.index as number;
+        setSubcontractorEntries((prev) => prev.filter((_, i) => i !== idx));
+        break;
+      }
+      case 'add_delivery_entry': {
+        const newEntry: MaterialDelivered = {
+          id: generateId(),
+          dailyReportId: currentReportId,
+          supplier: (input.supplier as string) || '',
+          material: (input.material as string) || '',
+          quantity: (input.quantity as string) || '',
+        };
+        setDeliveryEntries((prev) => [...prev, newEntry]);
+        break;
+      }
+      case 'remove_delivery_entry': {
+        const idx = input.index as number;
+        setDeliveryEntries((prev) => prev.filter((_, i) => i !== idx));
+        break;
+      }
+    }
+  }
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -536,6 +720,9 @@ export function DailyReportPage() {
           </Button>
         </div>
       </div>
+
+      {/* AI Assistant */}
+      <AIAssistant context={aiContext} onToolCall={handleAIToolCall} />
     </div>
   );
 }
