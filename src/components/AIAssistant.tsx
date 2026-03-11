@@ -115,7 +115,7 @@ export function AIAssistant({ context, onToolCall }: AIAssistantProps) {
     return (
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 flex items-center justify-center"
+        className="fixed top-1/2 -translate-y-1/2 right-6 z-50 w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 flex items-center justify-center"
       >
         <Bot className="w-6 h-6" />
       </button>
@@ -123,7 +123,7 @@ export function AIAssistant({ context, onToolCall }: AIAssistantProps) {
   }
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 w-[540px] max-w-[calc(100vw-3rem)]">
+    <div className="fixed top-1/2 -translate-y-1/2 right-6 z-50 w-[540px] max-w-[calc(100vw-3rem)]">
       <Card className="flex flex-col shadow-2xl p-0 max-h-[70dvh]">
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 border-b">
