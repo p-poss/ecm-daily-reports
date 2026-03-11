@@ -290,7 +290,6 @@ export function LaborSection({ entries, onChange, dailyReportId }: LaborSectionP
                   <TableRow
                     key={entry.id}
                     entry={entry}
-                    index={index}
                     employees={employees || []}
                     equipment={equipment || []}
                     costCodes={costCodes || []}
@@ -372,7 +371,6 @@ export function LaborSection({ entries, onChange, dailyReportId }: LaborSectionP
 
 interface TableRowProps {
   entry: LaborEntry;
-  index: number;
   employees: { id: string; name: string; trade: Trade }[];
   equipment: { id: string; equipmentNumber: string; description: string }[];
   costCodes: { id: string; code: string; description: string }[];
@@ -383,7 +381,6 @@ interface TableRowProps {
 
 function TableRow({
   entry,
-  index,
   employees,
   equipment,
   activeCostCodeIds,

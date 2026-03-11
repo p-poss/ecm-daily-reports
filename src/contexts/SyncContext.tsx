@@ -102,10 +102,18 @@ export function SyncProvider({ children }: { children: ReactNode }) {
     setSyncError(null);
 
     try {
-      // Get pending items ordered by creation time
+      // Get pending items ordered by creation time, skip items that have failed too many times
       const items = await db.syncQueue.orderBy('createdAt').toArray();
+      const retryableItems = items.filter(item => item.attempts < 5);
 
-      for (const item of items) {
+      // Remove items that have exceeded max retries
+      const failedItems = items.filter(item => item.attempts >= 5);
+      for (const item of failedItems) {
+        console.error(`Sync item ${item.id} removed after ${item.attempts} failed attempts: ${item.error}`);
+        await db.syncQueue.delete(item.id);
+      }
+
+      for (const item of retryableItems) {
         try {
           await syncItem(item);
           // Remove from queue on success
@@ -117,11 +125,6 @@ export function SyncProvider({ children }: { children: ReactNode }) {
             lastAttempt: now(),
             error: error instanceof Error ? error.message : 'Unknown error',
           });
-
-          // If too many attempts, log error but continue with other items
-          if (item.attempts >= 5) {
-            console.error(`Sync item ${item.id} failed after 5 attempts`);
-          }
         }
       }
 

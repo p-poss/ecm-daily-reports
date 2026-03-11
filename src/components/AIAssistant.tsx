@@ -3,7 +3,7 @@ import ReactMarkdown, { type Components } from 'react-markdown';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
-import { Bot, X, Send, Loader2 } from 'lucide-react';
+import { Sparkles, X, Send, Loader2 } from 'lucide-react';
 import { sendMessage, type ChatMessage, type ReportContext } from '@/lib/ai-assistant';
 import { cn } from '@/lib/utils';
 
@@ -117,7 +117,7 @@ export function AIAssistant({ context, onToolCall }: AIAssistantProps) {
         onClick={() => setIsOpen(true)}
         className="fixed top-1/2 -translate-y-1/2 right-6 z-50 w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 flex items-center justify-center"
       >
-        <Bot className="w-6 h-6" />
+        <Sparkles className="w-6 h-6" />
       </button>
     );
   }
@@ -128,7 +128,7 @@ export function AIAssistant({ context, onToolCall }: AIAssistantProps) {
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 border-b">
           <div className="flex items-center gap-2">
-            <Bot className="w-5 h-5 text-primary" />
+            <Sparkles className="w-5 h-5 text-primary" />
             <span className="font-semibold text-sm">Report Assistant</span>
           </div>
           <Button
