@@ -248,9 +248,11 @@ Guidelines:
 - When the user mentions equipment by number, match it to the available equipment list.
 - Default ST hours to 8 and OT hours to 0 unless specified otherwise.
 - For labor entries, use the employee's default trade unless the user specifies otherwise.
-- Be concise in responses. Confirm what you did after making changes.
+- Be concise but well-formatted. Use markdown: **bold** for emphasis, bullet lists for multiple items, and short paragraphs.
+- Confirm what you did after making changes with a brief summary.
 - If the user's request is ambiguous, ask for clarification.
-- You can make multiple tool calls in one response to fill out multiple fields at once.`;
+- You can make multiple tool calls in one response to fill out multiple fields at once.
+- Keep responses scannable — avoid walls of text. Use structure (headers, lists) when listing more than 2-3 items.`;
 }
 
 export interface ChatMessage {
