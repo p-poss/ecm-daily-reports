@@ -15,6 +15,7 @@ import { Plus, Sheet, X } from 'lucide-react';
 import type { LaborEntry, Trade } from '@/types';
 
 const TRADE_CODES: { value: Trade; label: string }[] = [
+  { value: 'N/A', label: 'N/A' },
   { value: 'S', label: 'S - Skilled' },
   { value: 'OE', label: 'OE - Operator' },
   { value: 'LB', label: 'LB - Laborer' },
@@ -93,7 +94,7 @@ export function LaborSection({ entries, onChange, dailyReportId }: LaborSectionP
       id: generateId(),
       dailyReportId,
       employeeId: '',
-      trade: 'LB',
+      trade: 'N/A',
       stHours: 8,
       otHours: 0,
       equipmentId: undefined,
@@ -408,7 +409,7 @@ function TableRow({
           value={entry.employeeId || 'none'}
           onValueChange={(value) => {
             if (value === 'none') {
-              onUpdate({ employeeId: '' });
+              onUpdate({ employeeId: '', trade: 'N/A' });
               return;
             }
             const emp = employees.find((e) => e.id === value);
