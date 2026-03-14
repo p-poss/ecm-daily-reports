@@ -3,7 +3,8 @@ import ReactMarkdown, { type Components } from 'react-markdown';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
-import { Sparkles, X, Send, Loader2 } from 'lucide-react';
+import { X, ArrowUp, Loader2 } from 'lucide-react';
+import { AIIcon } from '@/components/icons/AIIcon';
 import { sendMessage, type ChatMessage, type ReportContext } from '@/lib/ai-assistant';
 import { cn } from '@/lib/utils';
 
@@ -115,9 +116,9 @@ export function AIAssistant({ context, onToolCall }: AIAssistantProps) {
     return (
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed top-1/2 -translate-y-1/2 right-6 z-50 w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 flex items-center justify-center"
+        className="fixed top-1/2 -translate-y-1/2 right-6 z-50 w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 flex items-center justify-center cursor-pointer"
       >
-        <Sparkles className="w-6 h-6" />
+        <AIIcon className="w-9 h-9" />
       </button>
     );
   }
@@ -128,8 +129,8 @@ export function AIAssistant({ context, onToolCall }: AIAssistantProps) {
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 border-b">
           <div className="flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-primary" />
-            <span className="font-semibold text-sm">Report Assistant</span>
+            <AIIcon className="w-5 h-5 text-primary" />
+            <span className="font-semibold text-sm">Report Claude</span>
           </div>
           <Button
             variant="ghost"
@@ -196,7 +197,7 @@ export function AIAssistant({ context, onToolCall }: AIAssistantProps) {
               size="icon"
               disabled={!input.trim() || isLoading}
             >
-              <Send className="w-4 h-4" />
+              <ArrowUp className="w-4 h-4" />
             </Button>
           </form>
         </div>
