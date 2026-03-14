@@ -30,6 +30,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           const employee = await db.employees.get(session.foremanId);
           if (employee) {
             setForeman(employee);
+            document.title = 'Jobs | ECM';
           } else {
             // Session exists but employee not found, clear session
             await db.authSession.clear();
@@ -87,6 +88,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       await db.authSession.add(session);
       setForeman(employee);
+      document.title = 'Jobs | ECM';
 
       return { success: true };
     } catch (error) {
@@ -99,6 +101,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       await db.authSession.clear();
       setForeman(null);
+      document.title = 'Login | ECM';
     } catch (error) {
       console.error('Logout error:', error);
     }

@@ -26,6 +26,7 @@ export function NavigationProvider({ children }: { children: ReactNode }) {
     setSelectedJobId(null);
     setSelectedReportId(null);
     setCopyFromReportId(null);
+    document.title = 'Jobs | ECM';
   }
 
   function navigateToReports(jobId: string) {
@@ -33,6 +34,7 @@ export function NavigationProvider({ children }: { children: ReactNode }) {
     setSelectedReportId(null);
     setCopyFromReportId(null);
     setCurrentPage('reports');
+    document.title = 'Reports | ECM';
   }
 
   function navigateToReportForm(jobId: string, reportId?: string, copyFromId?: string) {
@@ -40,6 +42,7 @@ export function NavigationProvider({ children }: { children: ReactNode }) {
     setSelectedReportId(reportId || null);
     setCopyFromReportId(copyFromId || null);
     setCurrentPage('report-form');
+    document.title = 'Daily Report | ECM';
   }
 
   function goBack() {
@@ -47,9 +50,11 @@ export function NavigationProvider({ children }: { children: ReactNode }) {
       setCurrentPage('reports');
       setSelectedReportId(null);
       setCopyFromReportId(null);
+      document.title = 'Reports | ECM';
     } else if (currentPage === 'reports') {
       setCurrentPage('jobs');
       setSelectedJobId(null);
+      document.title = 'Jobs | ECM';
     }
   }
 
