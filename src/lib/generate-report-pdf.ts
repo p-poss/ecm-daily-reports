@@ -75,7 +75,6 @@ const RIGHT_X = MARGIN_L + LEFT_W;
 // Body region (below header)
 const BODY_TOP = HEADER_BOTTOM + 2;
 const BODY_BOTTOM = PAGE_H - MARGIN_B;
-const BODY_H = BODY_BOTTOM - BODY_TOP;
 
 // Labor / Equipment grid
 const LABOR_ROWS = 15;
@@ -132,12 +131,6 @@ function textCenter(doc: jsPDF, text: string, x: number, y: number) {
   doc.text(text, x, y, { align: 'center' });
 }
 
-function drawSTOTDiagonal(doc: jsPDF, x: number, y: number, w: number, h: number) {
-  // Draw a diagonal line splitting the cell: ST upper-left, OT lower-right
-  doc.setLineWidth(0.25);
-  doc.line(x, y + h, x + w, y);
-  doc.setLineWidth(0.5);
-}
 
 // ---------------------------------------------------------------------------
 // Column definitions for the labor/equipment grid
@@ -238,7 +231,6 @@ function drawHeader(doc: jsPDF, data: ReportPDFData) {
 
   const row1Y = HEADER_TOP + 12;
   const row2Y = row1Y + 14;
-  const row3Y = row2Y + 14;
 
   doc.text('JOB NO.', LEFT_X, row1Y);
   doc.setFont('helvetica', 'normal');
