@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/db/database';
+import { generateReportPDF, type ReportPDFData } from '@/lib/generate-report-pdf';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigation } from '@/contexts/NavigationContext';
 import { Card, CardContent } from '@/components/ui/card';
@@ -12,7 +13,7 @@ import { ThemeToggle } from '@/components/ThemeToggle';
 import {
   ArrowLeft,
   Plus,
-  FileText,
+
   Calendar,
   Clock,
   AlertTriangle,
@@ -108,6 +109,80 @@ export function ReportsListPage() {
     }
     const minutes = Math.floor(diff / (1000 * 60));
     return `${minutes}m left`;
+  }
+
+  async function handleViewPDF(reportId: string) {
+    const report = await db.dailyReports.get(reportId);
+    if (!report || !job) return;
+
+    const [laborEntries, diaryEntries, subEntries, deliveryEntries, employees, equipment, costCodes, subcontractors] = await Promise.all([
+      db.laborEntries.where('dailyReportId').equals(reportId).toArray(),
+      db.jobDiaryEntries.where('dailyReportId').equals(reportId).toArray(),
+      db.subcontractorWork.where('dailyReportId').equals(reportId).toArray(),
+      db.materialsDelivered.where('dailyReportId').equals(reportId).toArray(),
+      db.employees.toArray(),
+      db.equipment.toArray(),
+      db.costCodes.toArray(),
+      db.subcontractors.toArray(),
+    ]);
+
+    const usedCostCodeIds = new Set<string>();
+    for (const entry of laborEntries) {
+      for (const ccId of Object.keys(entry.costCodeHours)) {
+        const h = entry.costCodeHours[ccId];
+        if (h.st || h.ot) usedCostCodeIds.add(ccId);
+      }
+    }
+
+    const pdfData: ReportPDFData = {
+      jobNumber: job.jobNumber,
+      jobName: job.jobName,
+      date: report.date,
+      dayOfWeek: report.dayOfWeek,
+      foremanName: foreman?.name || '',
+      weather: report.weather,
+      comments: report.comments,
+      laborEntries: laborEntries.map((e) => {
+        const emp = employees.find((emp) => emp.id === e.employeeId);
+        const equip = e.equipmentId ? equipment.find((eq) => eq.id === e.equipmentId) : null;
+        return {
+          employeeName: emp?.name || '',
+          trade: e.trade,
+          stHours: e.stHours,
+          otHours: e.otHours,
+          equipmentNumber: equip?.equipmentNumber,
+          equipmentDescription: e.equipmentDescription,
+          idleStHours: e.idleStHours,
+          idleOtHours: e.idleOtHours,
+          downStHours: e.downStHours,
+          downOtHours: e.downOtHours,
+          workStHours: e.workStHours,
+          workOtHours: e.workOtHours,
+          costCodeHours: e.costCodeHours,
+        };
+      }),
+      costCodes: costCodes.filter((c) => usedCostCodeIds.has(c.id)),
+      subcontractors: subEntries.map((e) => ({
+        contractorName: subcontractors.find((s) => s.id === e.contractorId)?.name || '',
+        itemsWorked: e.itemsWorked,
+        production: e.production,
+      })),
+      deliveries: deliveryEntries.map((e) => ({
+        supplier: e.supplier,
+        material: e.material,
+        quantity: e.quantity,
+      })),
+      diaryEntries: diaryEntries.map((e) => ({
+        itemNumber: e.itemNumber,
+        entryText: e.entryText,
+        costCodeId: e.costCodeId,
+        costCodeDescription: e.costCodeId
+          ? costCodes.find((c) => c.id === e.costCodeId)?.description
+          : undefined,
+      })),
+    };
+
+    generateReportPDF(pdfData);
   }
 
   async function handleDeleteReport(reportId: string) {
@@ -282,6 +357,13 @@ export function ReportsListPage() {
                             Edit
                           </Button>
                           <Button
+                            variant="outline"
+                            className="flex-1"
+                            onClick={() => handleViewPDF(report.id)}
+                          >
+                            View PDF
+                          </Button>
+                          <Button
                             className="flex-1"
                             onClick={() => selectedJobId && navigateToReportForm(selectedJobId, report.id)}
                           >
@@ -301,10 +383,16 @@ export function ReportsListPage() {
                           <Button
                             variant="outline"
                             className="flex-1"
+                            onClick={() => handleViewPDF(report.id)}
+                          >
+                            View PDF
+                          </Button>
+                          <Button
+                            variant="outline"
+                            className="flex-1"
                             onClick={() => selectedJobId && navigateToReportForm(selectedJobId, report.id)}
                           >
-                            <FileText className="w-4 h-4 mr-2" />
-                            View / Edit
+                            Edit Report
                           </Button>
                           <Button
                             variant="destructive"
