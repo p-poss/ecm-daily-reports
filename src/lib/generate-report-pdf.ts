@@ -371,25 +371,52 @@ function drawLaborGrid(
     cx += col.w;
   }
 
-  // Draw cost code column headers with diagonal text
+  // Draw cost code column headers with horizontal text
   for (let i = 0; i < numCC; i++) {
     const ccx = LEFT_X + fixedW + i * costCodeW;
     doc.rect(ccx, headerY, costCodeW, GRID_HEADER_H);
 
     if (i < activeCodes.length) {
-      doc.setFontSize(5);
-      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(4.5);
+      doc.setFont('helvetica', 'bold');
 
-      // Draw rotated text: code + truncated description
-      const label = activeCodes[i].code;
+      const code = activeCodes[i].code;
       const desc = activeCodes[i].description;
-      const fullLabel = `${label} ${desc}`;
-      const truncated = fullLabel.length > 18 ? fullLabel.slice(0, 17) + '..' : fullLabel;
 
-      // Position text at bottom-left of cell, rotate 55 degrees
-      const textX = ccx + 3;
-      const textY = headerY + GRID_HEADER_H - 3;
-      doc.text(truncated, textX, textY, { angle: 55 });
+      // Code on top, description word-wrapped below
+      textCenter(doc, code, ccx + costCodeW / 2, headerY + 10);
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(4);
+      // Word-wrap description into lines that fit the column
+      const maxChars = Math.max(Math.floor(costCodeW / 3), 6);
+      const words = desc.split(' ');
+      const lines: string[] = [];
+      let current = '';
+      for (const word of words) {
+        if ((current + ' ' + word).trim().length > maxChars) {
+          lines.push(current.trim());
+          current = word;
+        } else {
+          current = current ? current + ' ' + word : word;
+        }
+      }
+      if (current.trim()) lines.push(current.trim());
+
+      for (let li = 0; li < Math.min(lines.length, 3); li++) {
+        textCenter(doc, lines[li], ccx + costCodeW / 2, headerY + 17 + li * 6);
+      }
+
+      // ST / OT labels at the bottom of the header cell
+      const halfW = costCodeW / 2;
+      doc.setFontSize(4);
+      doc.setFont('helvetica', 'bold');
+      textCenter(doc, 'ST', ccx + halfW / 2, headerY + GRID_HEADER_H - 2);
+      textCenter(doc, 'OT', ccx + halfW + halfW / 2, headerY + GRID_HEADER_H - 2);
+      // Vertical divider in header matching data cells
+      doc.setLineWidth(0.25);
+      doc.line(ccx + halfW, headerY + GRID_HEADER_H - 8, ccx + halfW, headerY + GRID_HEADER_H);
+      doc.setLineWidth(0.5);
     }
   }
 
@@ -449,7 +476,7 @@ function drawLaborGrid(
       colX += col.w;
     }
 
-    // Cost code cells
+    // Cost code cells — ST left, OT right with vertical divider
     for (let i = 0; i < numCC; i++) {
       const ccx = LEFT_X + fixedW + i * costCodeW;
       doc.rect(ccx, ry, costCodeW, GRID_ROW_H);
@@ -457,12 +484,19 @@ function drawLaborGrid(
       if (entry && i < activeCodes.length) {
         const ccId = activeCodes[i].id;
         const ccHours = entry.costCodeHours[ccId];
+        const halfW = costCodeW / 2;
+
+        // Draw vertical divider line in cell
+        doc.setLineWidth(0.25);
+        doc.line(ccx + halfW, ry, ccx + halfW, ry + GRID_ROW_H);
+        doc.setLineWidth(0.5);
+
         if (ccHours) {
-          const total = ccHours.st + ccHours.ot;
-          if (total) {
-            doc.setFontSize(5.5);
-            textCenter(doc, hrs(total), ccx + costCodeW / 2, ry + GRID_ROW_H - 3);
-          }
+          doc.setFontSize(5.5);
+          const pad = 2;
+          const textY = ry + GRID_ROW_H - 3;
+          if (ccHours.st) textRight(doc, hrs(ccHours.st), ccx + halfW - pad, textY);
+          if (ccHours.ot) textRight(doc, hrs(ccHours.ot), ccx + costCodeW - pad, textY);
         }
       } else if (!entry) {
         // Hatch unused rows in cost code area
