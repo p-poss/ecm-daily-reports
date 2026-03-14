@@ -54,7 +54,7 @@ export function JobDiarySection({ entries, onChange, dailyReportId }: JobDiarySe
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2 text-lg">
           <List className="w-5 h-5" />
-          Job Production + Notes
+          Production + Notes
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">

@@ -391,6 +391,7 @@ export function DailyReportPage() {
           stHours: e.stHours,
           otHours: e.otHours,
           equipmentNumber: equip?.equipmentNumber,
+          rentalCompany: e.rentalCompany,
           equipmentDescription: e.equipmentDescription,
           idleStHours: e.idleStHours,
           idleOtHours: e.idleOtHours,

@@ -18,6 +18,7 @@ export interface ReportPDFData {
     stHours: number;
     otHours: number;
     equipmentNumber?: string;
+    rentalCompany?: string;
     equipmentDescription?: string;
     idleStHours: number;
     idleOtHours: number;
@@ -85,8 +86,6 @@ const GRID_TOP = BODY_TOP;
 const GRID_HEADER_TOP = GRID_TOP + GRID_LABEL_H;
 const GRID_DATA_TOP = GRID_HEADER_TOP + GRID_HEADER_H;
 const GRID_DATA_BOTTOM = GRID_DATA_TOP + LABOR_ROWS * GRID_ROW_H;
-const GRID_FOOTER_H = 14;
-const GRID_FOOTER_TOP = GRID_DATA_BOTTOM;
 
 // Right-side sections
 const RIGHT_PAD = 4;
@@ -155,7 +154,8 @@ function buildColumns(numCostCodes: number): {
     { label: 'ST', w: 14, align: 'right' },
     { label: 'OT', w: 14, align: 'right' },
     { label: 'Equip. #', w: 32, align: 'center' },
-    { label: 'Equip.', w: 48, align: 'left' },
+    { label: 'Rental Co.', w: 42, align: 'left' },
+    { label: 'Equip.', w: 42, align: 'left' },
     { label: 'Idle', w: 18, align: 'right' },
     { label: 'Down', w: 18, align: 'right' },
     { label: 'Work', w: 18, align: 'right' },
@@ -232,40 +232,27 @@ function drawHeader(doc: jsPDF, data: ReportPDFData) {
   const row1Y = HEADER_TOP + 12;
   const row2Y = row1Y + 14;
 
-  doc.text('JOB NO.', LEFT_X, row1Y);
-  doc.setFont('helvetica', 'normal');
-  doc.text(data.jobNumber, LEFT_X + 38, row1Y);
-  doc.line(LEFT_X + 37, row1Y + 2, LEFT_X + 80, row1Y + 2);
+  const gap = 4; // uniform space between label and underline/value
 
-  doc.setFont('helvetica', 'bold');
-  doc.text('DAY', LEFT_X + 90, row1Y);
-  doc.setFont('helvetica', 'normal');
-  doc.text(data.dayOfWeek, LEFT_X + 108, row1Y);
-  doc.line(LEFT_X + 107, row1Y + 2, LEFT_X + 156, row1Y + 2);
+  // Helper: draw a labeled field (bold label, then value on underline)
+  function field(label: string, value: string, x: number, y: number, lineEndX: number) {
+    doc.setFont('helvetica', 'bold');
+    doc.text(label, x, y);
+    const labelW = doc.getTextWidth(label);
+    const valX = x + labelW + gap;
+    doc.setFont('helvetica', 'normal');
+    if (value) doc.text(value, valX, y);
+    doc.line(valX - 1, y + 2, lineEndX, y + 2);
+  }
 
-  doc.setFont('helvetica', 'bold');
-  doc.text('DATE', LEFT_X + 164, row1Y);
-  doc.setFont('helvetica', 'normal');
-  doc.text(dateStr, LEFT_X + 186, row1Y);
-  doc.line(LEFT_X + 185, row1Y + 2, LEFT_X + 240, row1Y + 2);
+  field('JOB NO.', data.jobNumber, LEFT_X, row1Y, LEFT_X + 80);
+  field('DAY', data.dayOfWeek, LEFT_X + 90, row1Y, LEFT_X + 156);
+  field('DATE', dateStr, LEFT_X + 164, row1Y, LEFT_X + 240);
 
   // Row 2
-  doc.setFont('helvetica', 'bold');
-  doc.text('JOB NAME / DESCRIPTION', LEFT_X, row2Y);
-  doc.setFont('helvetica', 'normal');
-  const jnX = LEFT_X + 112;
-  doc.text(data.jobName, jnX, row2Y);
-  doc.line(jnX - 1, row2Y + 2, LEFT_X + 320, row2Y + 2);
-
-  doc.setFont('helvetica', 'bold');
-  doc.text('SUPT', LEFT_X + 328, row2Y);
-  doc.setFont('helvetica', 'normal');
-  doc.text(data.foremanName, LEFT_X + 352, row2Y);
-  doc.line(LEFT_X + 350, row2Y + 2, LEFT_X + 430, row2Y + 2);
-
-  doc.setFont('helvetica', 'bold');
-  doc.text('APPR', LEFT_X + 438, row2Y);
-  doc.line(LEFT_X + 460, row2Y + 2, LEFT_X + 520, row2Y + 2);
+  field('JOB NAME / DESCRIPTION', data.jobName, LEFT_X, row2Y, LEFT_X + 320);
+  field('SUPT', data.foremanName, LEFT_X + 328, row2Y, LEFT_X + 430);
+  field('APPR', '', LEFT_X + 438, row2Y, LEFT_X + 520);
 
   // Right side – Company branding
   const brandX = PAGE_W - MARGIN_R;
@@ -276,9 +263,6 @@ function drawHeader(doc: jsPDF, data: ReportPDFData) {
   doc.setFontSize(7);
   doc.setFont('helvetica', 'normal');
   doc.text('Earth Construction Mining', brandX, HEADER_TOP + 24, { align: 'right' });
-
-  doc.setFontSize(6);
-  doc.text('GENERAL ENGINEERING CONTRACTOR', brandX, HEADER_TOP + 32, { align: 'right' });
 
   doc.setFontSize(9);
   doc.setFont('helvetica', 'bold');
@@ -316,7 +300,7 @@ function drawLaborGrid(
   textCenter(doc, 'LABOR', LEFT_X + laborBannerW / 2, bannerY + 9);
 
   // "EQUIPMENT" spans Equip#..Work columns
-  const equipBannerW = fixedCols[4].w + fixedCols[5].w + fixedCols[6].w + fixedCols[7].w + fixedCols[8].w;
+  const equipBannerW = fixedCols[4].w + fixedCols[5].w + fixedCols[6].w + fixedCols[7].w + fixedCols[8].w + fixedCols[9].w;
   const equipBannerX = LEFT_X + laborBannerW;
   doc.rect(equipBannerX, bannerY, equipBannerW, GRID_LABEL_H, 'FD');
   textCenter(doc, 'EQUIPMENT', equipBannerX + equipBannerW / 2, bannerY + 9);
@@ -451,16 +435,19 @@ function drawLaborGrid(
           case 4: // Equip #
             if (entry.equipmentNumber) textCenter(doc, entry.equipmentNumber.slice(0, 6), colX + col.w / 2, textY);
             break;
-          case 5: // Equip desc
+          case 5: // Rental Co.
+            if (entry.rentalCompany) doc.text(entry.rentalCompany.slice(0, 10), colX + pad, textY);
+            break;
+          case 6: // Equip desc
             if (entry.equipmentDescription) doc.text(entry.equipmentDescription.slice(0, 10), colX + pad, textY);
             break;
-          case 6: // Idle
+          case 7: // Idle
             if (entry.idleStHours + entry.idleOtHours) textRight(doc, hrs(entry.idleStHours + entry.idleOtHours), colX + col.w - pad, textY);
             break;
-          case 7: // Down
+          case 8: // Down
             if (entry.downStHours + entry.downOtHours) textRight(doc, hrs(entry.downStHours + entry.downOtHours), colX + col.w - pad, textY);
             break;
-          case 8: // Work
+          case 9: // Work
             if (entry.workStHours + entry.workOtHours) textRight(doc, hrs(entry.workStHours + entry.workOtHours), colX + col.w - pad, textY);
             break;
         }
@@ -504,49 +491,10 @@ function drawLaborGrid(
     }
   }
 
-  // ---- Grid footer ----
-  drawGridFooter(doc, fixedW, numCC, costCodeW, equipMovesW);
-
   // ---- Vertical divider between left and right halves ----
   doc.setLineWidth(0.75);
   doc.line(RIGHT_X, BODY_TOP, RIGHT_X, BODY_BOTTOM);
   doc.setLineWidth(0.5);
-}
-
-// ---------------------------------------------------------------------------
-// Grid footer (Inspector, Rental, Owner Rep)
-// ---------------------------------------------------------------------------
-
-function drawGridFooter(
-  doc: jsPDF,
-  _fixedW: number,
-  _numCC: number,
-  _costCodeW: number,
-  _equipMovesW: number,
-) {
-  const fy = GRID_FOOTER_TOP;
-  doc.rect(LEFT_X, fy, LEFT_W, GRID_FOOTER_H);
-
-  doc.setFontSize(6);
-  doc.setFont('helvetica', 'bold');
-
-  // Inspector
-  doc.text('Inspector', LEFT_X + 4, fy + 10);
-  doc.line(LEFT_X + 40, fy + 11, LEFT_X + 130, fy + 11);
-
-  // Rental / Equip labels
-  const midX = LEFT_X + LEFT_W / 2;
-  doc.setFontSize(5);
-  doc.setFont('helvetica', 'normal');
-  doc.text('\u2020 Rental Co.', midX - 30, fy + 6);
-  doc.text('Equip. \u2020', midX - 30, fy + 12);
-
-  // Owner Representative
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(6);
-  const orLabelX = LEFT_X + LEFT_W - 160;
-  doc.text('Owner Representative', orLabelX, fy + 10);
-  doc.line(orLabelX + 82, fy + 11, LEFT_X + LEFT_W - 4, fy + 11);
 }
 
 // ---------------------------------------------------------------------------
@@ -572,13 +520,13 @@ function drawRightSide(doc: jsPDF, data: ReportPDFData) {
   const diaryTop = BODY_TOP + subH + sectionGap + matH + sectionGap;
   const diaryH = BODY_BOTTOM - diaryTop - 18; // 18 for weather row at bottom
 
-  // =====  SUBCONTRACTORS WORKING ON JOB  =====
+  // =====  SUBCONTRACTORS  =====
   let sy = BODY_TOP;
   doc.setFillColor(230, 230, 230);
   doc.rect(rx, sy, rw, subHeaderH, 'FD');
   doc.setFontSize(6.5);
   doc.setFont('helvetica', 'bold');
-  textCenter(doc, 'SUBCONTRACTORS WORKING ON JOB', rx + rw / 2, sy + 7.5);
+  textCenter(doc, 'SUBCONTRACTORS', rx + rw / 2, sy + 7.5);
 
   sy += subHeaderH;
 
@@ -628,13 +576,13 @@ function drawRightSide(doc: jsPDF, data: ReportPDFData) {
     sy += subRowH;
   }
 
-  // =====  MATERIALS DELIVERED  =====
+  // =====  DELIVERIES  =====
   let my = sy + sectionGap;
   doc.setFillColor(230, 230, 230);
   doc.rect(rx, my, rw, matHeaderH, 'FD');
   doc.setFontSize(6.5);
   doc.setFont('helvetica', 'bold');
-  textCenter(doc, 'MATERIALS DELIVERED', rx + rw / 2, my + 7.5);
+  textCenter(doc, 'DELIVERIES', rx + rw / 2, my + 7.5);
   my += matHeaderH;
 
   const matCols = [
@@ -681,13 +629,13 @@ function drawRightSide(doc: jsPDF, data: ReportPDFData) {
     my += matRowH;
   }
 
-  // =====  JOB DIARY  =====
+  // =====  PRODUCTION + NOTES  =====
   const dy = diaryTop;
   doc.setFillColor(230, 230, 230);
   doc.rect(rx, dy, rw, matHeaderH, 'FD');
   doc.setFontSize(6.5);
   doc.setFont('helvetica', 'bold');
-  textCenter(doc, 'JOB DIARY', rx + rw / 2, dy + 7.5);
+  textCenter(doc, 'PRODUCTION + NOTES', rx + rw / 2, dy + 7.5);
 
   let diy = dy + matHeaderH;
 
