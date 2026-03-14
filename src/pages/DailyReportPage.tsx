@@ -21,11 +21,12 @@ import { SignatureCapture } from '@/components/SignatureCapture';
 import { PhotoAttachments } from '@/components/PhotoAttachments';
 import { DeadlineIndicator } from '@/components/DeadlineIndicator';
 import { AIAssistant } from '@/components/AIAssistant';
-import { ArrowLeft, BookOpen, Calendar as CalendarIcon, ChevronDown } from 'lucide-react';
+import { ArrowLeft, BookOpen, Calendar as CalendarIcon, ChevronDown, FileText } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import type { ReportContext } from '@/lib/ai-assistant';
 import type { DailyReport, LaborEntry, JobDiaryEntry, SubcontractorWork, MaterialDelivered, PhotoAttachment, Weather } from '@/types';
+import { generateReportPDF, type ReportPDFData } from '@/lib/generate-report-pdf';
 
 export function DailyReportPage() {
   const { foreman } = useAuth();
@@ -360,6 +361,68 @@ export function DailyReportPage() {
         photos.map((p) => ({ ...p, dailyReportId: report.id }))
       );
     }
+  }
+
+  function handleViewPDF() {
+    // Collect active cost codes from labor entries
+    const usedCostCodeIds = new Set<string>();
+    for (const entry of laborEntries) {
+      for (const ccId of Object.keys(entry.costCodeHours)) {
+        const h = entry.costCodeHours[ccId];
+        if (h.st || h.ot) usedCostCodeIds.add(ccId);
+      }
+    }
+    const activeCostCodes = (costCodes || []).filter((c) => usedCostCodeIds.has(c.id));
+
+    const pdfData: ReportPDFData = {
+      jobNumber: job?.jobNumber || '',
+      jobName: job?.jobName || '',
+      date,
+      dayOfWeek,
+      foremanName: foreman?.name || '',
+      weather,
+      comments,
+      laborEntries: laborEntries.map((e) => {
+        const emp = (employees || []).find((emp) => emp.id === e.employeeId);
+        const equip = e.equipmentId ? (equipment || []).find((eq) => eq.id === e.equipmentId) : null;
+        return {
+          employeeName: emp?.name || '',
+          trade: e.trade,
+          stHours: e.stHours,
+          otHours: e.otHours,
+          equipmentNumber: equip?.equipmentNumber,
+          equipmentDescription: e.equipmentDescription,
+          idleStHours: e.idleStHours,
+          idleOtHours: e.idleOtHours,
+          downStHours: e.downStHours,
+          downOtHours: e.downOtHours,
+          workStHours: e.workStHours,
+          workOtHours: e.workOtHours,
+          costCodeHours: e.costCodeHours,
+        };
+      }),
+      costCodes: activeCostCodes,
+      subcontractors: subcontractorEntries.map((e) => ({
+        contractorName: (subcontractors || []).find((s) => s.id === e.contractorId)?.name || '',
+        itemsWorked: e.itemsWorked,
+        production: e.production,
+      })),
+      deliveries: deliveryEntries.map((e) => ({
+        supplier: e.supplier,
+        material: e.material,
+        quantity: e.quantity,
+      })),
+      diaryEntries: diaryEntries.map((e) => ({
+        itemNumber: e.itemNumber,
+        entryText: e.entryText,
+        costCodeId: e.costCodeId,
+        costCodeDescription: e.costCodeId
+          ? (costCodes || []).find((c) => c.id === e.costCodeId)?.description
+          : undefined,
+      })),
+    };
+
+    generateReportPDF(pdfData);
   }
 
   const isEditing = !!selectedReportId;
@@ -710,6 +773,14 @@ export function DailyReportPage() {
             disabled={isSaving}
           >
             {isSaving ? 'Saving...' : 'Save Draft'}
+          </Button>
+          <Button
+            variant="outline"
+            className="flex-1"
+            onClick={handleViewPDF}
+          >
+            <FileText className="w-4 h-4" />
+            View PDF
           </Button>
           <Button
             className="flex-1"
