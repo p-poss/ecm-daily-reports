@@ -179,41 +179,37 @@ function buildColumns(numCostCodes: number): {
 // Main PDF generation
 // ---------------------------------------------------------------------------
 
-export function generateReportPDF(data: ReportPDFData): string {
-  const doc = new jsPDF({
-    orientation: 'landscape',
-    unit: 'pt',
-    format: 'letter',
-  });
-
+function drawReportPage(doc: jsPDF, data: ReportPDFData): void {
   doc.setFont('helvetica');
   doc.setLineWidth(0.5);
   doc.setDrawColor(0);
 
-  // ---- Determine cost code columns to show ----
   const activeCodes = data.costCodes.slice(0, MAX_COST_CODES);
   const numCC = Math.max(activeCodes.length, 1);
   const { fixedCols, costCodeW, equipMovesW } = buildColumns(numCC);
   const fixedW = fixedCols.reduce((s, c) => s + c.w, 0);
 
-  // =======================================================================
-  // HEADER
-  // =======================================================================
   drawHeader(doc, data);
-
-  // =======================================================================
-  // LEFT HALF – LABOR & EQUIPMENT GRID
-  // =======================================================================
   drawLaborGrid(doc, data, fixedCols, fixedW, costCodeW, equipMovesW, activeCodes, numCC);
-
-  // =======================================================================
-  // RIGHT HALF – SUBCONTRACTORS / MATERIALS / DIARY
-  // =======================================================================
   drawRightSide(doc, data);
+}
 
-  // =======================================================================
-  // Output
-  // =======================================================================
+function createDoc(): jsPDF {
+  return new jsPDF({ orientation: 'landscape', unit: 'pt', format: 'letter' });
+}
+
+export function generateReportPDF(data: ReportPDFData): string {
+  const doc = createDoc();
+  drawReportPage(doc, data);
+  return doc.output('bloburl') as unknown as string;
+}
+
+export function generateCombinedReportPDF(reports: ReportPDFData[]): string {
+  const doc = createDoc();
+  for (let i = 0; i < reports.length; i++) {
+    if (i > 0) doc.addPage('letter', 'landscape');
+    drawReportPage(doc, reports[i]);
+  }
   return doc.output('bloburl') as unknown as string;
 }
 

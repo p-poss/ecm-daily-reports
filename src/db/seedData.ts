@@ -18,6 +18,7 @@ export async function seedDatabase() {
       jobNumber: '2024-001',
       jobName: 'Highway 101 Expansion',
       status: 'Active',
+      sector: 'Public',
       address: '1234 Highway 101, San Jose, CA',
     },
     {
@@ -25,6 +26,7 @@ export async function seedDatabase() {
       jobNumber: '2024-002',
       jobName: 'Downtown Plaza Excavation',
       status: 'Active',
+      sector: 'Private',
       address: '500 Main St, Oakland, CA',
     },
     {
@@ -32,6 +34,7 @@ export async function seedDatabase() {
       jobNumber: '2024-003',
       jobName: 'Bay Bridge Approach',
       status: 'Active',
+      sector: 'Public',
       address: 'Bay Bridge Toll Plaza, Oakland, CA',
     },
     {
@@ -39,6 +42,7 @@ export async function seedDatabase() {
       jobNumber: '2023-045',
       jobName: 'Airport Runway Extension',
       status: 'Completed',
+      sector: 'Public',
       address: 'SFO Airport, San Francisco, CA',
     },
   ];

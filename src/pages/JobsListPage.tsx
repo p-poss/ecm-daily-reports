@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/db/database';
 import { useAuth } from '@/contexts/AuthContext';
@@ -5,13 +6,17 @@ import { useNavigation } from '@/contexts/NavigationContext';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { SyncIndicator } from '@/components/SyncIndicator';
-import { ArrowLeft, Briefcase, MapPin, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Briefcase, MapPin } from 'lucide-react';
+import { generateCombinedReportPDF, type ReportPDFData } from '@/lib/generate-report-pdf';
+import { PhotoGalleryModal, type GalleryPhoto } from '@/components/PhotoGalleryModal';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/ThemeToggle';
 
 export function JobsListPage() {
   const { foreman, logout } = useAuth();
   const { navigateToReports } = useNavigation();
+  const [galleryPhotos, setGalleryPhotos] = useState<GalleryPhoto[] | null>(null);
+  const [galleryTitle, setGalleryTitle] = useState('');
 
   // Get jobs assigned to this foreman
   const jobs = useLiveQuery(async () => {
@@ -48,6 +53,125 @@ export function JobsListPage() {
 
     return counts;
   }, [jobs, foreman]);
+
+  async function handleViewPDF(jobId: string) {
+    const pdfWindow = window.open('', '_blank');
+    const job = jobs?.find((j) => j.id === jobId);
+    if (!job || !foreman) { pdfWindow?.close(); return; }
+
+    const reports = await db.dailyReports
+      .where('jobId').equals(jobId)
+      .filter((r) => r.foremanId === foreman.id)
+      .sortBy('date');
+
+    if (reports.length === 0) { pdfWindow?.close(); return; }
+
+    const [employees, equipment, costCodes, subcontractors] = await Promise.all([
+      db.employees.toArray(),
+      db.equipment.toArray(),
+      db.costCodes.toArray(),
+      db.subcontractors.toArray(),
+    ]);
+
+    const pdfPages: ReportPDFData[] = [];
+    for (const report of reports) {
+      const [laborEntries, diaryEntries, subEntries, deliveryEntries] = await Promise.all([
+        db.laborEntries.where('dailyReportId').equals(report.id).toArray(),
+        db.jobDiaryEntries.where('dailyReportId').equals(report.id).toArray(),
+        db.subcontractorWork.where('dailyReportId').equals(report.id).toArray(),
+        db.materialsDelivered.where('dailyReportId').equals(report.id).toArray(),
+      ]);
+
+      const usedCostCodeIds = new Set<string>();
+      for (const entry of laborEntries) {
+        for (const ccId of Object.keys(entry.costCodeHours)) {
+          const h = entry.costCodeHours[ccId];
+          if (h.st || h.ot) usedCostCodeIds.add(ccId);
+        }
+      }
+
+      pdfPages.push({
+        jobNumber: job.jobNumber,
+        jobName: job.jobName,
+        date: report.date,
+        dayOfWeek: report.dayOfWeek,
+        foremanName: foreman.name,
+        weather: report.weather,
+        comments: report.comments,
+        laborEntries: laborEntries.map((e) => {
+          const emp = employees.find((emp) => emp.id === e.employeeId);
+          const equip = e.equipmentId ? equipment.find((eq) => eq.id === e.equipmentId) : null;
+          return {
+            employeeName: emp?.name || '',
+            trade: e.trade,
+            stHours: e.stHours,
+            otHours: e.otHours,
+            equipmentNumber: equip?.equipmentNumber,
+            rentalCompany: e.rentalCompany,
+            equipmentDescription: e.equipmentDescription,
+            idleStHours: e.idleStHours,
+            idleOtHours: e.idleOtHours,
+            downStHours: e.downStHours,
+            downOtHours: e.downOtHours,
+            workStHours: e.workStHours,
+            workOtHours: e.workOtHours,
+            costCodeHours: e.costCodeHours,
+          };
+        }),
+        costCodes: costCodes.filter((c) => usedCostCodeIds.has(c.id)),
+        subcontractors: subEntries.map((e) => ({
+          contractorName: subcontractors.find((s) => s.id === e.contractorId)?.name || '',
+          itemsWorked: e.itemsWorked,
+          production: e.production,
+        })),
+        deliveries: deliveryEntries.map((e) => ({
+          supplier: e.supplier,
+          material: e.material,
+          quantity: e.quantity,
+        })),
+        diaryEntries: diaryEntries.map((e) => ({
+          itemNumber: e.itemNumber,
+          entryText: e.entryText,
+          costCodeId: e.costCodeId,
+          costCodeDescription: e.costCodeId
+            ? costCodes.find((c) => c.id === e.costCodeId)?.description
+            : undefined,
+        })),
+      });
+    }
+
+    const blobUrl = generateCombinedReportPDF(pdfPages);
+    if (pdfWindow) { pdfWindow.location.href = blobUrl; }
+  }
+
+  async function handleViewPhotos(jobId: string) {
+    const job = jobs?.find((j) => j.id === jobId);
+    if (!job || !foreman) return;
+
+    const reports = await db.dailyReports
+      .where('jobId').equals(jobId)
+      .filter((r) => r.foremanId === foreman.id)
+      .sortBy('date');
+
+    const photos: GalleryPhoto[] = [];
+    for (const report of reports) {
+      const reportPhotos = await db.photoAttachments.where('dailyReportId').equals(report.id).toArray();
+      const dateStr = new Date(report.date + 'T00:00:00').toLocaleDateString('en-US', {
+        weekday: 'short', month: 'short', day: 'numeric', year: 'numeric',
+      });
+      for (const p of reportPhotos) {
+        photos.push({
+          id: p.id,
+          imageData: p.imageData,
+          caption: p.caption,
+          date: dateStr,
+        });
+      }
+    }
+
+    setGalleryTitle(`${job.jobNumber} — Photos`);
+    setGalleryPhotos(photos);
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -89,41 +213,58 @@ export function JobsListPage() {
           jobs?.map((job) => {
             const counts = reportCounts?.[job.id];
             return (
-              <Card
-                key={job.id}
-                className="cursor-pointer hover:bg-accent"
-                onClick={() => navigateToReports(job.id)}
-              >
+              <Card key={job.id}>
                 <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="font-bold text-lg">{job.jobNumber}</span>
-                        <Badge variant="secondary">{job.status}</Badge>
-                      </div>
-                      <h3 className="font-medium text-foreground truncate">
-                        {job.jobName}
-                      </h3>
-                      {job.address && (
-                        <p className="text-sm text-muted-foreground flex items-center gap-1 mt-1">
-                          <MapPin className="w-3 h-3" />
-                          <span className="truncate">{job.address}</span>
-                        </p>
-                      )}
-                      {counts && (
-                        <div className="flex gap-3 mt-2 text-xs">
-                          <span className="text-muted-foreground">
-                            {counts.total} report{counts.total !== 1 ? 's' : ''}
-                          </span>
-                          {counts.pending > 0 && (
-                            <Badge variant="warning" className="text-xs">
-                              {counts.pending} draft{counts.pending !== 1 ? 's' : ''}
-                            </Badge>
-                          )}
-                        </div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="font-bold text-lg">{job.jobNumber}</span>
+                    <Badge variant="secondary">{job.status}</Badge>
+                    <Badge variant={job.sector === 'Public' ? 'default' : 'outline'}>{job.sector}</Badge>
+                  </div>
+                  <h3 className="font-medium text-foreground truncate">
+                    {job.jobName}
+                  </h3>
+                  {job.address && (
+                    <p className="text-sm text-muted-foreground flex items-center gap-1 mt-1">
+                      <MapPin className="w-3 h-3" />
+                      <span className="truncate">{job.address}</span>
+                    </p>
+                  )}
+                  {counts && (
+                    <div className="flex gap-3 mt-2 text-xs">
+                      <span className="text-muted-foreground">
+                        {counts.total} report{counts.total !== 1 ? 's' : ''}
+                      </span>
+                      {counts.pending > 0 && (
+                        <Badge variant="warning" className="text-xs">
+                          {counts.pending} draft{counts.pending !== 1 ? 's' : ''}
+                        </Badge>
                       )}
                     </div>
-                    <ChevronRight className="w-5 h-5 text-muted-foreground ml-2" />
+                  )}
+                  <div className="flex gap-2 mt-3">
+                    <Button
+                      variant="outline"
+                      className="flex-1"
+                      onClick={() => handleViewPDF(job.id)}
+                      disabled={!counts?.total}
+                    >
+                      View PDF
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="flex-1"
+                      onClick={() => handleViewPhotos(job.id)}
+                      disabled={!counts?.total}
+                    >
+                      Photos
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="flex-1"
+                      onClick={() => navigateToReports(job.id)}
+                    >
+                      Make / Edit Reports
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
@@ -131,6 +272,14 @@ export function JobsListPage() {
           })
         )}
       </main>
+
+      {galleryPhotos && (
+        <PhotoGalleryModal
+          title={galleryTitle}
+          photos={galleryPhotos}
+          onClose={() => setGalleryPhotos(null)}
+        />
+      )}
     </div>
   );
 }

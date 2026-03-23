@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/db/database';
 import { generateReportPDF, type ReportPDFData } from '@/lib/generate-report-pdf';
+import { PhotoGalleryModal, type GalleryPhoto } from '@/components/PhotoGalleryModal';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigation } from '@/contexts/NavigationContext';
 import { Card, CardContent } from '@/components/ui/card';
@@ -28,6 +29,8 @@ export function ReportsListPage() {
   const { foreman } = useAuth();
   const { selectedJobId, navigateToJobs, navigateToReportForm } = useNavigation();
   const [showNewReportModal, setShowNewReportModal] = useState(false);
+  const [galleryPhotos, setGalleryPhotos] = useState<GalleryPhoto[] | null>(null);
+  const [galleryTitle, setGalleryTitle] = useState('');
 
   // Get job details
   const job = useLiveQuery(async () => {
@@ -192,6 +195,23 @@ export function ReportsListPage() {
     if (pdfWindow) {
       pdfWindow.location.href = blobUrl;
     }
+  }
+
+  async function handleViewPhotos(reportId: string) {
+    const report = await db.dailyReports.get(reportId);
+    const photos = await db.photoAttachments.where('dailyReportId').equals(reportId).toArray();
+    const dateStr = report
+      ? new Date(report.date + 'T00:00:00').toLocaleDateString('en-US', {
+          weekday: 'short', month: 'short', day: 'numeric', year: 'numeric',
+        })
+      : '';
+    setGalleryTitle(dateStr ? `Photos — ${dateStr}` : 'Photos');
+    setGalleryPhotos(photos.map((p) => ({
+      id: p.id,
+      imageData: p.imageData,
+      caption: p.caption,
+      date: dateStr,
+    })));
   }
 
   async function handleDeleteReport(reportId: string) {
@@ -373,6 +393,13 @@ export function ReportsListPage() {
                             View PDF
                           </Button>
                           <Button
+                            variant="outline"
+                            className="flex-1"
+                            onClick={() => handleViewPhotos(report.id)}
+                          >
+                            Photos
+                          </Button>
+                          <Button
                             className="flex-1"
                             onClick={() => selectedJobId && navigateToReportForm(selectedJobId, report.id)}
                           >
@@ -395,6 +422,13 @@ export function ReportsListPage() {
                             onClick={() => handleViewPDF(report.id)}
                           >
                             View PDF
+                          </Button>
+                          <Button
+                            variant="outline"
+                            className="flex-1"
+                            onClick={() => handleViewPhotos(report.id)}
+                          >
+                            Photos
                           </Button>
                           <Button
                             variant="outline"
@@ -489,6 +523,14 @@ export function ReportsListPage() {
             </div>
           </Card>
         </div>
+      )}
+
+      {galleryPhotos && (
+        <PhotoGalleryModal
+          title={galleryTitle}
+          photos={galleryPhotos}
+          onClose={() => setGalleryPhotos(null)}
+        />
       )}
     </div>
   );

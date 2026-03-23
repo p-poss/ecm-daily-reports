@@ -4,6 +4,7 @@ export interface Job {
   jobNumber: string;
   jobName: string;
   status: 'Active' | 'Completed' | 'On Hold';
+  sector: 'Public' | 'Private';
   address?: string;
   airtableId?: string;
 }
