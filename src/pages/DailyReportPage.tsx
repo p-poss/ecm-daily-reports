@@ -423,7 +423,8 @@ export function DailyReportPage() {
       })),
     };
 
-    generateReportPDF(pdfData);
+    const blobUrl = generateReportPDF(pdfData);
+    window.open(blobUrl, '_blank');
   }
 
   const isEditing = !!selectedReportId;

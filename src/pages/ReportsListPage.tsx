@@ -112,8 +112,13 @@ export function ReportsListPage() {
   }
 
   async function handleViewPDF(reportId: string) {
+    // Open window synchronously (before any awaits) to avoid popup blocker
+    const pdfWindow = window.open('', '_blank');
     const report = await db.dailyReports.get(reportId);
-    if (!report || !job) return;
+    if (!report || !job) {
+      pdfWindow?.close();
+      return;
+    }
 
     const [laborEntries, diaryEntries, subEntries, deliveryEntries, employees, equipment, costCodes, subcontractors] = await Promise.all([
       db.laborEntries.where('dailyReportId').equals(reportId).toArray(),
@@ -183,7 +188,10 @@ export function ReportsListPage() {
       })),
     };
 
-    generateReportPDF(pdfData);
+    const blobUrl = generateReportPDF(pdfData);
+    if (pdfWindow) {
+      pdfWindow.location.href = blobUrl;
+    }
   }
 
   async function handleDeleteReport(reportId: string) {

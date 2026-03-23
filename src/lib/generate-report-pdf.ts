@@ -179,7 +179,7 @@ function buildColumns(numCostCodes: number): {
 // Main PDF generation
 // ---------------------------------------------------------------------------
 
-export function generateReportPDF(data: ReportPDFData): void {
+export function generateReportPDF(data: ReportPDFData): string {
   const doc = new jsPDF({
     orientation: 'landscape',
     unit: 'pt',
@@ -214,8 +214,7 @@ export function generateReportPDF(data: ReportPDFData): void {
   // =======================================================================
   // Output
   // =======================================================================
-  const blobUrl = doc.output('bloburl');
-  window.open(blobUrl as unknown as string, '_blank');
+  return doc.output('bloburl') as unknown as string;
 }
 
 // ---------------------------------------------------------------------------
