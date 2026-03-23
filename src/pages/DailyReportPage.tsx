@@ -288,6 +288,36 @@ export function DailyReportPage() {
             'Item Number': entry.itemNumber,
           });
         }
+
+        // Add subcontractor work to queue
+        for (const entry of subcontractorEntries) {
+          await addToQueue('subcontractorWork', entry.id, 'create', {
+            'Daily Report': reportIdToSubmit,
+            'Contractor': entry.contractorId,
+            'Items Worked': entry.itemsWorked,
+            'Production': entry.production,
+          });
+        }
+
+        // Add material deliveries to queue
+        for (const entry of deliveryEntries) {
+          await addToQueue('materialsDelivered', entry.id, 'create', {
+            'Daily Report': reportIdToSubmit,
+            'Supplier': entry.supplier,
+            'Material': entry.material,
+            'Quantity': entry.quantity,
+          });
+        }
+
+        // Add photos to queue
+        for (const photo of photos) {
+          await addToQueue('photoAttachments', photo.id, 'create', {
+            'Daily Report': reportIdToSubmit,
+            'Image Data': photo.imageData,
+            'Caption': photo.caption,
+            'Created At': photo.createdAt,
+          });
+        }
       }
 
       alert('Report submitted successfully!');
