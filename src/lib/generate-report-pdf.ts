@@ -246,8 +246,7 @@ function drawHeader(doc: jsPDF, data: ReportPDFData) {
 
   // Row 2
   field('JOB NAME / DESCRIPTION', data.jobName, LEFT_X, row2Y, LEFT_X + 320);
-  field('SUPT', data.foremanName, LEFT_X + 328, row2Y, LEFT_X + 430);
-  field('APPR', '', LEFT_X + 438, row2Y, LEFT_X + 520);
+  field('SUPT', data.foremanName, LEFT_X + 328, row2Y, LEFT_X + 520);
 
   // Right side – Company branding
   const brandX = PAGE_W - MARGIN_R;
