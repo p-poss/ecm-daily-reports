@@ -698,12 +698,13 @@ export function DailyReportPage() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto p-4 space-y-8 pb-24">
+        <Separator className="h-[2px] bg-foreground" />
+
         {/* Date and Weather */}
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-lg"><BookOpen className="w-5 h-5" />General</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
+        <div className="space-y-3">
+          <h2 className="text-lg font-semibold flex items-center gap-2 px-4"><BookOpen className="w-5 h-5" />General</h2>
+          <Card>
+            <CardContent className="space-y-4 pt-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Date</Label>
@@ -749,7 +750,7 @@ export function DailyReportPage() {
             </div>
 
             {/* Comments */}
-            <div className="space-y-2">
+            <div className="space-y-2 pb-4">
               <Label>Comments (optional)</Label>
               <Textarea
                 value={comments}
@@ -760,18 +761,19 @@ export function DailyReportPage() {
               />
             </div>
 
-            <Separator />
+            <div>
+              <DeadlineIndicator
+                dailyDueBy={deadlines.dailyDueBy}
+                payrollDueBy={deadlines.payrollDueBy}
+                status={existingReport?.status || 'Draft'}
+                submittedAt={existingReport?.submittedAt}
+              />
+            </div>
+            </CardContent>
+          </Card>
+        </div>
 
-            <DeadlineIndicator
-              dailyDueBy={deadlines.dailyDueBy}
-              payrollDueBy={deadlines.payrollDueBy}
-              status={existingReport?.status || 'Draft'}
-              submittedAt={existingReport?.submittedAt}
-            />
-          </CardContent>
-        </Card>
-
-        <Separator />
+        <Separator className="h-[2px] bg-foreground" />
 
         {/* Labor Section */}
         <LaborSection
@@ -780,7 +782,7 @@ export function DailyReportPage() {
           dailyReportId={currentReportId}
         />
 
-        <Separator />
+        <Separator className="h-[2px] bg-foreground" />
 
         {/* Job Diary Section */}
         <JobDiarySection
@@ -789,7 +791,7 @@ export function DailyReportPage() {
           dailyReportId={currentReportId}
         />
 
-        <Separator />
+        <Separator className="h-[2px] bg-foreground" />
 
         {/* Subcontractors + Deliveries */}
         <SubcontractorsDeliveriesSection
@@ -800,7 +802,7 @@ export function DailyReportPage() {
           dailyReportId={currentReportId}
         />
 
-        <Separator />
+        <Separator className="h-[2px] bg-foreground" />
 
         {/* Photo Attachments */}
         <PhotoAttachments
@@ -809,7 +811,7 @@ export function DailyReportPage() {
           dailyReportId={currentReportId}
         />
 
-        <Separator />
+        <Separator className="h-[2px] bg-foreground" />
 
         {/* Signature */}
         <SignatureCapture
@@ -824,17 +826,17 @@ export function DailyReportPage() {
           <Button
             variant="outline"
             className="flex-1"
+            onClick={handleViewPDF}
+          >
+            View PDF
+          </Button>
+          <Button
+            variant="outline"
+            className="flex-1 btn-action"
             onClick={saveDraft}
             disabled={isSaving}
           >
             {isSaving ? 'Saving...' : 'Save Draft'}
-          </Button>
-          <Button
-            variant="outline"
-            className="flex-1"
-            onClick={handleViewPDF}
-          >
-            View PDF
           </Button>
           <Button
             className="flex-1"

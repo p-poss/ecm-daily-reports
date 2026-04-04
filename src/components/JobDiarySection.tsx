@@ -11,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Plus, X, List } from 'lucide-react';
 import type { JobDiaryEntry } from '@/types';
@@ -50,14 +50,13 @@ export function JobDiarySection({ entries, onChange, dailyReportId }: JobDiarySe
   }
 
   return (
-    <Card>
-      <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2 text-lg">
-          <List className="w-5 h-5" />
-          Production + Notes
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
+    <div className="space-y-3">
+      <h2 className="text-lg font-semibold flex items-center gap-2 px-4">
+        <List className="w-5 h-5" />
+        Production + Notes
+      </h2>
+      <Card>
+        <CardContent className="space-y-4 pt-4">
         {entries.length === 0 ? (
           <p className="text-sm text-muted-foreground text-center py-4">
             No journal entries.
@@ -79,14 +78,15 @@ export function JobDiarySection({ entries, onChange, dailyReportId }: JobDiarySe
         <Button
           type="button"
           variant="outline"
-          className="w-full"
+          className="w-full btn-action"
           onClick={addEntry}
         >
           <Plus className="w-4 h-4 mr-2" />
           Add Entry
         </Button>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </div>
   );
 }
 

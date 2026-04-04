@@ -359,7 +359,7 @@ export function LaborSection({ entries, onChange, dailyReportId }: LaborSectionP
       <Button
         type="button"
         variant="outline"
-        className="w-full bg-card"
+        className="w-full btn-action"
         onClick={addEntry}
       >
         <Plus className="w-4 h-4 mr-2" />

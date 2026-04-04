@@ -169,6 +169,20 @@
   }
 }
 
+/*
+ * Shared action button style (grey fill + outline).
+ * Used by: Add Row, Add Entry, Add Subcontractor, Add Delivery,
+ *          Add Photo, Clear signature, Make/Edit Reports,
+ *          Create New Report, Edit Report, Save Draft.
+ * Change here to update all at once.
+ */
+.btn-action {
+  background-color: color-mix(in oklch, var(--input) 50%, transparent);
+}
+.btn-action:hover {
+  background-color: color-mix(in oklch, var(--input) 80%, transparent);
+}
+
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
   -webkit-appearance: none;

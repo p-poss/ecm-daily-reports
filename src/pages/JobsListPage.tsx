@@ -260,7 +260,7 @@ export function JobsListPage() {
                     </Button>
                     <Button
                       variant="outline"
-                      className="flex-1"
+                      className="flex-1 btn-action"
                       onClick={() => navigateToReports(job.id)}
                     >
                       Make / Edit Reports

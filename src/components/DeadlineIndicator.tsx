@@ -69,7 +69,7 @@ export function DeadlineIndicator({
   }
 
   return (
-    <div className="divide-y">
+    <div className="divide-y border-t">
       {/* Daily Target */}
       <div className="flex items-center justify-between text-sm py-3">
         <div className="flex items-center gap-2">

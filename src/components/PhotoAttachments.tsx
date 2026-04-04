@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Camera, X } from 'lucide-react';
 import { generateId, now } from '@/db/database';
 import type { PhotoAttachment } from '@/types';
@@ -66,14 +66,13 @@ export function PhotoAttachments({ photos, onChange, dailyReportId }: PhotoAttac
   }
 
   return (
-    <Card>
-      <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2 text-lg">
-          <Camera className="w-5 h-5" />
-          Photos
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
+    <div className="space-y-3">
+      <h2 className="text-lg font-semibold flex items-center gap-2 px-4">
+        <Camera className="w-5 h-5" />
+        Photos
+      </h2>
+      <Card>
+        <CardContent className="space-y-4 pt-4">
         {photos.length > 0 && (
           <div className="grid grid-cols-2 gap-3">
             {photos.map((photo) => (
@@ -126,13 +125,14 @@ export function PhotoAttachments({ photos, onChange, dailyReportId }: PhotoAttac
         <Button
           type="button"
           variant="outline"
-          className="w-full"
+          className="w-full btn-action"
           onClick={() => fileInputRef.current?.click()}
         >
           <Camera className="w-4 h-4 mr-2" />
-          Take Photo or Choose from Library
+          Add Photo
         </Button>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </div>
   );
 }

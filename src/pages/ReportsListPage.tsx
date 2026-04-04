@@ -271,7 +271,7 @@ export function ReportsListPage() {
       <div className="max-w-7xl mx-auto p-4 pb-0">
         <Button
           variant="outline"
-          className="w-full bg-card"
+          className="w-full btn-action"
           onClick={() => setShowNewReportModal(true)}
         >
           <Plus className="w-4 h-4 mr-2" />
@@ -432,7 +432,7 @@ export function ReportsListPage() {
                           </Button>
                           <Button
                             variant="outline"
-                            className="flex-1"
+                            className="flex-1 btn-action"
                             onClick={() => selectedJobId && navigateToReportForm(selectedJobId, report.id)}
                           >
                             Edit Report

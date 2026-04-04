@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import SignatureCanvas from 'react-signature-canvas';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { PenTool, RotateCcw, Check } from 'lucide-react';
 
 interface SignatureCaptureProps {
@@ -29,14 +29,13 @@ export function SignatureCapture({ value, onChange, disabled }: SignatureCapture
   }
 
   return (
-    <Card>
-      <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2 text-lg">
-          <PenTool className="w-5 h-5" />
-          Signature
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-3">
+    <div className="space-y-3">
+      <h2 className="text-lg font-semibold flex items-center gap-2 px-4">
+        <PenTool className="w-5 h-5" />
+        Signature
+      </h2>
+      <Card>
+        <CardContent className="space-y-3 pt-4">
         {value && !signatureRef.current ? (
           // Show saved signature
           <div className="space-y-2">
@@ -73,7 +72,7 @@ export function SignatureCapture({ value, onChange, disabled }: SignatureCapture
               <Button
                 type="button"
                 variant="outline"
-                className="flex-1"
+                className="flex-1 btn-action"
                 onClick={handleClear}
                 disabled={isEmpty || disabled}
               >
@@ -93,7 +92,8 @@ export function SignatureCapture({ value, onChange, disabled }: SignatureCapture
             </p>
           </>
         )}
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </div>
   );
 }

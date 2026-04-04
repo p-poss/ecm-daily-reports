@@ -1,6 +1,7 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db, generateId } from '@/db/database';
 import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
@@ -11,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Plus, X, HardHat, Truck } from 'lucide-react';
 import type { SubcontractorWork, MaterialDelivered } from '@/types';
 
@@ -77,14 +78,13 @@ export function SubcontractorsDeliveriesSection({
   return (
     <>
       {/* Subcontractors */}
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="flex items-center gap-2 text-lg">
-            <HardHat className="w-5 h-5" />
-            Subcontractors
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
+      <div className="space-y-3">
+        <h2 className="text-lg font-semibold flex items-center gap-2 px-4">
+          <HardHat className="w-5 h-5" />
+          Subcontractors
+        </h2>
+        <Card>
+          <CardContent className="space-y-4 pt-4">
           {subcontractorEntries.length === 0 ? (
             <p className="text-sm text-muted-foreground text-center py-4">
               No subcontractor entries.
@@ -184,24 +184,26 @@ export function SubcontractorsDeliveriesSection({
           <Button
             type="button"
             variant="outline"
-            className="w-full"
+            className="w-full btn-action"
             onClick={addSubcontractorEntry}
           >
             <Plus className="w-4 h-4 mr-2" />
             Add Subcontractor
           </Button>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </div>
+
+      <Separator className="h-[2px] bg-foreground" />
 
       {/* Deliveries */}
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="flex items-center gap-2 text-lg">
-            <Truck className="w-5 h-5" />
-            Deliveries
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
+      <div className="space-y-3">
+        <h2 className="text-lg font-semibold flex items-center gap-2 px-4">
+          <Truck className="w-5 h-5" />
+          Deliveries
+        </h2>
+        <Card>
+          <CardContent className="space-y-4 pt-4">
           {deliveryEntries.length === 0 ? (
             <p className="text-sm text-muted-foreground text-center py-4">
               No delivery entries.
@@ -271,14 +273,15 @@ export function SubcontractorsDeliveriesSection({
           <Button
             type="button"
             variant="outline"
-            className="w-full"
+            className="w-full btn-action"
             onClick={addDeliveryEntry}
           >
             <Plus className="w-4 h-4 mr-2" />
             Add Delivery
           </Button>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </div>
     </>
   );
 }

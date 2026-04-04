@@ -205,8 +205,8 @@ export function AIAssistant({ context, onToolCall }: AIAssistantProps) {
         onClick={() => {
           if (!wasDragged.current) setIsOpen(true);
         }}
-        style={{ left: position.x, top: position.y }}
-        className="fixed z-50 w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-2xl hover:bg-primary/90 flex items-center justify-center cursor-grab active:cursor-grabbing touch-none select-none"
+        style={{ left: position.x, top: position.y, boxShadow: '0 8px 24px rgba(0,0,0,0.25), 0 2px 8px rgba(0,0,0,0.15)' }}
+        className="fixed z-50 w-14 h-14 rounded-xl bg-primary text-white hover:bg-primary/90 flex items-center justify-center cursor-grab active:cursor-grabbing touch-none select-none"
       >
         <AIIcon className="w-9 h-9 pointer-events-none" />
       </button>
@@ -235,7 +235,7 @@ export function AIAssistant({ context, onToolCall }: AIAssistantProps) {
           className="flex items-center justify-between px-4 py-3 border-b cursor-grab active:cursor-grabbing touch-none select-none"
         >
           <div className="flex items-center gap-2 pointer-events-none">
-            <AIIcon className="w-5 h-5 text-primary" />
+            <AIIcon className="w-5 h-5 text-[#E76E4B]" />
             <span className="font-semibold text-sm">Report Claude</span>
           </div>
           <Button
