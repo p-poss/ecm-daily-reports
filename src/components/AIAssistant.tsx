@@ -206,7 +206,7 @@ export function AIAssistant({ context, onToolCall }: AIAssistantProps) {
           if (!wasDragged.current) setIsOpen(true);
         }}
         style={{ left: position.x, top: position.y }}
-        className="fixed z-50 w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 flex items-center justify-center cursor-grab active:cursor-grabbing touch-none select-none"
+        className="fixed z-50 w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-2xl hover:bg-primary/90 flex items-center justify-center cursor-grab active:cursor-grabbing touch-none select-none"
       >
         <AIIcon className="w-9 h-9 pointer-events-none" />
       </button>
