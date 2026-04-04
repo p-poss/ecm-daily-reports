@@ -38,7 +38,30 @@ export function DailyReportPage() {
   const [date, setDate] = useState(() => new Date().toISOString().split('T')[0]);
   const [weather, setWeather] = useState<Weather | undefined>();
   const [comments, setComments] = useState('');
-  const [laborEntries, setLaborEntries] = useState<LaborEntry[]>([]);
+  const isNewReport = !selectedReportId && !copyFromReportId;
+  const [laborEntries, setLaborEntries] = useState<LaborEntry[]>(() => {
+    // Seed one empty row for new reports
+    if (isNewReport) {
+      return [{
+        id: generateId(),
+        dailyReportId: reportId,
+        employeeId: '',
+        trade: 'N/A' as const,
+        stHours: 8,
+        otHours: 0,
+        equipmentId: undefined,
+        rentalCompany: undefined,
+        idleStHours: 0,
+        idleOtHours: 0,
+        downStHours: 0,
+        downOtHours: 0,
+        workStHours: 0,
+        workOtHours: 0,
+        costCodeHours: {},
+      }];
+    }
+    return [];
+  });
   const [diaryEntries, setDiaryEntries] = useState<JobDiaryEntry[]>([]);
   const [subcontractorEntries, setSubcontractorEntries] = useState<SubcontractorWork[]>([]);
   const [deliveryEntries, setDeliveryEntries] = useState<MaterialDelivered[]>([]);
