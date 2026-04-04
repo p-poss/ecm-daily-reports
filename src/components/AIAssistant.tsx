@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils';
 
 const DRAG_THRESHOLD = 8; // pixels moved before it counts as a drag
 
-function useDraggable(initialPosition: { x: number; y: number }) {
+function useDraggable(initialPosition: { x: number; y: number }, containerRef?: React.RefObject<HTMLElement | null>) {
   const [position, setPosition] = useState(initialPosition);
   const dragging = useRef(false);
   const wasDragged = useRef(false);
@@ -18,7 +18,9 @@ function useDraggable(initialPosition: { x: number; y: number }) {
   const startOffset = useRef({ x: 0, y: 0 });
 
   const clamp = useCallback((x: number, y: number, el: HTMLElement) => {
-    const rect = el.getBoundingClientRect();
+    // Use container ref if available (for panel), otherwise use the element itself (for FAB)
+    const sizeEl = containerRef?.current ?? el;
+    const rect = sizeEl.getBoundingClientRect();
     const vw = window.innerWidth;
     const vh = window.innerHeight;
     // Measure header and footer to keep the element between them
@@ -29,7 +31,7 @@ function useDraggable(initialPosition: { x: number; y: number }) {
     const clampedX = Math.max(4, Math.min(vw - rect.width - 4, x));
     const clampedY = Math.max(minY, Math.min(maxY, y));
     return { x: clampedX, y: clampedY };
-  }, []);
+  }, [containerRef]);
 
   const onPointerDown = useCallback((e: React.PointerEvent<HTMLElement>) => {
     // Only drag with primary button / single touch
@@ -125,12 +127,13 @@ export function AIAssistant({ context, onToolCall }: AIAssistantProps) {
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
 
   // Default position: right side, vertically centered
   const { position, setPosition, wasDragged, handlers } = useDraggable({
     x: typeof window !== 'undefined' ? window.innerWidth - 80 : 0,
     y: typeof window !== 'undefined' ? window.innerHeight / 2 - 28 : 0,
-  });
+  }, panelRef);
 
   // Keep in-bounds on resize
   useEffect(() => {
@@ -214,12 +217,14 @@ export function AIAssistant({ context, onToolCall }: AIAssistantProps) {
   const headerEl = document.querySelector('header');
   const footerEl = document.querySelector('[class*="fixed bottom-0"]');
   const panelMinY = headerEl ? headerEl.getBoundingClientRect().bottom + 4 : 4;
-  const panelMaxY = (footerEl ? footerEl.getBoundingClientRect().top : window.innerHeight) - 200;
+  const panelHeight = panelRef.current?.getBoundingClientRect().height ?? 400;
+  const panelMaxY = (footerEl ? footerEl.getBoundingClientRect().top : window.innerHeight) - panelHeight - 4;
   const panelX = Math.min(position.x, window.innerWidth - Math.min(540, window.innerWidth - 48) - 8);
   const panelY = Math.max(panelMinY, Math.min(position.y, panelMaxY));
 
   return (
     <div
+      ref={panelRef}
       style={{ left: panelX, top: panelY }}
       className="fixed z-50 w-[540px] max-w-[calc(100vw-3rem)]"
     >
