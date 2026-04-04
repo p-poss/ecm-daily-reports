@@ -662,7 +662,7 @@ export function DailyReportPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="bg-background p-4 sticky top-0 z-10 border border-border rounded-b-[2rem]">
+      <header className="bg-background p-4 fixed top-0 left-0 right-0 z-10 border border-border rounded-b-[2rem]">
         <div className="flex items-start max-w-7xl mx-auto relative">
           <Button
             variant="outline"
@@ -697,7 +697,7 @@ export function DailyReportPage() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto p-4 pb-24">
+      <main className="max-w-7xl mx-auto p-4 pb-24 pt-[120px]">
         <Separator className="h-[2px] bg-foreground mt-[90px]" />
 
         {/* Date and Weather */}

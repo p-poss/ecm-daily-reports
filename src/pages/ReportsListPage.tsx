@@ -237,7 +237,7 @@ export function ReportsListPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="bg-background p-4 sticky top-0 z-10 border border-border rounded-b-[2rem]">
+      <header className="bg-background p-4 fixed top-0 left-0 right-0 z-10 border border-border rounded-b-[2rem]">
         <div className="flex items-start max-w-7xl mx-auto relative">
           <Button
             variant="outline"
@@ -267,20 +267,8 @@ export function ReportsListPage() {
         </div>
       </header>
 
-      {/* Create New Report Button */}
-      <div className="max-w-7xl mx-auto p-4 pb-0">
-        <Button
-          variant="outline"
-          className="w-full btn-action"
-          onClick={() => setShowNewReportModal(true)}
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          Create New Report
-        </Button>
-      </div>
-
       {/* Reports List */}
-      <main className="max-w-7xl mx-auto p-4 space-y-3">
+      <main className="max-w-7xl mx-auto p-4 pt-[120px] space-y-3">
         {reports === undefined ? (
           <div className="flex justify-center py-8">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
@@ -453,6 +441,15 @@ export function ReportsListPage() {
             );
           })
         )}
+        {/* Create New Report Button */}
+        <Button
+          variant="outline"
+          className="w-full btn-action"
+          onClick={() => setShowNewReportModal(true)}
+        >
+          <Plus className="w-4 h-4 mr-2" />
+          Create New Report
+        </Button>
       </main>
 
       {/* New Report Modal */}
