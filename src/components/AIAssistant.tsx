@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, type ComponentPropsWithoutRef } from 'react';
+import { useState, useRef, useEffect, useCallback, type ComponentPropsWithoutRef } from 'react';
 import ReactMarkdown, { type Components } from 'react-markdown';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,6 +7,65 @@ import { X, ArrowUp, Loader2 } from 'lucide-react';
 import { AIIcon } from '@/components/icons/AIIcon';
 import { sendMessage, type ChatMessage, type ReportContext } from '@/lib/ai-assistant';
 import { cn } from '@/lib/utils';
+
+const DRAG_THRESHOLD = 8; // pixels moved before it counts as a drag
+
+function useDraggable(initialPosition: { x: number; y: number }) {
+  const [position, setPosition] = useState(initialPosition);
+  const dragging = useRef(false);
+  const wasDragged = useRef(false);
+  const startPos = useRef({ x: 0, y: 0 });
+  const startOffset = useRef({ x: 0, y: 0 });
+
+  const clamp = useCallback((x: number, y: number, el: HTMLElement) => {
+    const rect = el.getBoundingClientRect();
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    // Measure header and footer to keep the element between them
+    const header = document.querySelector('header');
+    const footer = document.querySelector('[class*="fixed bottom-0"]');
+    const minY = header ? header.getBoundingClientRect().bottom + 4 : 4;
+    const maxY = (footer ? footer.getBoundingClientRect().top : vh) - rect.height - 4;
+    const clampedX = Math.max(4, Math.min(vw - rect.width - 4, x));
+    const clampedY = Math.max(minY, Math.min(maxY, y));
+    return { x: clampedX, y: clampedY };
+  }, []);
+
+  const onPointerDown = useCallback((e: React.PointerEvent<HTMLElement>) => {
+    // Only drag with primary button / single touch
+    if (e.button !== 0) return;
+    const el = e.currentTarget;
+    el.setPointerCapture(e.pointerId);
+    dragging.current = true;
+    wasDragged.current = false;
+    startPos.current = { x: e.clientX, y: e.clientY };
+    startOffset.current = { ...position };
+  }, [position]);
+
+  const onPointerMove = useCallback((e: React.PointerEvent<HTMLElement>) => {
+    if (!dragging.current) return;
+    const dx = e.clientX - startPos.current.x;
+    const dy = e.clientY - startPos.current.y;
+    if (!wasDragged.current && Math.abs(dx) < DRAG_THRESHOLD && Math.abs(dy) < DRAG_THRESHOLD) return;
+    wasDragged.current = true;
+    const el = e.currentTarget;
+    const newPos = clamp(startOffset.current.x + dx, startOffset.current.y + dy, el);
+    setPosition(newPos);
+  }, [clamp]);
+
+  const onPointerUp = useCallback((e: React.PointerEvent<HTMLElement>) => {
+    if (!dragging.current) return;
+    dragging.current = false;
+    e.currentTarget.releasePointerCapture(e.pointerId);
+  }, []);
+
+  return {
+    position,
+    setPosition,
+    wasDragged,
+    handlers: { onPointerDown, onPointerMove, onPointerUp },
+  };
+}
 
 const markdownComponents: Components = {
   p: ({ children, ...props }: ComponentPropsWithoutRef<'p'>) => (
@@ -67,6 +126,30 @@ export function AIAssistant({ context, onToolCall }: AIAssistantProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // Default position: right side, vertically centered
+  const { position, setPosition, wasDragged, handlers } = useDraggable({
+    x: typeof window !== 'undefined' ? window.innerWidth - 80 : 0,
+    y: typeof window !== 'undefined' ? window.innerHeight / 2 - 28 : 0,
+  });
+
+  // Keep in-bounds on resize
+  useEffect(() => {
+    function onResize() {
+      setPosition((prev) => {
+        const header = document.querySelector('header');
+        const footer = document.querySelector('[class*="fixed bottom-0"]');
+        const minY = header ? header.getBoundingClientRect().bottom + 4 : 4;
+        const maxY = (footer ? footer.getBoundingClientRect().top : window.innerHeight) - 60;
+        return {
+          x: Math.max(4, Math.min(prev.x, window.innerWidth - 60)),
+          y: Math.max(minY, Math.min(prev.y, maxY)),
+        };
+      });
+    }
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, [setPosition]);
+
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
@@ -115,26 +198,46 @@ export function AIAssistant({ context, onToolCall }: AIAssistantProps) {
   if (!isOpen) {
     return (
       <button
-        onClick={() => setIsOpen(true)}
-        className="fixed top-1/2 -translate-y-1/2 right-6 z-50 w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 flex items-center justify-center cursor-pointer"
+        {...handlers}
+        onClick={() => {
+          if (!wasDragged.current) setIsOpen(true);
+        }}
+        style={{ left: position.x, top: position.y }}
+        className="fixed z-50 w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 flex items-center justify-center cursor-grab active:cursor-grabbing touch-none select-none"
       >
-        <AIIcon className="w-9 h-9" />
+        <AIIcon className="w-9 h-9 pointer-events-none" />
       </button>
     );
   }
 
+  // Clamp panel position so it stays between header and footer
+  const headerEl = document.querySelector('header');
+  const footerEl = document.querySelector('[class*="fixed bottom-0"]');
+  const panelMinY = headerEl ? headerEl.getBoundingClientRect().bottom + 4 : 4;
+  const panelMaxY = (footerEl ? footerEl.getBoundingClientRect().top : window.innerHeight) - 200;
+  const panelX = Math.min(position.x, window.innerWidth - Math.min(540, window.innerWidth - 48) - 8);
+  const panelY = Math.max(panelMinY, Math.min(position.y, panelMaxY));
+
   return (
-    <div className="fixed top-1/2 -translate-y-1/2 right-6 z-50 w-[540px] max-w-[calc(100vw-3rem)]">
+    <div
+      style={{ left: panelX, top: panelY }}
+      className="fixed z-50 w-[540px] max-w-[calc(100vw-3rem)]"
+    >
       <Card className="flex flex-col shadow-2xl p-0 max-h-[70dvh]">
-        {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3 border-b">
-          <div className="flex items-center gap-2">
+        {/* Header — draggable handle */}
+        <div
+          {...handlers}
+          className="flex items-center justify-between px-4 py-3 border-b cursor-grab active:cursor-grabbing touch-none select-none"
+        >
+          <div className="flex items-center gap-2 pointer-events-none">
             <AIIcon className="w-5 h-5 text-primary" />
             <span className="font-semibold text-sm">Report Claude</span>
           </div>
           <Button
             variant="ghost"
             size="icon-sm"
+            className="pointer-events-auto"
+            onPointerDown={(e) => e.stopPropagation()}
             onClick={() => setIsOpen(false)}
           >
             <X className="w-4 h-4" />
