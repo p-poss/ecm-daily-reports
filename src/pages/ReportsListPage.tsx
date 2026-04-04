@@ -237,7 +237,7 @@ export function ReportsListPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="bg-background border-b p-4 sticky top-0 z-10">
+      <header className="bg-background p-4 sticky top-0 z-10 border border-border rounded-b-[2rem]">
         <div className="flex items-start max-w-7xl mx-auto relative">
           <Button
             variant="outline"

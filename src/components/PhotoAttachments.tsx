@@ -66,9 +66,9 @@ export function PhotoAttachments({ photos, onChange, dailyReportId }: PhotoAttac
   }
 
   return (
-    <div className="space-y-3">
-      <h2 className="text-lg font-semibold flex items-center gap-2 px-4">
-        <Camera className="w-5 h-5" />
+    <div className="space-y-[20px]">
+      <h2 className="text-lg font-semibold flex items-center gap-3 px-4">
+        <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground"><Camera className="w-3 h-3" /></span>
         Photos
       </h2>
       <Card>

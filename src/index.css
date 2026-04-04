@@ -183,6 +183,7 @@
   background-color: color-mix(in oklch, var(--input) 80%, transparent);
 }
 
+
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
   -webkit-appearance: none;

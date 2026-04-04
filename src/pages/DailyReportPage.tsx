@@ -662,7 +662,7 @@ export function DailyReportPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="bg-background border-b p-4 sticky top-0 z-10">
+      <header className="bg-background p-4 sticky top-0 z-10 border border-border rounded-b-[2rem]">
         <div className="flex items-start max-w-7xl mx-auto relative">
           <Button
             variant="outline"
@@ -697,12 +697,12 @@ export function DailyReportPage() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto p-4 space-y-8 pb-24">
-        <Separator className="h-[2px] bg-foreground" />
+      <main className="max-w-7xl mx-auto p-4 pb-24">
+        <Separator className="h-[2px] bg-foreground mt-[90px]" />
 
         {/* Date and Weather */}
-        <div className="space-y-3">
-          <h2 className="text-lg font-semibold flex items-center gap-2 px-4"><BookOpen className="w-5 h-5" />General</h2>
+        <div className="space-y-[20px] mt-[20px]">
+          <h2 className="text-lg font-semibold flex items-center gap-3 px-4"><span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground"><BookOpen className="w-3 h-3" /></span>General</h2>
           <Card>
             <CardContent className="space-y-4 pt-4">
             <div className="grid grid-cols-2 gap-4">
@@ -773,27 +773,32 @@ export function DailyReportPage() {
           </Card>
         </div>
 
-        <Separator className="h-[2px] bg-foreground" />
+        <Separator className="h-[2px] bg-foreground mt-[90px]" />
 
         {/* Labor Section */}
+        <div className="mt-[20px]">
         <LaborSection
           entries={laborEntries}
           onChange={setLaborEntries}
           dailyReportId={currentReportId}
         />
+        </div>
 
-        <Separator className="h-[2px] bg-foreground" />
+        <Separator className="h-[2px] bg-foreground mt-[90px]" />
 
         {/* Job Diary Section */}
+        <div className="mt-[20px]">
         <JobDiarySection
           entries={diaryEntries}
           onChange={setDiaryEntries}
           dailyReportId={currentReportId}
         />
+        </div>
 
-        <Separator className="h-[2px] bg-foreground" />
+        <Separator className="h-[2px] bg-foreground mt-[90px]" />
 
         {/* Subcontractors + Deliveries */}
+        <div className="mt-[20px]">
         <SubcontractorsDeliveriesSection
           subcontractorEntries={subcontractorEntries}
           deliveryEntries={deliveryEntries}
@@ -801,27 +806,32 @@ export function DailyReportPage() {
           onDeliveriesChange={setDeliveryEntries}
           dailyReportId={currentReportId}
         />
+        </div>
 
-        <Separator className="h-[2px] bg-foreground" />
+        <Separator className="h-[2px] bg-foreground mt-[90px]" />
 
         {/* Photo Attachments */}
+        <div className="mt-[20px]">
         <PhotoAttachments
           photos={photos}
           onChange={setPhotos}
           dailyReportId={currentReportId}
         />
+        </div>
 
-        <Separator className="h-[2px] bg-foreground" />
+        <Separator className="h-[2px] bg-foreground mt-[90px]" />
 
         {/* Signature */}
+        <div className="mt-[20px]">
         <SignatureCapture
           value={signature}
           onChange={setSignature}
         />
+        </div>
       </main>
 
       {/* Fixed Bottom Actions */}
-      <div className="fixed bottom-0 left-0 right-0 z-10 bg-background border-t p-4 safe-area-inset-bottom">
+      <div className="fixed bottom-0 left-0 right-0 z-10 bg-background p-4 safe-area-inset-bottom border border-border rounded-t-[2rem]">
         <div className="max-w-7xl mx-auto flex gap-3">
           <Button
             variant="outline"

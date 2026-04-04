@@ -78,9 +78,9 @@ export function SubcontractorsDeliveriesSection({
   return (
     <>
       {/* Subcontractors */}
-      <div className="space-y-3">
-        <h2 className="text-lg font-semibold flex items-center gap-2 px-4">
-          <HardHat className="w-5 h-5" />
+      <div className="space-y-[20px]">
+        <h2 className="text-lg font-semibold flex items-center gap-3 px-4">
+          <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground"><HardHat className="w-3 h-3" /></span>
           Subcontractors
         </h2>
         <Card>
@@ -194,12 +194,12 @@ export function SubcontractorsDeliveriesSection({
         </Card>
       </div>
 
-      <Separator className="h-[2px] bg-foreground" />
+      <Separator className="h-[2px] bg-foreground mt-[90px]" />
 
       {/* Deliveries */}
-      <div className="space-y-3">
-        <h2 className="text-lg font-semibold flex items-center gap-2 px-4">
-          <Truck className="w-5 h-5" />
+      <div className="space-y-[20px] mt-[20px]">
+        <h2 className="text-lg font-semibold flex items-center gap-3 px-4">
+          <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground"><Truck className="w-3 h-3" /></span>
           Deliveries
         </h2>
         <Card>

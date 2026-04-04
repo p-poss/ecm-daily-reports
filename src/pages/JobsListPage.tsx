@@ -176,7 +176,7 @@ export function JobsListPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="bg-background border-b p-4 sticky top-0 z-10">
+      <header className="bg-background p-4 sticky top-0 z-10 border border-border rounded-b-[2rem]">
         <div className="flex items-start max-w-7xl mx-auto relative">
           <Button
             variant="outline"
@@ -187,7 +187,7 @@ export function JobsListPage() {
             <span>Logout</span>
           </Button>
           <div className="flex-1 text-center">
-            <h1 className="text-lg font-bold text-foreground">Current Jobs</h1>
+            <h1 className="text-lg font-bold text-primary">Current Jobs</h1>
             <p className="text-sm text-muted-foreground">{foreman?.name}</p>
           </div>
           <div className="flex items-center gap-3 absolute right-0">
@@ -263,7 +263,7 @@ export function JobsListPage() {
                       className="flex-1 btn-action"
                       onClick={() => navigateToReports(job.id)}
                     >
-                      Make / Edit Reports
+                      Manage Reports
                     </Button>
                   </div>
                 </CardContent>

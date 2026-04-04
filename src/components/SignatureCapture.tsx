@@ -29,9 +29,9 @@ export function SignatureCapture({ value, onChange, disabled }: SignatureCapture
   }
 
   return (
-    <div className="space-y-3">
-      <h2 className="text-lg font-semibold flex items-center gap-2 px-4">
-        <PenTool className="w-5 h-5" />
+    <div className="space-y-[20px]">
+      <h2 className="text-lg font-semibold flex items-center gap-3 px-4">
+        <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground"><PenTool className="w-3 h-3" /></span>
         Signature
       </h2>
       <Card>
