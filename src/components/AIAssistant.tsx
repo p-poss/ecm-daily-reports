@@ -3,7 +3,7 @@ import ReactMarkdown, { type Components } from 'react-markdown';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
-import { X, ArrowUp, Loader2 } from 'lucide-react';
+import { Minus, ArrowUp, Loader2 } from 'lucide-react';
 import { AIIcon } from '@/components/icons/AIIcon';
 import { sendMessage, type ChatMessage, type ReportContext } from '@/lib/ai-assistant';
 import { cn } from '@/lib/utils';
@@ -245,7 +245,7 @@ export function AIAssistant({ context, onToolCall }: AIAssistantProps) {
             onPointerDown={(e) => e.stopPropagation()}
             onClick={() => setIsOpen(false)}
           >
-            <X className="w-4 h-4" />
+            <Minus className="w-4 h-4" />
           </Button>
         </div>
 
