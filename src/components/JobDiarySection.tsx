@@ -64,7 +64,7 @@ export function JobDiarySection({ entries, onChange, dailyReportId }: JobDiarySe
         ) : (
           entries.map((entry, index) => (
             <div key={entry.id}>
-              {index > 0 && <Separator className="my-4" />}
+              {index > 0 && <Separator className="mt-[60px] mb-[20px]" />}
               <DiaryEntryForm
                 entry={entry}
                 costCodes={costCodes || []}

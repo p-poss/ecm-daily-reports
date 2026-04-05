@@ -92,7 +92,7 @@ export function SubcontractorsDeliveriesSection({
           ) : (
             subcontractorEntries.map((entry, index) => (
               <div key={entry.id} className="space-y-3">
-                {index > 0 && <Separator className="mb-4" />}
+                {index > 0 && <Separator className="mt-[60px] mb-[20px]" />}
                 <div className="flex justify-between items-start">
                   <div className="flex items-center gap-2">
                     <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-medium">
@@ -212,7 +212,7 @@ export function SubcontractorsDeliveriesSection({
           ) : (
             deliveryEntries.map((entry, index) => (
               <div key={entry.id} className="space-y-3">
-                {index > 0 && <Separator className="mb-4" />}
+                {index > 0 && <Separator className="mt-[60px] mb-[20px]" />}
                 <div className="flex justify-between items-start">
                   <div className="flex items-center gap-2">
                     <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-medium">
