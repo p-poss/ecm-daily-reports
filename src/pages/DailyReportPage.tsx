@@ -662,7 +662,7 @@ export function DailyReportPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="bg-background p-4 fixed top-0 left-0 right-0 z-10 border border-border rounded-b-[2rem]">
+      <header className="bg-background p-4 fixed top-0 left-0 right-0 z-10 border-2 border-border border-t-0 rounded-b-[2rem]">
         <div className="flex items-start max-w-7xl mx-auto relative">
           <Button
             variant="outline"
@@ -698,11 +698,11 @@ export function DailyReportPage() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto p-4 pb-24 pt-[120px]">
-        <Separator className="h-[2px] bg-foreground mt-[90px]" />
+        <Separator className="h-[2px] bg-primary mt-[90px]" />
 
         {/* Date and Weather */}
         <div className="space-y-[20px] mt-[20px]">
-          <h2 className="text-lg font-semibold flex items-center gap-3 px-4"><span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground"><BookOpen className="w-3 h-3" /></span>General</h2>
+          <h2 className="text-lg font-semibold flex items-center gap-2 px-4 text-primary"><span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground"><BookOpen className="w-3 h-3" /></span>General</h2>
           <Card>
             <CardContent className="space-y-4 pt-4">
             <div className="grid grid-cols-2 gap-4">
@@ -773,7 +773,7 @@ export function DailyReportPage() {
           </Card>
         </div>
 
-        <Separator className="h-[2px] bg-foreground mt-[90px]" />
+        <Separator className="h-[2px] bg-primary mt-[90px]" />
 
         {/* Labor Section */}
         <div className="mt-[20px]">
@@ -784,7 +784,7 @@ export function DailyReportPage() {
         />
         </div>
 
-        <Separator className="h-[2px] bg-foreground mt-[90px]" />
+        <Separator className="h-[2px] bg-primary mt-[90px]" />
 
         {/* Job Diary Section */}
         <div className="mt-[20px]">
@@ -795,7 +795,7 @@ export function DailyReportPage() {
         />
         </div>
 
-        <Separator className="h-[2px] bg-foreground mt-[90px]" />
+        <Separator className="h-[2px] bg-primary mt-[90px]" />
 
         {/* Subcontractors + Deliveries */}
         <div className="mt-[20px]">
@@ -808,7 +808,7 @@ export function DailyReportPage() {
         />
         </div>
 
-        <Separator className="h-[2px] bg-foreground mt-[90px]" />
+        <Separator className="h-[2px] bg-primary mt-[90px]" />
 
         {/* Photo Attachments */}
         <div className="mt-[20px]">
@@ -819,7 +819,7 @@ export function DailyReportPage() {
         />
         </div>
 
-        <Separator className="h-[2px] bg-foreground mt-[90px]" />
+        <Separator className="h-[2px] bg-primary mt-[90px]" />
 
         {/* Signature */}
         <div className="mt-[20px]">
@@ -831,7 +831,7 @@ export function DailyReportPage() {
       </main>
 
       {/* Fixed Bottom Actions */}
-      <div className="fixed bottom-0 left-0 right-0 z-10 bg-background p-4 safe-area-inset-bottom border border-border rounded-t-[2rem]">
+      <div className="fixed bottom-0 left-0 right-0 z-10 bg-background p-4 safe-area-inset-bottom border-2 border-border border-b-0 rounded-t-[2rem]">
         <div className="max-w-7xl mx-auto flex gap-3">
           <Button
             variant="outline"

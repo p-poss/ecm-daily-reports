@@ -79,7 +79,7 @@ export function SubcontractorsDeliveriesSection({
     <>
       {/* Subcontractors */}
       <div className="space-y-[20px]">
-        <h2 className="text-lg font-semibold flex items-center gap-3 px-4">
+        <h2 className="text-lg font-semibold flex items-center gap-2 px-4 text-primary">
           <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground"><HardHat className="w-3 h-3" /></span>
           Subcontractors
         </h2>
@@ -92,6 +92,7 @@ export function SubcontractorsDeliveriesSection({
           ) : (
             subcontractorEntries.map((entry, index) => (
               <div key={entry.id} className="space-y-3">
+                {index > 0 && <Separator className="mb-4" />}
                 <div className="flex justify-between items-start">
                   <div className="flex items-center gap-2">
                     <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-medium">
@@ -194,11 +195,11 @@ export function SubcontractorsDeliveriesSection({
         </Card>
       </div>
 
-      <Separator className="h-[2px] bg-foreground mt-[90px]" />
+      <Separator className="h-[2px] bg-primary mt-[90px]" />
 
       {/* Deliveries */}
       <div className="space-y-[20px] mt-[20px]">
-        <h2 className="text-lg font-semibold flex items-center gap-3 px-4">
+        <h2 className="text-lg font-semibold flex items-center gap-2 px-4 text-primary">
           <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground"><Truck className="w-3 h-3" /></span>
           Deliveries
         </h2>
@@ -211,6 +212,7 @@ export function SubcontractorsDeliveriesSection({
           ) : (
             deliveryEntries.map((entry, index) => (
               <div key={entry.id} className="space-y-3">
+                {index > 0 && <Separator className="mb-4" />}
                 <div className="flex justify-between items-start">
                   <div className="flex items-center gap-2">
                     <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-medium">

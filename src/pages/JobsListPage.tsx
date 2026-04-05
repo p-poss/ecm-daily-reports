@@ -176,7 +176,7 @@ export function JobsListPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="bg-background p-4 fixed top-0 left-0 right-0 z-10 border border-border rounded-b-[2rem]">
+      <header className="bg-background p-4 fixed top-0 left-0 right-0 z-10 border-2 border-border border-t-0 rounded-b-[2rem]">
         <div className="flex items-start max-w-7xl mx-auto relative">
           <Button
             variant="outline"

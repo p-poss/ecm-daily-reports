@@ -158,7 +158,7 @@ export function LaborSection({ entries, onChange, dailyReportId }: LaborSectionP
     <div className="space-y-[20px]">
       {/* Section Header */}
       <div className="flex items-center justify-between px-4">
-        <h2 className="text-lg font-semibold flex items-center gap-3">
+        <h2 className="text-lg font-semibold flex items-center gap-2 text-primary">
           <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground"><Sheet className="w-3 h-3" /></span>
           Labor + Equipment
           {entries.length > 0 && (

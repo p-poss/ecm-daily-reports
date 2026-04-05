@@ -51,7 +51,7 @@ export function JobDiarySection({ entries, onChange, dailyReportId }: JobDiarySe
 
   return (
     <div className="space-y-[20px]">
-      <h2 className="text-lg font-semibold flex items-center gap-3 px-4">
+      <h2 className="text-lg font-semibold flex items-center gap-2 px-4 text-primary">
         <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground"><List className="w-3 h-3" /></span>
         Production + Notes
       </h2>
