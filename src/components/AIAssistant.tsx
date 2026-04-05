@@ -118,9 +118,10 @@ const markdownComponents: Components = {
 interface AIAssistantProps {
   context: ReportContext;
   onToolCall: (name: string, input: Record<string, unknown>) => void;
+  onBeforeToolCalls?: () => void;
 }
 
-export function AIAssistant({ context, onToolCall }: AIAssistantProps) {
+export function AIAssistant({ context, onToolCall, onBeforeToolCalls }: AIAssistantProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
@@ -177,6 +178,9 @@ export function AIAssistant({ context, onToolCall }: AIAssistantProps) {
       const result = await sendMessage(newMessages, context);
 
       // Execute tool calls
+      if (result.toolCalls.length > 0) {
+        onBeforeToolCalls?.();
+      }
       for (const tool of result.toolCalls) {
         onToolCall(tool.name, tool.input);
       }

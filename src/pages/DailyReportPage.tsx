@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db, generateId, now, calculateDeadlines, isDeadlinePassed } from '@/db/database';
 import { useAuth } from '@/contexts/AuthContext';
@@ -21,12 +21,13 @@ import { SignatureCapture } from '@/components/SignatureCapture';
 import { PhotoAttachments } from '@/components/PhotoAttachments';
 import { DeadlineIndicator } from '@/components/DeadlineIndicator';
 import { AIAssistant } from '@/components/AIAssistant';
-import { ArrowLeft, BookOpen, Calendar as CalendarIcon, ChevronDown } from 'lucide-react';
+import { ArrowLeft, BookOpen, Calendar as CalendarIcon, ChevronDown, Undo2, Redo2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import type { ReportContext } from '@/lib/ai-assistant';
 import type { DailyReport, LaborEntry, JobDiaryEntry, SubcontractorWork, MaterialDelivered, PhotoAttachment, Weather } from '@/types';
 import { generateReportPDF, type ReportPDFData } from '@/lib/generate-report-pdf';
+import { useUndoRedo } from '@/hooks/useUndoRedo';
 
 export function DailyReportPage() {
   const { foreman } = useAuth();
@@ -35,38 +36,66 @@ export function DailyReportPage() {
 
   // Form state
   const [reportId] = useState(() => selectedReportId || generateId());
-  const [date, setDate] = useState(() => new Date().toISOString().split('T')[0]);
-  const [weather, setWeather] = useState<Weather | undefined>();
-  const [comments, setComments] = useState('');
   const isNewReport = !selectedReportId && !copyFromReportId;
-  const [laborEntries, setLaborEntries] = useState<LaborEntry[]>(() => {
-    // Seed one empty row for new reports
-    if (isNewReport) {
-      return [{
-        id: generateId(),
-        dailyReportId: reportId,
-        employeeId: '',
-        trade: 'N/A' as const,
-        stHours: 8,
-        otHours: 0,
-        equipmentId: undefined,
-        rentalCompany: undefined,
-        idleStHours: 0,
-        idleOtHours: 0,
-        downStHours: 0,
-        downOtHours: 0,
-        workStHours: 0,
-        workOtHours: 0,
-        costCodeHours: {},
-      }];
-    }
-    return [];
+
+  const initialLaborEntries: LaborEntry[] = isNewReport ? [{
+    id: generateId(),
+    dailyReportId: reportId,
+    employeeId: '',
+    trade: 'N/A' as const,
+    stHours: 8,
+    otHours: 0,
+    equipmentId: undefined,
+    rentalCompany: undefined,
+    idleStHours: 0,
+    idleOtHours: 0,
+    downStHours: 0,
+    downOtHours: 0,
+    workStHours: 0,
+    workOtHours: 0,
+    costCodeHours: {},
+  }] : [];
+
+  const {
+    state: formState,
+    set,
+    setQuiet,
+    takeSnapshot,
+    reset: resetForm,
+    undo,
+    redo,
+    canUndo,
+    canRedo,
+  } = useUndoRedo({
+    date: new Date().toISOString().split('T')[0],
+    weather: undefined,
+    comments: '',
+    laborEntries: initialLaborEntries,
+    diaryEntries: [],
+    subcontractorEntries: [],
+    deliveryEntries: [],
+    photos: [],
+    signature: '',
   });
-  const [diaryEntries, setDiaryEntries] = useState<JobDiaryEntry[]>([]);
-  const [subcontractorEntries, setSubcontractorEntries] = useState<SubcontractorWork[]>([]);
-  const [deliveryEntries, setDeliveryEntries] = useState<MaterialDelivered[]>([]);
-  const [photos, setPhotos] = useState<PhotoAttachment[]>([]);
-  const [signature, setSignature] = useState('');
+
+  const { date, weather, comments, laborEntries, diaryEntries, subcontractorEntries, deliveryEntries, photos, signature } = formState;
+
+  // Keyboard shortcuts for undo/redo
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      const mod = e.metaKey || e.ctrlKey;
+      if (mod && e.key === 'z' && !e.shiftKey) {
+        e.preventDefault();
+        undo();
+      } else if (mod && e.key === 'z' && e.shiftKey) {
+        e.preventDefault();
+        redo();
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [undo, redo]);
+
   const [isSaving, setIsSaving] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -93,10 +122,10 @@ export function DailyReportPage() {
   // Load existing report data
   useEffect(() => {
     if (existingReport && !isLoaded) {
-      setDate(existingReport.date);
-      setWeather(existingReport.weather);
-      setComments(existingReport.comments || '');
-      setSignature(existingReport.signatureImage || '');
+      setQuiet('date', existingReport.date);
+      setQuiet('weather', existingReport.weather);
+      setQuiet('comments', existingReport.comments || '');
+      setQuiet('signature', existingReport.signatureImage || '');
       loadReportData(existingReport.id);
       setIsLoaded(true);
     }
@@ -116,7 +145,7 @@ export function DailyReportPage() {
       if (!sourceReport) return;
 
       // Copy weather
-      setWeather(sourceReport.weather);
+      setQuiet('weather', sourceReport.weather);
 
       // Copy labor entries with new IDs
       const sourceLaborEntries = await db.laborEntries
@@ -131,7 +160,7 @@ export function DailyReportPage() {
         airtableId: undefined,
       }));
 
-      setLaborEntries(copiedLaborEntries);
+      setQuiet('laborEntries', copiedLaborEntries);
 
       // Set copied from date for display
       setCopiedFrom(sourceReport.date);
@@ -148,11 +177,11 @@ export function DailyReportPage() {
       db.materialsDelivered.where('dailyReportId').equals(id).toArray(),
       db.photoAttachments.where('dailyReportId').equals(id).toArray(),
     ]);
-    setLaborEntries(labor);
-    setDiaryEntries(diary);
-    setSubcontractorEntries(subs);
-    setDeliveryEntries(deliveries);
-    setPhotos(attachments);
+    setQuiet('laborEntries', labor);
+    setQuiet('diaryEntries', diary);
+    setQuiet('subcontractorEntries', subs);
+    setQuiet('deliveryEntries', deliveries);
+    setQuiet('photos', attachments);
   }
 
   // Calculate deadlines
@@ -530,16 +559,16 @@ export function DailyReportPage() {
     availableSubcontractors: (subcontractors || []).map((s) => ({ id: s.id, name: s.name })),
   };
 
-  function handleAIToolCall(name: string, input: Record<string, unknown>) {
+  const handleAIToolCall = useCallback((name: string, input: Record<string, unknown>) => {
     switch (name) {
       case 'set_date':
-        setDate(input.date as string);
+        setQuiet('date', input.date as string);
         break;
       case 'set_weather':
-        setWeather(input.weather as Weather);
+        setQuiet('weather', input.weather as Weather);
         break;
       case 'set_comments':
-        setComments(input.comments as string);
+        setQuiet('comments', input.comments as string);
         break;
       case 'add_labor_entry': {
         const emp = (employees || []).find((e) => e.id === input.employeeId);
@@ -561,31 +590,29 @@ export function DailyReportPage() {
           workOtHours: 0,
           costCodeHours: {},
         };
-        setLaborEntries((prev) => [...prev, newEntry]);
+        setQuiet('laborEntries', [...laborEntries, newEntry]);
         break;
       }
       case 'update_labor_entry': {
         const idx = input.index as number;
-        setLaborEntries((prev) => {
-          const updated = [...prev];
-          if (updated[idx]) {
-            const updates: Partial<LaborEntry> = {};
-            if (input.employeeId !== undefined) updates.employeeId = input.employeeId as string;
-            if (input.trade !== undefined) updates.trade = input.trade as string;
-            if (input.stHours !== undefined) updates.stHours = input.stHours as number;
-            if (input.otHours !== undefined) updates.otHours = input.otHours as number;
-            if (input.equipmentId !== undefined) updates.equipmentId = input.equipmentId as string;
-            if (input.rentalCompany !== undefined) updates.rentalCompany = input.rentalCompany as string;
-            if (input.equipmentDescription !== undefined) updates.equipmentDescription = input.equipmentDescription as string;
-            updated[idx] = { ...updated[idx], ...updates };
-          }
-          return updated;
-        });
+        const updated = [...laborEntries];
+        if (updated[idx]) {
+          const updates: Partial<LaborEntry> = {};
+          if (input.employeeId !== undefined) updates.employeeId = input.employeeId as string;
+          if (input.trade !== undefined) updates.trade = input.trade as string;
+          if (input.stHours !== undefined) updates.stHours = input.stHours as number;
+          if (input.otHours !== undefined) updates.otHours = input.otHours as number;
+          if (input.equipmentId !== undefined) updates.equipmentId = input.equipmentId as string;
+          if (input.rentalCompany !== undefined) updates.rentalCompany = input.rentalCompany as string;
+          if (input.equipmentDescription !== undefined) updates.equipmentDescription = input.equipmentDescription as string;
+          updated[idx] = { ...updated[idx], ...updates };
+        }
+        setQuiet('laborEntries', updated);
         break;
       }
       case 'remove_labor_entry': {
         const idx = input.index as number;
-        setLaborEntries((prev) => prev.filter((_, i) => i !== idx));
+        setQuiet('laborEntries', laborEntries.filter((_, i) => i !== idx));
         break;
       }
       case 'add_diary_entry': {
@@ -599,28 +626,26 @@ export function DailyReportPage() {
           total: input.loads && input.yield ? (input.loads as number) * (input.yield as number) : undefined,
           itemNumber: diaryEntries.length + 1,
         };
-        setDiaryEntries((prev) => [...prev, newEntry]);
+        setQuiet('diaryEntries', [...diaryEntries, newEntry]);
         break;
       }
       case 'update_diary_entry': {
         const idx = input.index as number;
-        setDiaryEntries((prev) => {
-          const updated = [...prev];
-          if (updated[idx]) {
-            const updates: Partial<JobDiaryEntry> = {};
-            if (input.entryText !== undefined) updates.entryText = input.entryText as string;
-            if (input.costCodeId !== undefined) updates.costCodeId = input.costCodeId as string;
-            if (input.loads !== undefined) updates.loads = input.loads as number;
-            if (input.yield !== undefined) updates.yield = input.yield as number;
-            updated[idx] = { ...updated[idx], ...updates };
-          }
-          return updated;
-        });
+        const updated = [...diaryEntries];
+        if (updated[idx]) {
+          const updates: Partial<JobDiaryEntry> = {};
+          if (input.entryText !== undefined) updates.entryText = input.entryText as string;
+          if (input.costCodeId !== undefined) updates.costCodeId = input.costCodeId as string;
+          if (input.loads !== undefined) updates.loads = input.loads as number;
+          if (input.yield !== undefined) updates.yield = input.yield as number;
+          updated[idx] = { ...updated[idx], ...updates };
+        }
+        setQuiet('diaryEntries', updated);
         break;
       }
       case 'remove_diary_entry': {
         const idx = input.index as number;
-        setDiaryEntries((prev) => prev.filter((_, i) => i !== idx));
+        setQuiet('diaryEntries', diaryEntries.filter((_, i) => i !== idx));
         break;
       }
       case 'add_subcontractor_entry': {
@@ -632,12 +657,12 @@ export function DailyReportPage() {
           production: input.production as string | undefined,
           costCodeId: input.costCodeId as string | undefined,
         };
-        setSubcontractorEntries((prev) => [...prev, newEntry]);
+        setQuiet('subcontractorEntries', [...subcontractorEntries, newEntry]);
         break;
       }
       case 'remove_subcontractor_entry': {
         const idx = input.index as number;
-        setSubcontractorEntries((prev) => prev.filter((_, i) => i !== idx));
+        setQuiet('subcontractorEntries', subcontractorEntries.filter((_, i) => i !== idx));
         break;
       }
       case 'add_delivery_entry': {
@@ -648,16 +673,16 @@ export function DailyReportPage() {
           material: (input.material as string) || '',
           quantity: (input.quantity as string) || '',
         };
-        setDeliveryEntries((prev) => [...prev, newEntry]);
+        setQuiet('deliveryEntries', [...deliveryEntries, newEntry]);
         break;
       }
       case 'remove_delivery_entry': {
         const idx = input.index as number;
-        setDeliveryEntries((prev) => prev.filter((_, i) => i !== idx));
+        setQuiet('deliveryEntries', deliveryEntries.filter((_, i) => i !== idx));
         break;
       }
     }
-  }
+  }, [formState, setQuiet, employees, reportId]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -737,7 +762,7 @@ export function DailyReportPage() {
                       selected={date ? new Date(date + 'T00:00:00') : undefined}
                       onSelect={(selectedDate) => {
                         if (selectedDate) {
-                          setDate(format(selectedDate, 'yyyy-MM-dd'));
+                          set('date', format(selectedDate, 'yyyy-MM-dd'));
                         }
                       }}
                       initialFocus
@@ -746,7 +771,7 @@ export function DailyReportPage() {
                 </Popover>
               </div>
 
-              <WeatherSelector value={weather} onChange={setWeather} />
+              <WeatherSelector value={weather} onChange={(w) => set('weather', w)} />
             </div>
 
             {/* Comments */}
@@ -754,7 +779,8 @@ export function DailyReportPage() {
               <Label>Comments (optional)</Label>
               <Textarea
                 value={comments}
-                onChange={(e) => setComments(e.target.value)}
+                onChange={(e) => setQuiet('comments', e.target.value)}
+                onBlur={() => takeSnapshot()}
                 placeholder="Additional notes or comments..."
                 rows={3}
                 className="text-base resize-none"
@@ -779,7 +805,7 @@ export function DailyReportPage() {
         <div className="mt-[20px]">
         <LaborSection
           entries={laborEntries}
-          onChange={setLaborEntries}
+          onChange={(entries) => set('laborEntries', entries)}
           dailyReportId={currentReportId}
         />
         </div>
@@ -790,7 +816,7 @@ export function DailyReportPage() {
         <div className="mt-[20px]">
         <JobDiarySection
           entries={diaryEntries}
-          onChange={setDiaryEntries}
+          onChange={(entries) => set('diaryEntries', entries)}
           dailyReportId={currentReportId}
         />
         </div>
@@ -802,8 +828,8 @@ export function DailyReportPage() {
         <SubcontractorsDeliveriesSection
           subcontractorEntries={subcontractorEntries}
           deliveryEntries={deliveryEntries}
-          onSubcontractorsChange={setSubcontractorEntries}
-          onDeliveriesChange={setDeliveryEntries}
+          onSubcontractorsChange={(entries) => set('subcontractorEntries', entries)}
+          onDeliveriesChange={(entries) => set('deliveryEntries', entries)}
           dailyReportId={currentReportId}
         />
         </div>
@@ -814,7 +840,7 @@ export function DailyReportPage() {
         <div className="mt-[20px]">
         <PhotoAttachments
           photos={photos}
-          onChange={setPhotos}
+          onChange={(p) => set('photos', p)}
           dailyReportId={currentReportId}
         />
         </div>
@@ -825,14 +851,33 @@ export function DailyReportPage() {
         <div className="mt-[20px]">
         <SignatureCapture
           value={signature}
-          onChange={setSignature}
+          onChange={(sig) => set('signature', sig)}
         />
         </div>
       </main>
 
       {/* Fixed Bottom Actions */}
       <div className="fixed bottom-0 left-0 right-0 z-10 bg-card p-4 safe-area-inset-bottom ring-2 ring-foreground/10 rounded-t-[2rem]">
-        <div className="max-w-7xl mx-auto flex gap-3">
+        <div className="max-w-7xl mx-auto flex gap-3 items-center">
+          {/* Undo/Redo */}
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={undo}
+            disabled={!canUndo}
+            title="Undo (Ctrl+Z)"
+          >
+            <Undo2 className="w-4 h-4" />
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={redo}
+            disabled={!canRedo}
+            title="Redo (Ctrl+Shift+Z)"
+          >
+            <Redo2 className="w-4 h-4" />
+          </Button>
           <Button
             variant="outline"
             className="flex-1"
@@ -859,7 +904,7 @@ export function DailyReportPage() {
       </div>
 
       {/* AI Assistant */}
-      <AIAssistant context={aiContext} onToolCall={handleAIToolCall} />
+      <AIAssistant context={aiContext} onToolCall={handleAIToolCall} onBeforeToolCalls={takeSnapshot} />
     </div>
   );
 }
