@@ -662,7 +662,7 @@ export function DailyReportPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="bg-background p-4 fixed top-0 left-0 right-0 z-10 border-2 border-border border-t-0 rounded-b-[2rem]">
+      <header className="bg-card p-4 fixed top-0 left-0 right-0 z-10 ring-1 ring-foreground/10 rounded-b-[2rem]">
         <div className="flex items-start max-w-7xl mx-auto relative">
           <Button
             variant="outline"
@@ -831,7 +831,7 @@ export function DailyReportPage() {
       </main>
 
       {/* Fixed Bottom Actions */}
-      <div className="fixed bottom-0 left-0 right-0 z-10 bg-background p-4 safe-area-inset-bottom border-2 border-border border-b-0 rounded-t-[2rem]">
+      <div className="fixed bottom-0 left-0 right-0 z-10 bg-card p-4 safe-area-inset-bottom ring-1 ring-foreground/10 rounded-t-[2rem]">
         <div className="max-w-7xl mx-auto flex gap-3">
           <Button
             variant="outline"
