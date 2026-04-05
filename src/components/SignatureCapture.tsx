@@ -35,7 +35,7 @@ export function SignatureCapture({ value, onChange, disabled }: SignatureCapture
         Signature
       </h2>
       <Card>
-        <CardContent className="space-y-3 pt-4">
+        <CardContent className="space-y-3">
         {value && !signatureRef.current ? (
           // Show saved signature
           <div className="space-y-2">

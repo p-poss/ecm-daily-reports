@@ -84,7 +84,7 @@ export function SubcontractorsDeliveriesSection({
           Subcontractors
         </h2>
         <Card>
-          <CardContent className="space-y-4 pt-4">
+          <CardContent className="space-y-4">
           {subcontractorEntries.length === 0 ? (
             <p className="text-sm text-muted-foreground text-center py-4">
               No subcontractor entries.
@@ -204,7 +204,7 @@ export function SubcontractorsDeliveriesSection({
           Deliveries
         </h2>
         <Card>
-          <CardContent className="space-y-4 pt-4">
+          <CardContent className="space-y-4">
           {deliveryEntries.length === 0 ? (
             <p className="text-sm text-muted-foreground text-center py-4">
               No delivery entries.

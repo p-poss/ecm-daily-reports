@@ -56,7 +56,7 @@ export function JobDiarySection({ entries, onChange, dailyReportId }: JobDiarySe
         Production + Notes
       </h2>
       <Card>
-        <CardContent className="space-y-4 pt-4">
+        <CardContent className="space-y-4">
         {entries.length === 0 ? (
           <p className="text-sm text-muted-foreground text-center py-4">
             No journal entries.

@@ -72,7 +72,7 @@ export function PhotoAttachments({ photos, onChange, dailyReportId }: PhotoAttac
         Photos
       </h2>
       <Card>
-        <CardContent className="space-y-4 pt-4">
+        <CardContent className="space-y-4">
         {photos.length > 0 && (
           <div className="grid grid-cols-2 gap-3">
             {photos.map((photo) => (

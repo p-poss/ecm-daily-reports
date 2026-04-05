@@ -704,7 +704,7 @@ export function DailyReportPage() {
         <div className="space-y-[20px] mt-[20px]">
           <h2 className="text-lg font-semibold flex items-center gap-2 px-4 text-primary"><span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground"><BookOpen className="w-3 h-3" /></span>General</h2>
           <Card>
-            <CardContent className="space-y-4 pt-4">
+            <CardContent className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Date</Label>
