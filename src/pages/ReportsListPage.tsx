@@ -291,9 +291,6 @@ export function ReportsListPage() {
                       <div className="flex items-center gap-2">
                         <Calendar className="w-4 h-4 text-muted-foreground" />
                         <span className="font-bold">{formatDate(report.date)}</span>
-                        <span className="text-muted-foreground">{report.dayOfWeek}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
                         <Badge
                           variant={
                             report.status === 'Submitted'
@@ -307,14 +304,14 @@ export function ReportsListPage() {
                         >
                           {report.status}
                         </Badge>
-                        <Button
-                          variant="destructive"
-                          size="icon-xs"
-                          onClick={() => handleDeleteReport(report.id)}
-                        >
-                          <X className="w-3 h-3" />
-                        </Button>
                       </div>
+                      <Button
+                        variant="destructive"
+                        size="icon-xs"
+                        onClick={() => handleDeleteReport(report.id)}
+                      >
+                        <X className="w-3 h-3" />
+                      </Button>
                     </div>
                   </div>
 
@@ -324,34 +321,38 @@ export function ReportsListPage() {
                     {report.submittedAt && (
                       <div className="flex items-center justify-between text-sm py-3">
                         <span className="flex items-center gap-2 text-muted-foreground">
-                          <CheckCircle className="w-4 h-4 text-green-600" />
+                          <CheckCircle className="w-4 h-4" />
                           Submitted
                         </span>
                         <span>{formatDateTime(report.submittedAt)}</span>
                       </div>
                     )}
 
-                    {/* Daily Target (Desired Date) */}
-                    <div className="flex items-center justify-between text-sm py-3">
-                      <span className="flex items-center gap-2 text-muted-foreground">
-                        <Clock className="w-4 h-4" />
-                        Daily Target:
-                      </span>
-                      <span className={report.isDailyLate && report.status === 'Draft' ? 'text-orange-600' : ''}>
-                        {formatDateTime(report.dailyDueBy)}
-                      </span>
-                    </div>
+                    {report.status === 'Draft' && (
+                      <>
+                        {/* Daily Target (Desired Date) */}
+                        <div className="flex items-center justify-between text-sm py-3">
+                          <span className="flex items-center gap-2 text-muted-foreground">
+                            <Clock className="w-4 h-4" />
+                            Daily Target:
+                          </span>
+                          <span className={report.isDailyLate ? 'text-orange-600' : ''}>
+                            {formatDateTime(report.dailyDueBy)}
+                          </span>
+                        </div>
 
-                    {/* Hard Deadline (Payroll) */}
-                    <div className="flex items-center justify-between text-sm py-3">
-                      <span className="flex items-center gap-2 text-muted-foreground">
-                        <AlertTriangle className={`w-4 h-4 ${timePastDue ? 'text-destructive' : ''}`} />
-                        Payroll Deadline:
-                      </span>
-                      <span className={timePastDue ? 'text-destructive font-medium' : ''}>
-                        {formatDateTime(report.payrollDueBy)}
-                      </span>
-                    </div>
+                        {/* Hard Deadline (Payroll) */}
+                        <div className="flex items-center justify-between text-sm py-3">
+                          <span className="flex items-center gap-2 text-muted-foreground">
+                            <AlertTriangle className={`w-4 h-4 ${timePastDue ? 'text-destructive' : ''}`} />
+                            Payroll Deadline:
+                          </span>
+                          <span className={timePastDue ? 'text-destructive font-medium' : ''}>
+                            {formatDateTime(report.payrollDueBy)}
+                          </span>
+                        </div>
+                      </>
+                    )}
 
                     {/* Time Past Due or Remaining */}
                     {report.status === 'Draft' ? (
@@ -366,9 +367,27 @@ export function ReportsListPage() {
                           </p>
                         ) : null}
                       </div>
-                    ) : (
-                      <div />
-                    )}
+                    ) : (() => {
+                      if (!report.submittedAt) return <div />;
+                      const submitted = new Date(report.submittedAt).getTime();
+                      const deadline = new Date(report.payrollDueBy).getTime();
+                      if (submitted <= deadline) return (
+                        <div className="py-1">
+                          <p className="text-xs text-green-600 text-right">On time</p>
+                        </div>
+                      );
+                      const diff = submitted - deadline;
+                      const hours = Math.floor(diff / (1000 * 60 * 60));
+                      const days = Math.floor(hours / 24);
+                      const label = days > 0
+                        ? `${days}d ${hours % 24}h late`
+                        : `${hours}h ${Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))}m late`;
+                      return (
+                        <div className="py-1">
+                          <p className="text-xs text-destructive font-medium text-right">{label}</p>
+                        </div>
+                      );
+                    })()}
 
                   </div>
                   {/* Action Buttons */}

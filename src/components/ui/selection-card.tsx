@@ -32,7 +32,7 @@ const SelectionCard = React.forwardRef<HTMLButtonElement, SelectionCardProps>(
           <div className="flex-1 min-w-0">
             <div className="font-medium">{title}</div>
             {description && (
-              <div className="text-sm text-muted-foreground">
+              <div className="text-xs text-muted-foreground">
                 {description}
               </div>
             )}

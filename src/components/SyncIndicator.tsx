@@ -26,7 +26,7 @@ export function SyncIndicator() {
   const config = statusConfig[status];
 
   return (
-    <div className="flex items-center gap-2 text-sm">
+    <div className="flex items-center gap-2 text-xs">
       <div className={cn('w-2.5 h-2.5 rounded-full', config.color)} />
       <span className="text-muted-foreground">{config.label}</span>
       {syncError && (

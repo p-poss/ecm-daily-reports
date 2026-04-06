@@ -225,7 +225,7 @@ export function JobsListPage() {
                         <Badge variant={job.sector === 'Public' ? 'default' : 'outline'}>{job.sector}</Badge>
                       </div>
                       {counts && counts.pending > 0 && (
-                        <Badge variant="warning" className="text-xs">
+                        <Badge variant="warning" className="text-[10px]">
                           {counts.pending} draft{counts.pending !== 1 ? 's' : ''}
                         </Badge>
                       )}
@@ -234,7 +234,7 @@ export function JobsListPage() {
 
                   {/* Job Details */}
                   <div className="px-4 py-3">
-                    <h3 className="font-medium text-foreground truncate text-base">
+                    <h3 className="font-medium text-foreground truncate text-[14px]">
                       {job.jobName}
                     </h3>
                     {job.address && (
