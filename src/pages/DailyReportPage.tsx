@@ -921,7 +921,7 @@ export function DailyReportPage() {
             onClick={submitReport}
             disabled={!signature || isSubmitting}
           >
-            {isSubmitting ? 'Submitting...' : 'Submit Report'}
+            {isSubmitting ? 'Submitting...' : 'Submit'}
           </Button>
         </div>
       </div>

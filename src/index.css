@@ -173,6 +173,27 @@
   animation: ai-glow 60s ease-out forwards;
   border-radius: var(--radius-md, 6px);
 }
+tr.ai-highlight {
+  border-radius: 0;
+  box-shadow: none;
+  animation: none;
+  position: relative;
+}
+tr.ai-highlight::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 2px solid rgba(251, 93, 51, 0.9);
+  pointer-events: none;
+  z-index: 2;
+  animation: ai-glow-border 60s ease-out forwards;
+}
+@keyframes ai-glow-border {
+  0% { opacity: 0; }
+  0.5% { opacity: 1; }
+  99.5% { opacity: 1; }
+  100% { opacity: 0; }
+}
 
 @layer base {
   * {
