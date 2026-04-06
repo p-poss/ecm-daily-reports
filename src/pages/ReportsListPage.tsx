@@ -353,7 +353,7 @@ export function ReportsListPage() {
                     </div>
 
                     {/* Time Past Due or Remaining */}
-                    {report.status === 'Draft' && (
+                    {report.status === 'Draft' ? (
                       <div className="py-1">
                         {timePastDue ? (
                           <p className="text-sm text-destructive font-medium text-right">
@@ -365,6 +365,8 @@ export function ReportsListPage() {
                           </p>
                         ) : null}
                       </div>
+                    ) : (
+                      <div />
                     )}
 
                   </div>
