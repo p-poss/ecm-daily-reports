@@ -80,7 +80,7 @@ export function SignatureCapture({ value, onChange, disabled }: SignatureCapture
                 Clear
               </Button>
               {!isEmpty && (
-                <div className="flex items-center text-sm text-green-600">
+                <div className="flex items-center text-xs text-green-600">
                   <Check className="w-4 h-4 mr-1" />
                   Signed
                 </div>
