@@ -883,25 +883,23 @@ export function DailyReportPage() {
       <div className="fixed bottom-0 left-0 right-0 z-10 bg-card/80 backdrop-blur-md p-4 safe-area-inset-bottom ring-2 ring-foreground/10 rounded-t-[2rem]">
         <div className="max-w-7xl mx-auto flex gap-3 items-center">
           {/* Undo/Redo */}
-          <div className="flex-1 flex gap-2">
-            <Button
-              variant="outline"
-              className="flex-1"
+          <div className="flex-1 flex border border-border rounded-md overflow-hidden">
+            <button
               onClick={undo}
               disabled={!canUndo}
               title="Undo (Ctrl+Z)"
+              className="flex-1 flex items-center justify-center h-7 hover:bg-input/50 disabled:opacity-50 disabled:pointer-events-none cursor-pointer border-r border-border"
             >
               <Undo2 className="w-4 h-4" />
-            </Button>
-            <Button
-              variant="outline"
-              className="flex-1"
+            </button>
+            <button
               onClick={redo}
               disabled={!canRedo}
               title="Redo (Ctrl+Shift+Z)"
+              className="flex-1 flex items-center justify-center h-7 hover:bg-input/50 disabled:opacity-50 disabled:pointer-events-none cursor-pointer"
             >
               <Redo2 className="w-4 h-4" />
-            </Button>
+            </button>
           </div>
           <Button
             variant="outline"
