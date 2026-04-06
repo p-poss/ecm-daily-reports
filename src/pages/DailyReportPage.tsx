@@ -25,7 +25,7 @@ import { ArrowLeft, BookOpen, Calendar as CalendarIcon, ChevronDown, Undo2, Redo
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import type { ReportContext } from '@/lib/ai-assistant';
-import type { DailyReport, LaborEntry, JobDiaryEntry, SubcontractorWork, MaterialDelivered, PhotoAttachment, Weather } from '@/types';
+import type { DailyReport, LaborEntry, JobDiaryEntry, SubcontractorWork, MaterialDelivered, Weather } from '@/types';
 import { generateReportPDF, type ReportPDFData } from '@/lib/generate-report-pdf';
 import { useUndoRedo } from '@/hooks/useUndoRedo';
 
@@ -61,7 +61,7 @@ export function DailyReportPage() {
     set,
     setQuiet,
     takeSnapshot,
-    reset: resetForm,
+    reset: _resetForm,
     undo,
     redo,
     canUndo,

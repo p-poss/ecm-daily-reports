@@ -14,12 +14,9 @@ import { ThemeToggle } from '@/components/ThemeToggle';
 import {
   ArrowLeft,
   Plus,
-
   Calendar,
   Clock,
   AlertTriangle,
-  Edit,
-  Send,
   CheckCircle,
   Copy,
   X,
