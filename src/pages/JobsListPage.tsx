@@ -6,7 +6,7 @@ import { useNavigation } from '@/contexts/NavigationContext';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { SyncIndicator } from '@/components/SyncIndicator';
-import { ArrowLeft, Briefcase, MapPin } from 'lucide-react';
+import { ArrowLeft, Briefcase, MapPin, Camera, FileText } from 'lucide-react';
 import { generateCombinedReportPDF, type ReportPDFData } from '@/lib/generate-report-pdf';
 import { PhotoGalleryModal, type GalleryPhoto } from '@/components/PhotoGalleryModal';
 import { Button } from '@/components/ui/button';
@@ -176,7 +176,7 @@ export function JobsListPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="bg-card p-4 fixed top-0 left-0 right-0 z-10 ring-2 ring-foreground/10 rounded-b-[2rem]">
+      <header className="bg-card/80 backdrop-blur-md p-4 fixed top-0 left-0 right-0 z-10 ring-2 ring-foreground/10 rounded-b-[2rem]">
         <div className="flex items-start max-w-7xl mx-auto relative">
           <Button
             variant="outline"
@@ -198,7 +198,7 @@ export function JobsListPage() {
       </header>
 
       {/* Jobs List */}
-      <main className="max-w-7xl mx-auto p-4 pt-[120px] space-y-[20px]">
+      <main className="max-w-7xl mx-auto p-4 pt-[200px] space-y-[20px]">
         {jobs === undefined ? (
           <div className="flex justify-center py-8">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
@@ -248,6 +248,7 @@ export function JobsListPage() {
                       onClick={() => handleViewPDF(job.id)}
                       disabled={!counts?.total}
                     >
+                      <FileText className="w-4 h-4 mr-1" />
                       View PDF
                     </Button>
                     <Button
@@ -256,6 +257,7 @@ export function JobsListPage() {
                       onClick={() => handleViewPhotos(job.id)}
                       disabled={!counts?.total}
                     >
+                      <Camera className="w-4 h-4 mr-1" />
                       Photos
                     </Button>
                     <Button

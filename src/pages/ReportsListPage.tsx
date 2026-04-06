@@ -23,6 +23,8 @@ import {
   CheckCircle,
   Copy,
   X,
+  FileText,
+  Camera,
 } from 'lucide-react';
 
 export function ReportsListPage() {
@@ -237,7 +239,7 @@ export function ReportsListPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="bg-card p-4 fixed top-0 left-0 right-0 z-10 ring-2 ring-foreground/10 rounded-b-[2rem]">
+      <header className="bg-card/80 backdrop-blur-md p-4 fixed top-0 left-0 right-0 z-10 ring-2 ring-foreground/10 rounded-b-[2rem]">
         <div className="flex items-start max-w-7xl mx-auto relative">
           <Button
             variant="outline"
@@ -268,7 +270,7 @@ export function ReportsListPage() {
       </header>
 
       {/* Reports List */}
-      <main className="max-w-7xl mx-auto p-4 pt-[120px] space-y-4">
+      <main className="max-w-7xl mx-auto p-4 pt-[200px] space-y-[20px]">
         {reports === undefined ? (
           <div className="flex justify-center py-8">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
@@ -346,7 +348,7 @@ export function ReportsListPage() {
 
                     {/* Time Past Due or Remaining */}
                     {report.status === 'Draft' && (
-                      <div className="pt-2 border-t">
+                      <div className="pt-2">
                         {timePastDue ? (
                           <div className="flex items-center justify-center gap-2 text-destructive font-medium">
                             <AlertTriangle className="w-4 h-4" />
@@ -362,22 +364,15 @@ export function ReportsListPage() {
                     )}
 
                     {/* Action Buttons */}
-                    <div className="flex gap-2 pt-2">
+                    <div className="flex gap-2 pt-2 !border-t-0">
                       {report.status === 'Draft' ? (
                         <>
                           <Button
                             variant="outline"
                             className="flex-1"
-                            onClick={() => selectedJobId && navigateToReportForm(selectedJobId, report.id)}
-                          >
-                            <Edit className="w-4 h-4 mr-2" />
-                            Edit
-                          </Button>
-                          <Button
-                            variant="outline"
-                            className="flex-1"
                             onClick={() => handleViewPDF(report.id)}
                           >
+                            <FileText className="w-4 h-4 mr-1" />
                             View PDF
                           </Button>
                           <Button
@@ -385,13 +380,21 @@ export function ReportsListPage() {
                             className="flex-1"
                             onClick={() => handleViewPhotos(report.id)}
                           >
+                            <Camera className="w-4 h-4 mr-1" />
                             Photos
+                          </Button>
+                          <Button
+                            variant="outline"
+                            className="flex-1 btn-action"
+                            onClick={() => selectedJobId && navigateToReportForm(selectedJobId, report.id)}
+                          >
+                            <Edit className="w-4 h-4 mr-2" />
+                            Edit
                           </Button>
                           <Button
                             className="flex-1"
                             onClick={() => selectedJobId && navigateToReportForm(selectedJobId, report.id)}
                           >
-                            <Send className="w-4 h-4 mr-2" />
                             Submit
                           </Button>
                           <Button
@@ -409,6 +412,7 @@ export function ReportsListPage() {
                             className="flex-1"
                             onClick={() => handleViewPDF(report.id)}
                           >
+                            <FileText className="w-4 h-4 mr-1" />
                             View PDF
                           </Button>
                           <Button
@@ -416,6 +420,7 @@ export function ReportsListPage() {
                             className="flex-1"
                             onClick={() => handleViewPhotos(report.id)}
                           >
+                            <Camera className="w-4 h-4 mr-1" />
                             Photos
                           </Button>
                           <Button
