@@ -216,7 +216,7 @@ export function JobsListPage() {
               <Card key={job.id} className="overflow-hidden">
                 <CardContent className="p-0">
                   {/* Job Header */}
-                  <div className="p-4 border-b">
+                  <div className="px-4 pb-4 border-b">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <span className="font-bold text-lg">{job.jobNumber}</span>
