@@ -323,7 +323,7 @@ export function ReportsListPage() {
                       <div className="flex items-center justify-between text-sm py-3">
                         <span className="flex items-center gap-2 text-muted-foreground">
                           <CheckCircle className="w-4 h-4" />
-                          Submitted
+                          Submitted:
                         </span>
                         <span>{formatDateTime(report.submittedAt)}</span>
                       </div>
@@ -334,7 +334,7 @@ export function ReportsListPage() {
                       <div className="flex items-center justify-between text-sm py-3">
                         <span className="flex items-center gap-2 text-muted-foreground">
                           <PenLine className="w-4 h-4" />
-                          Revised
+                          Revised:
                         </span>
                         <span>{formatDateTime(report.updatedAt)}</span>
                       </div>
