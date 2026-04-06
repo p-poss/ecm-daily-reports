@@ -23,7 +23,7 @@ import {
   CheckCircle,
   Copy,
   X,
-  FileText,
+  File,
   Camera,
 } from 'lucide-react';
 
@@ -380,7 +380,7 @@ export function ReportsListPage() {
                             className="flex-1"
                             onClick={() => handleViewPDF(report.id)}
                           >
-                            <FileText className="w-4 h-4 mr-1" />
+                            <File className="w-4 h-4 mr-1" />
                             View PDF
                           </Button>
                           <Button
@@ -412,7 +412,7 @@ export function ReportsListPage() {
                             className="flex-1"
                             onClick={() => handleViewPDF(report.id)}
                           >
-                            <FileText className="w-4 h-4 mr-1" />
+                            <File className="w-4 h-4 mr-1" />
                             View PDF
                           </Button>
                           <Button

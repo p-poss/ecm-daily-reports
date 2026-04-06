@@ -21,7 +21,7 @@ import { SignatureCapture } from '@/components/SignatureCapture';
 import { PhotoAttachments } from '@/components/PhotoAttachments';
 import { DeadlineIndicator } from '@/components/DeadlineIndicator';
 import { AIAssistant } from '@/components/AIAssistant';
-import { ArrowLeft, BookOpen, Calendar as CalendarIcon, ChevronDown, Undo2, Redo2, FileText } from 'lucide-react';
+import { ArrowLeft, BookOpen, Calendar as CalendarIcon, ChevronDown, Undo2, Redo2, File } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import type { ReportContext } from '@/lib/ai-assistant';
@@ -906,7 +906,7 @@ export function DailyReportPage() {
             className="flex-1"
             onClick={handleViewPDF}
           >
-            <FileText className="w-4 h-4 mr-1" />
+            <File className="w-4 h-4 mr-1" />
             View PDF
           </Button>
           <Button

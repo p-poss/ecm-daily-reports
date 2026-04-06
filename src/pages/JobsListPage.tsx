@@ -6,7 +6,7 @@ import { useNavigation } from '@/contexts/NavigationContext';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { SyncIndicator } from '@/components/SyncIndicator';
-import { ArrowLeft, Briefcase, MapPin, Camera, FileText } from 'lucide-react';
+import { ArrowLeft, Briefcase, MapPin, Camera, FileStack } from 'lucide-react';
 import { generateCombinedReportPDF, type ReportPDFData } from '@/lib/generate-report-pdf';
 import { PhotoGalleryModal, type GalleryPhoto } from '@/components/PhotoGalleryModal';
 import { Button } from '@/components/ui/button';
@@ -257,7 +257,7 @@ export function JobsListPage() {
                       onClick={() => handleViewPDF(job.id)}
                       disabled={!counts?.total}
                     >
-                      <FileText className="w-4 h-4 mr-1" />
+                      <FileStack className="w-4 h-4 mr-1" />
                       View PDF
                     </Button>
                     <Button
