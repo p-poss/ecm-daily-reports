@@ -83,7 +83,7 @@ export function LoginPage() {
               {isSubmitting ? 'Signing in...' : 'Sign In'}
             </Button>
 
-            <div className="pt-[20px] mt-[90px] border-t text-center text-sm text-muted-foreground">
+            <div className="pt-[20px] mt-[90px] border-t text-center text-xs text-muted-foreground">
               <p className="mb-1">For assistance, contact the office:</p>
               <p>
                 <a href="tel:+17148974326" className="text-primary hover:underline">+1 (714) 897-4326</a>

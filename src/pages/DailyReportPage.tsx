@@ -295,10 +295,13 @@ export function DailyReportPage() {
       const reportIdToSubmit = existingReport?.id || reportId;
 
       // Update status to submitted
-      const submittedAt = now();
+      // Preserve original submittedAt if re-submitting after edit
+      const submittedAt = existingReport?.submittedAt || now();
+      const updatedAt = now();
       await db.dailyReports.update(reportIdToSubmit, {
         status: 'Submitted',
         submittedAt,
+        updatedAt,
         isDailyLate: isDeadlinePassed(deadlines.dailyDueBy),
         isPayrollLate: isDeadlinePassed(deadlines.payrollDueBy),
         syncStatus: 'pending',
