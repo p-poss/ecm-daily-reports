@@ -5,5 +5,5 @@ export function ThemeToggle() {
   const { theme, toggleTheme } = useTheme();
   const isDark = theme === 'dark';
 
-  return <Switch checked={isDark} onCheckedChange={toggleTheme} className="cursor-pointer" />;
+  return <Switch checked={isDark} onCheckedChange={toggleTheme} className="cursor-pointer hidden md:inline-flex" />;
 }
