@@ -64,14 +64,14 @@ export function ReportsListPage() {
 
   function formatDateTime(dateStr: string): string {
     const date = new Date(dateStr);
+    const weekday = date.toLocaleDateString('en-US', { weekday: 'short' });
     const month = date.toLocaleDateString('en-US', { month: 'short' });
     const day = date.getDate();
     const hour = date.getHours();
     const minute = date.getMinutes().toString().padStart(2, '0');
     const ampm = hour >= 12 ? 'PM' : 'AM';
     const hour12 = hour % 12 || 12;
-    // Format manually to prevent iOS date detection
-    return `${month} ${day}, ${hour12}:${minute} ${ampm}`;
+    return `${weekday}, ${month} ${day}, ${hour12}:${minute} ${ampm}`;
   }
 
   function getTimePastDue(deadline: string): string | null {
@@ -328,7 +328,7 @@ export function ReportsListPage() {
                     <div className="flex items-center justify-between text-sm py-3">
                       <span className="flex items-center gap-2 text-muted-foreground">
                         <Clock className="w-4 h-4" />
-                        Daily Target
+                        Daily Target:
                       </span>
                       <span className={report.isDailyLate && report.status === 'Draft' ? 'text-orange-600' : ''}>
                         {formatDateTime(report.dailyDueBy)}
@@ -339,7 +339,7 @@ export function ReportsListPage() {
                     <div className="flex items-center justify-between text-sm py-3">
                       <span className="flex items-center gap-2 text-muted-foreground">
                         <AlertTriangle className={`w-4 h-4 ${timePastDue ? 'text-destructive' : ''}`} />
-                        Payroll Deadline
+                        Payroll Deadline:
                       </span>
                       <span className={timePastDue ? 'text-destructive font-medium' : ''}>
                         {formatDateTime(report.payrollDueBy)}
@@ -348,24 +348,23 @@ export function ReportsListPage() {
 
                     {/* Time Past Due or Remaining */}
                     {report.status === 'Draft' && (
-                      <div className="pt-2">
+                      <div className="py-1">
                         {timePastDue ? (
-                          <div className="flex items-center justify-center gap-2 text-destructive font-medium">
-                            <AlertTriangle className="w-4 h-4" />
+                          <p className="text-sm text-destructive font-medium text-right">
                             {timePastDue}
-                          </div>
+                          </p>
                         ) : timeRemaining ? (
-                          <div className="flex items-center justify-center gap-2 text-muted-foreground text-sm">
-                            <Clock className="w-4 h-4" />
+                          <p className="text-xs text-muted-foreground text-right">
                             {timeRemaining}
-                          </div>
+                          </p>
                         ) : null}
                       </div>
                     )}
 
-                    {/* Action Buttons */}
-                    <div className="flex gap-2 pt-2 !border-t-0">
-                      {report.status === 'Draft' ? (
+                  </div>
+                  {/* Action Buttons */}
+                  <div className="flex gap-2 px-4 pt-2">
+                    {report.status === 'Draft' ? (
                         <>
                           <Button
                             variant="outline"
@@ -439,7 +438,6 @@ export function ReportsListPage() {
                           </Button>
                         </>
                       )}
-                    </div>
                   </div>
                 </CardContent>
               </Card>

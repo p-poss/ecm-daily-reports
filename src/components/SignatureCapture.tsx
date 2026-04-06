@@ -86,10 +86,6 @@ export function SignatureCapture({ value, onChange, disabled }: SignatureCapture
                 </div>
               )}
             </div>
-
-            <p className="text-xs text-muted-foreground text-center">
-              Sign above to confirm this report
-            </p>
           </>
         )}
         </CardContent>
