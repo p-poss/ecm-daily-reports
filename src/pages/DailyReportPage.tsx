@@ -98,7 +98,7 @@ export function DailyReportPage() {
 
   // AI change highlighting
   const [highlightedIds, setHighlightedIds] = useState<Set<string>>(new Set());
-  const highlightTimerRef = useRef<ReturnType<typeof setTimeout>>();
+  const highlightTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   function addHighlight(id: string) {
     setHighlightedIds((prev) => new Set([...prev, id]));
