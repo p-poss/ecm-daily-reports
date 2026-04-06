@@ -213,35 +213,44 @@ export function JobsListPage() {
           jobs?.map((job) => {
             const counts = reportCounts?.[job.id];
             return (
-              <Card key={job.id}>
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="font-bold text-lg">{job.jobNumber}</span>
-                    <Badge variant="secondary">{job.status}</Badge>
-                    <Badge variant={job.sector === 'Public' ? 'default' : 'outline'}>{job.sector}</Badge>
-                  </div>
-                  <h3 className="font-medium text-foreground truncate">
-                    {job.jobName}
-                  </h3>
-                  {job.address && (
-                    <p className="text-sm text-muted-foreground flex items-center gap-1 mt-1">
-                      <MapPin className="w-3 h-3" />
-                      <span className="truncate">{job.address}</span>
-                    </p>
-                  )}
-                  {counts && (
-                    <div className="flex gap-3 mt-2 text-xs">
-                      <span className="text-muted-foreground">
-                        {counts.total} report{counts.total !== 1 ? 's' : ''}
-                      </span>
-                      {counts.pending > 0 && (
+              <Card key={job.id} className="overflow-hidden">
+                <CardContent className="p-0">
+                  {/* Job Header */}
+                  <div className="p-4 border-b">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-lg">{job.jobNumber}</span>
+                        <Badge variant="secondary">{job.status}</Badge>
+                        <Badge variant={job.sector === 'Public' ? 'default' : 'outline'}>{job.sector}</Badge>
+                      </div>
+                      {counts && counts.pending > 0 && (
                         <Badge variant="warning" className="text-xs">
                           {counts.pending} draft{counts.pending !== 1 ? 's' : ''}
                         </Badge>
                       )}
                     </div>
-                  )}
-                  <div className="flex gap-2 mt-3">
+                  </div>
+
+                  {/* Job Details */}
+                  <div className="px-4 py-3">
+                    <h3 className="font-medium text-foreground truncate text-base">
+                      {job.jobName}
+                    </h3>
+                    {job.address && (
+                      <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
+                        <MapPin className="w-3 h-3" />
+                        <span className="truncate">{job.address}</span>
+                      </p>
+                    )}
+                    {counts && (
+                      <p className="text-xs text-muted-foreground mt-2">
+                        {counts.total} report{counts.total !== 1 ? 's' : ''}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex gap-2 px-4 pt-4">
                     <Button
                       variant="outline"
                       className="flex-1"

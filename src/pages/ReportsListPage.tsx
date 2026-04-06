@@ -363,7 +363,7 @@ export function ReportsListPage() {
 
                   </div>
                   {/* Action Buttons */}
-                  <div className="flex gap-2 px-4 pt-2">
+                  <div className="flex gap-2 px-4 pt-4">
                     {report.status === 'Draft' ? (
                         <>
                           <Button
