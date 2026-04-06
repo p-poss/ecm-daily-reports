@@ -2,7 +2,7 @@ import { useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
-import { Camera, X } from 'lucide-react';
+import { Plus, Image, X } from 'lucide-react';
 import { generateId, now } from '@/db/database';
 import type { PhotoAttachment } from '@/types';
 
@@ -68,7 +68,7 @@ export function PhotoAttachments({ photos, onChange, dailyReportId }: PhotoAttac
   return (
     <div className="space-y-[20px]">
       <h2 className="text-lg font-semibold flex items-center gap-2 px-4 text-primary">
-        <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground"><Camera className="w-3 h-3" /></span>
+        <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground"><Image className="w-3 h-3" /></span>
         Photos
       </h2>
       <Card>
@@ -128,7 +128,7 @@ export function PhotoAttachments({ photos, onChange, dailyReportId }: PhotoAttac
           className="w-full btn-action"
           onClick={() => fileInputRef.current?.click()}
         >
-          <Camera className="w-4 h-4 mr-2" />
+          <Plus className="w-4 h-4 mr-2" />
           Add Photo
         </Button>
         </CardContent>

@@ -21,7 +21,7 @@ import {
   Copy,
   X,
   File,
-  Camera,
+  Images,
 } from 'lucide-react';
 
 export function ReportsListPage() {
@@ -385,7 +385,7 @@ export function ReportsListPage() {
                             className="flex-1"
                             onClick={() => handleViewPhotos(report.id)}
                           >
-                            <Camera className="w-4 h-4 mr-1" />
+                            <Images className="w-4 h-4 mr-1" />
                             Photos
                           </Button>
                           <Button
@@ -417,7 +417,7 @@ export function ReportsListPage() {
                             className="flex-1"
                             onClick={() => handleViewPhotos(report.id)}
                           >
-                            <Camera className="w-4 h-4 mr-1" />
+                            <Images className="w-4 h-4 mr-1" />
                             Photos
                           </Button>
                           <Button
@@ -427,6 +427,7 @@ export function ReportsListPage() {
                           >
                             Edit
                           </Button>
+                          <div className="flex-1" />
                         </>
                       )}
                   </div>

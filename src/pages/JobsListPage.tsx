@@ -6,7 +6,7 @@ import { useNavigation } from '@/contexts/NavigationContext';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { SyncIndicator } from '@/components/SyncIndicator';
-import { ArrowLeft, Briefcase, MapPin, Camera, FileStack } from 'lucide-react';
+import { ArrowLeft, Briefcase, MapPin, Images, FileStack } from 'lucide-react';
 import { generateCombinedReportPDF, type ReportPDFData } from '@/lib/generate-report-pdf';
 import { PhotoGalleryModal, type GalleryPhoto } from '@/components/PhotoGalleryModal';
 import { Button } from '@/components/ui/button';
@@ -266,7 +266,7 @@ export function JobsListPage() {
                       onClick={() => handleViewPhotos(job.id)}
                       disabled={!counts?.total}
                     >
-                      <Camera className="w-4 h-4 mr-1" />
+                      <Images className="w-4 h-4 mr-1" />
                       Photos
                     </Button>
                     <Button
@@ -274,7 +274,7 @@ export function JobsListPage() {
                       className="flex-1 btn-action"
                       onClick={() => navigateToReports(job.id)}
                     >
-                      Manage Reports
+                      Reports
                     </Button>
                   </div>
                 </CardContent>

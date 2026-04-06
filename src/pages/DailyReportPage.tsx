@@ -722,7 +722,7 @@ export function DailyReportPage() {
             </h1>
             {job ? (
               <p className="text-sm text-muted-foreground">
-                {job.jobNumber} - {job.jobName}
+                {job.jobNumber} · {job.jobName}
               </p>
             ) : (
               <div className="h-5 w-48 bg-muted rounded animate-pulse mx-auto" />
