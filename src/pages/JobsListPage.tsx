@@ -192,6 +192,7 @@ export function JobsListPage() {
           </div>
           <div className="flex items-center gap-3 absolute right-0">
             <SyncIndicator />
+            <div className="hidden md:block w-px h-4 bg-border" />
             <ThemeToggle />
           </div>
         </div>
