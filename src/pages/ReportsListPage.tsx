@@ -295,19 +295,28 @@ export function ReportsListPage() {
                         <span className="font-bold">{formatDate(report.date)}</span>
                         <span className="text-muted-foreground">{report.dayOfWeek}</span>
                       </div>
-                      <Badge
-                        variant={
-                          report.status === 'Submitted'
-                            ? 'success'
-                            : report.status === 'Approved'
-                            ? 'default'
-                            : timePastDue
-                            ? 'destructive'
-                            : 'secondary'
-                        }
-                      >
-                        {report.status}
-                      </Badge>
+                      <div className="flex items-center gap-2">
+                        <Badge
+                          variant={
+                            report.status === 'Submitted'
+                              ? 'success'
+                              : report.status === 'Approved'
+                              ? 'default'
+                              : timePastDue
+                              ? 'destructive'
+                              : 'secondary'
+                          }
+                        >
+                          {report.status}
+                        </Badge>
+                        <Button
+                          variant="destructive"
+                          size="icon-xs"
+                          onClick={() => handleDeleteReport(report.id)}
+                        >
+                          <X className="w-3 h-3" />
+                        </Button>
+                      </div>
                     </div>
                   </div>
 
@@ -387,7 +396,6 @@ export function ReportsListPage() {
                             className="flex-1 btn-action"
                             onClick={() => selectedJobId && navigateToReportForm(selectedJobId, report.id)}
                           >
-                            <Edit className="w-4 h-4 mr-2" />
                             Edit
                           </Button>
                           <Button
@@ -395,13 +403,6 @@ export function ReportsListPage() {
                             onClick={() => selectedJobId && navigateToReportForm(selectedJobId, report.id)}
                           >
                             Submit
-                          </Button>
-                          <Button
-                            variant="destructive"
-                            size="icon"
-                            onClick={() => handleDeleteReport(report.id)}
-                          >
-                            <X className="w-4 h-4" />
                           </Button>
                         </>
                       ) : (
@@ -427,14 +428,7 @@ export function ReportsListPage() {
                             className="flex-1 btn-action"
                             onClick={() => selectedJobId && navigateToReportForm(selectedJobId, report.id)}
                           >
-                            Edit Report
-                          </Button>
-                          <Button
-                            variant="destructive"
-                            size="icon"
-                            onClick={() => handleDeleteReport(report.id)}
-                          >
-                            <X className="w-4 h-4" />
+                            Edit
                           </Button>
                         </>
                       )}
