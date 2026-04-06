@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import SignatureCanvas from 'react-signature-canvas';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -13,6 +13,16 @@ interface SignatureCaptureProps {
 export function SignatureCapture({ value, onChange, disabled }: SignatureCaptureProps) {
   const signatureRef = useRef<SignatureCanvas>(null);
   const [isEmpty, setIsEmpty] = useState(!value);
+
+  // Sync internal state when value changes externally (e.g. undo)
+  useEffect(() => {
+    if (!value) {
+      signatureRef.current?.clear();
+      setIsEmpty(true);
+    } else {
+      setIsEmpty(false);
+    }
+  }, [value]);
 
   function handleClear() {
     signatureRef.current?.clear();
