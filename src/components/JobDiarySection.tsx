@@ -20,9 +20,10 @@ interface JobDiarySectionProps {
   entries: JobDiaryEntry[];
   onChange: (entries: JobDiaryEntry[]) => void;
   dailyReportId: string;
+  highlightedIds?: Set<string>;
 }
 
-export function JobDiarySection({ entries, onChange, dailyReportId }: JobDiarySectionProps) {
+export function JobDiarySection({ entries, onChange, dailyReportId, highlightedIds }: JobDiarySectionProps) {
   const costCodes = useLiveQuery(() => db.costCodes.toArray());
 
   function addEntry() {
@@ -63,7 +64,7 @@ export function JobDiarySection({ entries, onChange, dailyReportId }: JobDiarySe
           </p>
         ) : (
           entries.map((entry, index) => (
-            <div key={entry.id}>
+            <div key={entry.id} className={highlightedIds?.has(entry.id) ? 'ai-highlight' : ''}>
               {index > 0 && <Separator className="mt-[60px] mb-[20px]" />}
               <DiaryEntryForm
                 entry={entry}

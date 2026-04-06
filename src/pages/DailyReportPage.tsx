@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db, generateId, now, calculateDeadlines, isDeadlinePassed } from '@/db/database';
 import { useAuth } from '@/contexts/AuthContext';
@@ -95,6 +95,16 @@ export function DailyReportPage() {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [undo, redo]);
+
+  // AI change highlighting
+  const [highlightedIds, setHighlightedIds] = useState<Set<string>>(new Set());
+  const highlightTimerRef = useRef<ReturnType<typeof setTimeout>>();
+
+  function addHighlight(id: string) {
+    setHighlightedIds((prev) => new Set([...prev, id]));
+    clearTimeout(highlightTimerRef.current);
+    highlightTimerRef.current = setTimeout(() => setHighlightedIds(new Set()), 60000);
+  }
 
   const [isSaving, setIsSaving] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -563,12 +573,15 @@ export function DailyReportPage() {
     switch (name) {
       case 'set_date':
         setQuiet('date', input.date as string);
+        addHighlight('__date__');
         break;
       case 'set_weather':
         setQuiet('weather', input.weather as Weather);
+        addHighlight('__weather__');
         break;
       case 'set_comments':
         setQuiet('comments', input.comments as string);
+        addHighlight('__comments__');
         break;
       case 'add_labor_entry': {
         const emp = (employees || []).find((e) => e.id === input.employeeId);
@@ -591,10 +604,12 @@ export function DailyReportPage() {
           costCodeHours: {},
         };
         setQuiet('laborEntries', [...laborEntries, newEntry]);
+        addHighlight(newEntry.id);
         break;
       }
       case 'update_labor_entry': {
         const idx = input.index as number;
+        if (laborEntries[idx]) addHighlight(laborEntries[idx].id);
         const updated = [...laborEntries];
         if (updated[idx]) {
           const updates: Partial<LaborEntry> = {};
@@ -627,10 +642,12 @@ export function DailyReportPage() {
           itemNumber: diaryEntries.length + 1,
         };
         setQuiet('diaryEntries', [...diaryEntries, newEntry]);
+        addHighlight(newEntry.id);
         break;
       }
       case 'update_diary_entry': {
         const idx = input.index as number;
+        if (diaryEntries[idx]) addHighlight(diaryEntries[idx].id);
         const updated = [...diaryEntries];
         if (updated[idx]) {
           const updates: Partial<JobDiaryEntry> = {};
@@ -658,6 +675,7 @@ export function DailyReportPage() {
           costCodeId: input.costCodeId as string | undefined,
         };
         setQuiet('subcontractorEntries', [...subcontractorEntries, newEntry]);
+        addHighlight(newEntry.id);
         break;
       }
       case 'remove_subcontractor_entry': {
@@ -674,6 +692,7 @@ export function DailyReportPage() {
           quantity: (input.quantity as string) || '',
         };
         setQuiet('deliveryEntries', [...deliveryEntries, newEntry]);
+        addHighlight(newEntry.id);
         break;
       }
       case 'remove_delivery_entry': {
@@ -739,7 +758,8 @@ export function DailyReportPage() {
                       variant="outline"
                       className={cn(
                         "w-full justify-between text-left font-normal text-sm md:text-xs/relaxed bg-input/20 border-input hover:bg-input/20 hover:text-current",
-                        !date && "text-muted-foreground"
+                        !date && "text-muted-foreground",
+                        highlightedIds.has('__date__') && "ai-highlight"
                       )}
                       disabled={isEditing && existingReport?.status === 'Submitted'}
                     >
@@ -771,7 +791,7 @@ export function DailyReportPage() {
                 </Popover>
               </div>
 
-              <WeatherSelector value={weather} onChange={(w) => set('weather', w)} />
+              <WeatherSelector value={weather} onChange={(w) => set('weather', w)} highlighted={highlightedIds.has('__weather__')} />
             </div>
 
             {/* Comments */}
@@ -783,7 +803,7 @@ export function DailyReportPage() {
                 onBlur={() => takeSnapshot()}
                 placeholder="Additional notes or comments..."
                 rows={3}
-                className="text-base resize-none"
+                className={cn("text-base resize-none", highlightedIds.has('__comments__') && "ai-highlight")}
               />
             </div>
 
@@ -807,6 +827,7 @@ export function DailyReportPage() {
           entries={laborEntries}
           onChange={(entries) => set('laborEntries', entries)}
           dailyReportId={currentReportId}
+          highlightedIds={highlightedIds}
         />
         </div>
 
@@ -818,6 +839,7 @@ export function DailyReportPage() {
           entries={diaryEntries}
           onChange={(entries) => set('diaryEntries', entries)}
           dailyReportId={currentReportId}
+          highlightedIds={highlightedIds}
         />
         </div>
 
@@ -831,6 +853,7 @@ export function DailyReportPage() {
           onSubcontractorsChange={(entries) => set('subcontractorEntries', entries)}
           onDeliveriesChange={(entries) => set('deliveryEntries', entries)}
           dailyReportId={currentReportId}
+          highlightedIds={highlightedIds}
         />
         </div>
 

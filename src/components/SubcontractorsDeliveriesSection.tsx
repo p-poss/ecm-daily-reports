@@ -22,6 +22,7 @@ interface SubcontractorsDeliveriesSectionProps {
   onSubcontractorsChange: (entries: SubcontractorWork[]) => void;
   onDeliveriesChange: (entries: MaterialDelivered[]) => void;
   dailyReportId: string;
+  highlightedIds?: Set<string>;
 }
 
 export function SubcontractorsDeliveriesSection({
@@ -30,6 +31,7 @@ export function SubcontractorsDeliveriesSection({
   onSubcontractorsChange,
   onDeliveriesChange,
   dailyReportId,
+  highlightedIds,
 }: SubcontractorsDeliveriesSectionProps) {
   const subcontractors = useLiveQuery(() => db.subcontractors.toArray());
   const costCodes = useLiveQuery(() => db.costCodes.toArray());
@@ -91,7 +93,7 @@ export function SubcontractorsDeliveriesSection({
             </p>
           ) : (
             subcontractorEntries.map((entry, index) => (
-              <div key={entry.id} className="space-y-3">
+              <div key={entry.id} className={`space-y-3 ${highlightedIds?.has(entry.id) ? 'ai-highlight' : ''}`}>
                 {index > 0 && <Separator className="mt-[60px] mb-[20px]" />}
                 <div className="flex justify-between items-start">
                   <div className="flex items-center gap-2">
@@ -211,7 +213,7 @@ export function SubcontractorsDeliveriesSection({
             </p>
           ) : (
             deliveryEntries.map((entry, index) => (
-              <div key={entry.id} className="space-y-3">
+              <div key={entry.id} className={`space-y-3 ${highlightedIds?.has(entry.id) ? 'ai-highlight' : ''}`}>
                 {index > 0 && <Separator className="mt-[60px] mb-[20px]" />}
                 <div className="flex justify-between items-start">
                   <div className="flex items-center gap-2">

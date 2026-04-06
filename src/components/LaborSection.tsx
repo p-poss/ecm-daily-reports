@@ -31,6 +31,7 @@ interface LaborSectionProps {
   entries: LaborEntry[];
   onChange: (entries: LaborEntry[]) => void;
   dailyReportId: string;
+  highlightedIds?: Set<string>;
 }
 
 /** Reusable split cell with ST (left) and OT (right) inputs */
@@ -83,7 +84,7 @@ function SplitHeaderLabel() {
   );
 }
 
-export function LaborSection({ entries, onChange, dailyReportId }: LaborSectionProps) {
+export function LaborSection({ entries, onChange, dailyReportId, highlightedIds }: LaborSectionProps) {
   const [activeCostCodeIds, setActiveCostCodeIds] = useState<string[]>([]);
   const employees = useLiveQuery(() => db.employees.toArray());
   const equipment = useLiveQuery(() => db.equipment.toArray());
@@ -296,6 +297,7 @@ export function LaborSection({ entries, onChange, dailyReportId }: LaborSectionP
                     activeCostCodeIds={allActiveCostCodeIds}
                     onUpdate={(updates) => updateEntry(index, updates)}
                     onRemove={() => removeEntry(index)}
+                    highlighted={highlightedIds?.has(entry.id)}
                   />
                 ))}
                 {/* Totals Row */}
@@ -377,6 +379,7 @@ interface TableRowProps {
   activeCostCodeIds: string[];
   onUpdate: (updates: Partial<LaborEntry>) => void;
   onRemove: () => void;
+  highlighted?: boolean;
 }
 
 function TableRow({
@@ -386,6 +389,7 @@ function TableRow({
   activeCostCodeIds,
   onUpdate,
   onRemove,
+  highlighted,
 }: TableRowProps) {
   const selectedEquipment = equipment.find((e) => e.id === entry.equipmentId);
 
@@ -399,7 +403,7 @@ function TableRow({
   }
 
   return (
-    <tr className="border-b border-b-border">
+    <tr className={`border-b border-b-border ${highlighted ? 'ai-highlight' : ''}`}>
       {/* Employee */}
       <td className="p-2 pl-4 sticky left-0 z-[1] bg-card shadow-[inset_-2px_0_0_0_var(--border)]">
         <Select

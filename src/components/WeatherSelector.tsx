@@ -28,9 +28,10 @@ const PRESET_VALUES = WEATHER_OPTIONS.map((o) => o.value);
 interface WeatherSelectorProps {
   value?: Weather;
   onChange: (value: Weather) => void;
+  highlighted?: boolean;
 }
 
-export function WeatherSelector({ value, onChange }: WeatherSelectorProps) {
+export function WeatherSelector({ value, onChange, highlighted }: WeatherSelectorProps) {
   const isCustomValue = value && !PRESET_VALUES.includes(value);
   const [showCustomInput, setShowCustomInput] = useState(isCustomValue);
   const [customValue, setCustomValue] = useState(isCustomValue ? value : '');
@@ -67,7 +68,7 @@ export function WeatherSelector({ value, onChange }: WeatherSelectorProps) {
     <div className="space-y-2">
       <Label>Weather</Label>
       <Select value={selectValue} onValueChange={handleSelectChange}>
-        <SelectTrigger className="w-full text-sm cursor-pointer">
+        <SelectTrigger className={`w-full text-sm cursor-pointer ${highlighted ? 'ai-highlight' : ''}`}>
           <SelectValue placeholder="Select weather conditions" />
         </SelectTrigger>
         <SelectContent>
