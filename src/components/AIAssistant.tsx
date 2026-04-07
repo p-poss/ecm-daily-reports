@@ -3,10 +3,37 @@ import ReactMarkdown, { type Components } from 'react-markdown';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
-import { Minus, ArrowUp, Loader2 } from 'lucide-react';
+import { Minus, ArrowUp, Loader2, Mic } from 'lucide-react';
 import { AIIcon } from '@/components/icons/AIIcon';
 import { sendMessage, type ChatMessage, type ReportContext } from '@/lib/ai-assistant';
 import { cn } from '@/lib/utils';
+
+// Minimal Web Speech API types
+interface SpeechRecognitionResult {
+  isFinal: boolean;
+  [index: number]: { transcript: string };
+}
+interface SpeechRecognitionEvent extends Event {
+  resultIndex: number;
+  results: { length: number; [index: number]: SpeechRecognitionResult };
+}
+interface SpeechRecognition extends EventTarget {
+  continuous: boolean;
+  interimResults: boolean;
+  lang: string;
+  start(): void;
+  stop(): void;
+  onresult: ((event: SpeechRecognitionEvent) => void) | null;
+  onerror: ((event: Event) => void) | null;
+  onend: ((event: Event) => void) | null;
+}
+type SpeechRecognitionCtor = new () => SpeechRecognition;
+declare global {
+  interface Window {
+    SpeechRecognition?: SpeechRecognitionCtor;
+    webkitSpeechRecognition?: SpeechRecognitionCtor;
+  }
+}
 
 const DRAG_THRESHOLD = 8; // pixels moved before it counts as a drag
 
@@ -126,9 +153,66 @@ export function AIAssistant({ context, onToolCall, onBeforeToolCalls }: AIAssist
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isListening, setIsListening] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
+  const recognitionRef = useRef<SpeechRecognition | null>(null);
+
+  // Check if Web Speech API is supported
+  const speechSupported = typeof window !== 'undefined' &&
+    ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window);
+
+  function startListening() {
+    if (!speechSupported) return;
+    const Ctor = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!Ctor) return;
+
+    const recognition = new Ctor();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.lang = 'en-US';
+
+    let finalTranscript = '';
+
+    recognition.onresult = (event: SpeechRecognitionEvent) => {
+      let interim = '';
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const transcript = event.results[i][0].transcript;
+        if (event.results[i].isFinal) {
+          finalTranscript += transcript;
+        } else {
+          interim += transcript;
+        }
+      }
+      setInput((finalTranscript + interim).trim());
+    };
+
+    recognition.onerror = () => {
+      setIsListening(false);
+    };
+
+    recognition.onend = () => {
+      setIsListening(false);
+    };
+
+    recognitionRef.current = recognition;
+    recognition.start();
+    setIsListening(true);
+  }
+
+  function stopListening() {
+    recognitionRef.current?.stop();
+    setIsListening(false);
+  }
+
+  function handleMicClick() {
+    if (isListening) {
+      stopListening();
+    } else {
+      startListening();
+    }
+  }
 
   // Default position: right side, vertically centered
   const { position, setPosition, wasDragged, handlers } = useDraggable({
@@ -304,13 +388,26 @@ export function AIAssistant({ context, onToolCall, onBeforeToolCalls }: AIAssist
               className="text-sm"
               disabled={isLoading}
             />
-            <Button
-              type="submit"
-              size="icon"
-              disabled={!input.trim() || isLoading}
-            >
-              <ArrowUp className="w-4 h-4" />
-            </Button>
+            {input.trim() ? (
+              <Button
+                type="submit"
+                size="icon"
+                disabled={isLoading}
+              >
+                <ArrowUp className="w-4 h-4" />
+              </Button>
+            ) : (
+              <Button
+                type="button"
+                size="icon"
+                onClick={handleMicClick}
+                disabled={isLoading || !speechSupported}
+                title={speechSupported ? (isListening ? 'Stop listening' : 'Start voice input') : 'Voice input not supported in this browser'}
+                className={isListening ? 'animate-pulse' : ''}
+              >
+                <Mic className="w-4 h-4" />
+              </Button>
+            )}
           </form>
         </div>
       </Card>
