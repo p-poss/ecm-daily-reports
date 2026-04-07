@@ -158,53 +158,168 @@ export function AIAssistant({ context, onToolCall, onBeforeToolCalls }: AIAssist
   const inputRef = useRef<HTMLInputElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const audioStreamRef = useRef<MediaStream | null>(null);
+  const animationFrameRef = useRef<number | null>(null);
+  const barRefs = useRef<(HTMLDivElement | null)[]>([null, null, null, null]);
+  // Tracks user intent — true while user wants to keep listening, even if recognition restarts
+  const wantListeningRef = useRef(false);
+  const finalTranscriptRef = useRef('');
 
   // Check if Web Speech API is supported
   const speechSupported = typeof window !== 'undefined' &&
     ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window);
 
-  function startListening() {
-    if (!speechSupported) return;
-    const Ctor = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!Ctor) return;
+  async function startAudioAnalysis() {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      audioStreamRef.current = stream;
+      const AudioCtx = window.AudioContext || (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+      if (!AudioCtx) return;
+      const audioContext = new AudioCtx();
+      audioContextRef.current = audioContext;
+      const source = audioContext.createMediaStreamSource(stream);
+      const analyser = audioContext.createAnalyser();
+      analyser.fftSize = 256;
+      source.connect(analyser);
+      const dataArray = new Uint8Array(analyser.frequencyBinCount);
 
+      // Smoothed levels per bar (lerp toward target)
+      const smoothed = [0, 0, 0, 0];
+      const targets = [0, 0, 0, 0];
+      let frame = 0;
+      const tick = () => {
+        analyser.getByteFrequencyData(dataArray);
+        let sum = 0;
+        for (let i = 0; i < dataArray.length; i++) {
+          sum += dataArray[i];
+        }
+        const avg = sum / dataArray.length;
+        const baseLevel = Math.min(1, (avg / 60) * 1.5);
+        // Only randomize new targets every few frames to reduce jitter
+        if (frame % 6 === 0) {
+          for (let i = 0; i < 4; i++) {
+            const variation = 0.7 + Math.random() * 0.3;
+            targets[i] = Math.min(1, baseLevel * variation);
+          }
+        }
+        frame++;
+        // Lerp smoothed values toward targets and apply
+        for (let i = 0; i < 4; i++) {
+          smoothed[i] += (targets[i] - smoothed[i]) * 0.25;
+          const bar = barRefs.current[i];
+          if (bar) {
+            const height = Math.max(2, smoothed[i] * 10);
+            bar.style.height = `${height}px`;
+          }
+        }
+        animationFrameRef.current = requestAnimationFrame(tick);
+      };
+      tick();
+    } catch {
+      // Mic permission denied or unavailable — silently ignore
+    }
+  }
+
+  function stopAudioAnalysis() {
+    if (animationFrameRef.current) {
+      cancelAnimationFrame(animationFrameRef.current);
+      animationFrameRef.current = null;
+    }
+    audioStreamRef.current?.getTracks().forEach((t) => t.stop());
+    audioStreamRef.current = null;
+    audioContextRef.current?.close();
+    audioContextRef.current = null;
+    // Reset bar heights
+    barRefs.current.forEach((bar) => {
+      if (bar) bar.style.height = '3px';
+    });
+  }
+
+  function spawnRecognition(): SpeechRecognition | null {
+    const Ctor = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!Ctor) return null;
     const recognition = new Ctor();
     recognition.continuous = true;
     recognition.interimResults = true;
     recognition.lang = 'en-US';
-
-    let finalTranscript = '';
 
     recognition.onresult = (event: SpeechRecognitionEvent) => {
       let interim = '';
       for (let i = event.resultIndex; i < event.results.length; i++) {
         const transcript = event.results[i][0].transcript;
         if (event.results[i].isFinal) {
-          finalTranscript += transcript;
+          finalTranscriptRef.current += transcript;
         } else {
           interim += transcript;
         }
       }
-      setInput((finalTranscript + interim).trim());
+      setInput((finalTranscriptRef.current + interim).trim());
     };
 
-    recognition.onerror = () => {
-      setIsListening(false);
+    recognition.onerror = (event: Event) => {
+      const errType = (event as Event & { error?: string }).error;
+      if (errType === 'not-allowed' || errType === 'service-not-allowed') {
+        wantListeningRef.current = false;
+        setIsListening(false);
+        stopAudioAnalysis();
+      }
     };
 
     recognition.onend = () => {
-      setIsListening(false);
+      // Only restart if user still wants to listen — spawn a fresh instance
+      if (wantListeningRef.current) {
+        setTimeout(() => {
+          if (!wantListeningRef.current) return;
+          const next = spawnRecognition();
+          if (!next) return;
+          recognitionRef.current = next;
+          try {
+            next.start();
+          } catch {
+            // Ignore — will retry on its own onend
+          }
+        }, 50);
+      } else {
+        setIsListening(false);
+        stopAudioAnalysis();
+      }
     };
 
+    return recognition;
+  }
+
+  function startListening() {
+    if (!speechSupported) return;
+    finalTranscriptRef.current = '';
+    wantListeningRef.current = true;
+    const recognition = spawnRecognition();
+    if (!recognition) return;
     recognitionRef.current = recognition;
-    recognition.start();
+    try {
+      recognition.start();
+    } catch {
+      // Already running
+    }
     setIsListening(true);
+    startAudioAnalysis();
   }
 
   function stopListening() {
+    wantListeningRef.current = false;
     recognitionRef.current?.stop();
+    stopAudioAnalysis();
     setIsListening(false);
   }
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      wantListeningRef.current = false;
+      stopAudioAnalysis();
+      recognitionRef.current?.stop();
+    };
+  }, []);
 
   function handleMicClick() {
     if (isListening) {
@@ -388,26 +503,36 @@ export function AIAssistant({ context, onToolCall, onBeforeToolCalls }: AIAssist
               className="text-sm"
               disabled={isLoading}
             />
-            {input.trim() ? (
-              <Button
-                type="submit"
-                size="icon"
-                disabled={isLoading}
-              >
-                <ArrowUp className="w-4 h-4" />
-              </Button>
-            ) : (
-              <Button
-                type="button"
-                size="icon"
-                onClick={handleMicClick}
-                disabled={isLoading || !speechSupported}
-                title={speechSupported ? (isListening ? 'Stop listening' : 'Start voice input') : 'Voice input not supported in this browser'}
-                className={isListening ? 'animate-pulse' : ''}
-              >
+            <Button
+              type="button"
+              size="icon"
+              variant="outline"
+              onClick={handleMicClick}
+              disabled={isLoading || !speechSupported}
+              title={speechSupported ? (isListening ? 'Stop listening' : 'Start voice input') : 'Voice input not supported in this browser'}
+            >
+              {isListening ? (
+                <div className="flex items-center justify-center gap-[2px] h-4">
+                  {[0, 1, 2, 3].map((i) => (
+                    <div
+                      key={i}
+                      ref={(el) => { barRefs.current[i] = el; }}
+                      className="w-[2px] bg-current rounded-full"
+                      style={{ height: '2px' }}
+                    />
+                  ))}
+                </div>
+              ) : (
                 <Mic className="w-4 h-4" />
-              </Button>
-            )}
+              )}
+            </Button>
+            <Button
+              type="submit"
+              size="icon"
+              disabled={isLoading || !input.trim()}
+            >
+              <ArrowUp className="w-4 h-4" />
+            </Button>
           </form>
         </div>
       </Card>
