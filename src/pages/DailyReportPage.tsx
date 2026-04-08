@@ -310,10 +310,14 @@ export function DailyReportPage() {
         syncStatus: 'pending',
       });
 
-      // Add to sync queue
+      // Add to sync queue. If the report has already been synced once
+      // (has an airtableId), queue an 'update' so we don't create a
+      // duplicate Airtable record. Note that re-submission still creates
+      // duplicate child rows in Airtable today — see the TODO below.
       const report = await db.dailyReports.get(reportIdToSubmit);
       if (report) {
-        await addToQueue('dailyReports', reportIdToSubmit, 'create', {
+        const reportOp = report.airtableId ? 'update' : 'create';
+        await addToQueue('dailyReports', reportIdToSubmit, reportOp, {
           'Job': report.jobId,
           'Date': report.date,
           'Day of Week': report.dayOfWeek,
@@ -326,6 +330,13 @@ export function DailyReportPage() {
           'Is Daily Late': report.isDailyLate,
           'Is Payroll Late': report.isPayrollLate,
         });
+
+        // Child rows. TODO(tier-2): the saveDraft pattern wipes and
+        // re-inserts local child entries on every edit, which means a
+        // re-submission queues fresh creates without cleaning up the
+        // previously-synced rows in Airtable. Fix is to either preserve
+        // child UUIDs across drafts or queue deletes for the orphans
+        // before queuing the new creates.
 
         // Add labor entries to queue
         for (const entry of laborEntries) {
@@ -343,7 +354,9 @@ export function DailyReportPage() {
             'Down OT Hours': entry.downOtHours,
             'Work ST Hours': entry.workStHours,
             'Work OT Hours': entry.workOtHours,
-            'Cost Code Hours': entry.costCodeHours,
+            // 'Cost Code Hours' intentionally omitted — Airtable can't
+            // store the per-cost-code-hours JSON object as a single
+            // field. TODO(tier-2): split into a junction table.
           });
         }
 
@@ -377,15 +390,12 @@ export function DailyReportPage() {
           });
         }
 
-        // Add photos to queue
-        for (const photo of photos) {
-          await addToQueue('photoAttachments', photo.id, 'create', {
-            'Daily Report': reportIdToSubmit,
-            'Image Data': photo.imageData,
-            'Caption': photo.caption,
-            'Created At': photo.createdAt,
-          });
-        }
+        // TODO(tier-2): Photo sync needs an external storage host
+        // (S3/Cloudinary) so we can pass URLs to Airtable's Attachment
+        // field. Base64 in IndexedDB is too large to store in a text
+        // field, and Airtable attachments can't accept base64 directly.
+        // Photos remain local-only until that infrastructure is built.
+        // for (const photo of photos) { ... }
       }
 
       alert('Report submitted successfully!');

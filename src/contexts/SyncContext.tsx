@@ -208,6 +208,19 @@ export function SyncProvider({ children }: { children: ReactNode }) {
       'Content-Type': 'application/json',
     };
 
+    // Helper: read the response body to surface Airtable's actual error
+    // detail. statusText is empty on HTTP/2 so we have to read the body.
+    async function describeError(resp: Response, op: string): Promise<string> {
+      let detail = '';
+      try {
+        const body = await resp.text();
+        detail = body.slice(0, 500); // cap so we don't blow up the log
+      } catch {
+        detail = '(no body)';
+      }
+      return `Airtable ${op} failed [${resp.status}] on ${item.tableName}: ${detail}`;
+    }
+
     switch (item.operation) {
       case 'create': {
         const fields = await resolveLinkedFields(item.tableName, item.data);
@@ -217,7 +230,7 @@ export function SyncProvider({ children }: { children: ReactNode }) {
           body: JSON.stringify({ fields }),
         });
         if (!response.ok) {
-          throw new Error(`Airtable create failed: ${response.statusText}`);
+          throw new Error(await describeError(response, 'create'));
         }
         const result = await response.json();
         // Update local record with Airtable ID
@@ -237,7 +250,7 @@ export function SyncProvider({ children }: { children: ReactNode }) {
           body: JSON.stringify({ fields }),
         });
         if (!response.ok) {
-          throw new Error(`Airtable update failed: ${response.statusText}`);
+          throw new Error(await describeError(response, 'update'));
         }
         break;
       }
@@ -249,7 +262,7 @@ export function SyncProvider({ children }: { children: ReactNode }) {
             headers,
           });
           if (!response.ok) {
-            throw new Error(`Airtable delete failed: ${response.statusText}`);
+            throw new Error(await describeError(response, 'delete'));
           }
         }
         break;
