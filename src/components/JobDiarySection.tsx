@@ -137,16 +137,20 @@ function DiaryEntryForm({
         <Combobox
           className="w-full text-sm"
           value={entry.costCodeId || ''}
-          onChange={(value) => onUpdate({ costCodeId: value || undefined })}
+          onChange={(value) => {
+            // '' (input cleared) and '__none__' (clicked the sentinel) both clear.
+            const next = !value || value === '__none__' ? undefined : value;
+            onUpdate({ costCodeId: next });
+          }}
           items={[
-            { value: '', label: 'No cost code' },
+            { value: '__none__', label: 'No cost code' },
             ...costCodes.map((cc) => ({
               value: cc.id,
               label: cc.code,
               detail: cc.description,
             })),
           ]}
-          placeholder="Search cost codes…"
+          placeholder="No cost code"
           emptyText="No cost codes match."
         />
       </div>

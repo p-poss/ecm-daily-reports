@@ -413,7 +413,9 @@ function TableRow({
           className="h-8 text-sm w-full"
           value={entry.employeeId || ''}
           onChange={(value) => {
-            if (!value) {
+            // Backspacing the input fires onChange(''); explicitly picking
+            // the N/A item fires onChange('__none__'). Both clear.
+            if (!value || value === '__none__') {
               onUpdate({ employeeId: '', trade: 'N/A' });
               return;
             }
@@ -424,14 +426,14 @@ function TableRow({
             });
           }}
           items={[
-            { value: '', label: 'N/A' },
+            { value: '__none__', label: 'N/A' },
             ...employees.map((emp) => ({
               value: emp.id,
               label: emp.name,
               detail: emp.trade,
             })),
           ]}
-          placeholder="Search employees…"
+          placeholder="N/A"
           emptyText="No employees match."
         />
       </td>
