@@ -586,6 +586,23 @@ export function DailyReportPage() {
   };
 
   const handleAIToolCall = useCallback((name: string, input: Record<string, unknown>) => {
+    // Defensive: the AI sometimes passes the cost code's numeric `code`
+    // (e.g. "1100") instead of the canonical UUID `id`. Resolve either
+    // form to the UUID by looking it up in the loaded cost codes. Returns
+    // undefined for null/undefined input. Pass-through if no match —
+    // better to write a stale value than silently drop the field.
+    function resolveCostCodeId(raw: unknown): string | undefined {
+      if (raw == null || raw === '') return undefined;
+      if (typeof raw !== 'string') return undefined;
+      const list = costCodes || [];
+      // Direct ID hit
+      if (list.some((c) => c.id === raw)) return raw;
+      // Code number fallback
+      const byCode = list.find((c) => c.code === raw);
+      if (byCode) return byCode.id;
+      return raw;
+    }
+
     switch (name) {
       case 'set_date':
         setQuiet('date', input.date as string);
@@ -651,7 +668,7 @@ export function DailyReportPage() {
           id: generateId(),
           dailyReportId: currentReportId,
           entryText: (input.entryText as string) || '',
-          costCodeId: input.costCodeId as string | undefined,
+          costCodeId: resolveCostCodeId(input.costCodeId),
           loads: input.loads as number | undefined,
           yield: input.yield as number | undefined,
           total: input.loads && input.yield ? (input.loads as number) * (input.yield as number) : undefined,
@@ -668,7 +685,7 @@ export function DailyReportPage() {
         if (updated[idx]) {
           const updates: Partial<JobDiaryEntry> = {};
           if (input.entryText !== undefined) updates.entryText = input.entryText as string;
-          if (input.costCodeId !== undefined) updates.costCodeId = input.costCodeId as string;
+          if (input.costCodeId !== undefined) updates.costCodeId = resolveCostCodeId(input.costCodeId);
           if (input.loads !== undefined) updates.loads = input.loads as number;
           if (input.yield !== undefined) updates.yield = input.yield as number;
           updated[idx] = { ...updated[idx], ...updates };
@@ -688,10 +705,25 @@ export function DailyReportPage() {
           contractorId: (input.contractorId as string) || '',
           itemsWorked: (input.itemsWorked as string) || '',
           production: input.production as string | undefined,
-          costCodeId: input.costCodeId as string | undefined,
+          costCodeId: resolveCostCodeId(input.costCodeId),
         };
         setQuiet('subcontractorEntries', [...subcontractorEntries, newEntry]);
         addHighlight(newEntry.id);
+        break;
+      }
+      case 'update_subcontractor_entry': {
+        const idx = input.index as number;
+        if (subcontractorEntries[idx]) addHighlight(subcontractorEntries[idx].id);
+        const updated = [...subcontractorEntries];
+        if (updated[idx]) {
+          const updates: Partial<SubcontractorWork> = {};
+          if (input.contractorId !== undefined) updates.contractorId = input.contractorId as string;
+          if (input.itemsWorked !== undefined) updates.itemsWorked = input.itemsWorked as string;
+          if (input.production !== undefined) updates.production = input.production as string;
+          if (input.costCodeId !== undefined) updates.costCodeId = resolveCostCodeId(input.costCodeId);
+          updated[idx] = { ...updated[idx], ...updates };
+        }
+        setQuiet('subcontractorEntries', updated);
         break;
       }
       case 'remove_subcontractor_entry': {
@@ -709,6 +741,20 @@ export function DailyReportPage() {
         };
         setQuiet('deliveryEntries', [...deliveryEntries, newEntry]);
         addHighlight(newEntry.id);
+        break;
+      }
+      case 'update_delivery_entry': {
+        const idx = input.index as number;
+        if (deliveryEntries[idx]) addHighlight(deliveryEntries[idx].id);
+        const updated = [...deliveryEntries];
+        if (updated[idx]) {
+          const updates: Partial<MaterialDelivered> = {};
+          if (input.supplier !== undefined) updates.supplier = input.supplier as string;
+          if (input.material !== undefined) updates.material = input.material as string;
+          if (input.quantity !== undefined) updates.quantity = input.quantity as string;
+          updated[idx] = { ...updated[idx], ...updates };
+        }
+        setQuiet('deliveryEntries', updated);
         break;
       }
       case 'remove_delivery_entry': {

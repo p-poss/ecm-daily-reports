@@ -88,7 +88,7 @@ export const assistantTools = [
       type: 'object' as const,
       properties: {
         entryText: { type: 'string', description: 'Description of work performed' },
-        costCodeId: { type: 'string', description: 'Cost code ID (optional)' },
+        costCodeId: { type: 'string', description: 'Cost code UUID from "Available Cost Codes" — must be the ID, not the numeric code. The dispatcher will also accept the numeric code as a fallback. Optional.' },
         loads: { type: 'number', description: 'Number of loads (optional)' },
         yield: { type: 'number', description: 'Yield amount (optional)' },
       },
@@ -97,13 +97,13 @@ export const assistantTools = [
   },
   {
     name: 'update_diary_entry',
-    description: 'Update an existing diary entry by index (0-based).',
+    description: 'Update an existing diary entry by index (0-based). Only the fields you pass are changed; omitted fields stay as-is.',
     input_schema: {
       type: 'object' as const,
       properties: {
         index: { type: 'number', description: '0-based index' },
         entryText: { type: 'string' },
-        costCodeId: { type: 'string' },
+        costCodeId: { type: 'string', description: 'Cost code UUID from "Available Cost Codes" — must be the ID, not the numeric code. The dispatcher will also accept the numeric code as a fallback.' },
         loads: { type: 'number' },
         yield: { type: 'number' },
       },
@@ -116,12 +116,27 @@ export const assistantTools = [
     input_schema: {
       type: 'object' as const,
       properties: {
-        contractorId: { type: 'string', description: 'Subcontractor ID from available list' },
+        contractorId: { type: 'string', description: 'Subcontractor UUID from "Available Subcontractors"' },
         itemsWorked: { type: 'string', description: 'Description of items worked on' },
         production: { type: 'string', description: 'Production quantity (optional)' },
-        costCodeId: { type: 'string', description: 'Cost code ID (optional)' },
+        costCodeId: { type: 'string', description: 'Cost code UUID from "Available Cost Codes" — must be the ID, not the numeric code. The dispatcher will also accept the numeric code as a fallback. Optional.' },
       },
       required: ['contractorId', 'itemsWorked'],
+    },
+  },
+  {
+    name: 'update_subcontractor_entry',
+    description: 'Update an existing subcontractor entry by index (0-based). Only the fields you pass are changed; omitted fields stay as-is.',
+    input_schema: {
+      type: 'object' as const,
+      properties: {
+        index: { type: 'number', description: '0-based index of the subcontractor entry to update' },
+        contractorId: { type: 'string', description: 'Subcontractor UUID from "Available Subcontractors"' },
+        itemsWorked: { type: 'string', description: 'Description of items worked on' },
+        production: { type: 'string', description: 'Production quantity' },
+        costCodeId: { type: 'string', description: 'Cost code UUID from "Available Cost Codes" — must be the ID, not the numeric code. The dispatcher will also accept the numeric code as a fallback.' },
+      },
+      required: ['index'],
     },
   },
   {
@@ -135,6 +150,20 @@ export const assistantTools = [
         quantity: { type: 'string', description: 'Quantity with units, e.g. "10 CY" or "500 LF"' },
       },
       required: ['supplier', 'material', 'quantity'],
+    },
+  },
+  {
+    name: 'update_delivery_entry',
+    description: 'Update an existing delivery entry by index (0-based). Only the fields you pass are changed; omitted fields stay as-is.',
+    input_schema: {
+      type: 'object' as const,
+      properties: {
+        index: { type: 'number', description: '0-based index of the delivery entry to update' },
+        supplier: { type: 'string', description: 'Supplier name' },
+        material: { type: 'string', description: 'Material description' },
+        quantity: { type: 'string', description: 'Quantity with units, e.g. "10 CY" or "500 LF"' },
+      },
+      required: ['index'],
     },
   },
   {
