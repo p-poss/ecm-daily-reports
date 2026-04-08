@@ -709,7 +709,7 @@ export function DailyReportPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="bg-card/80 backdrop-blur-md p-4 fixed top-0 left-0 right-0 z-10 ring-2 ring-foreground/10 rounded-b-[16px]">
+      <header className="bg-card/60 backdrop-blur-md p-4 fixed top-0 left-0 right-0 z-10 ring-2 ring-foreground/10 rounded-b-[16px]">
         <div className="flex items-start max-w-7xl mx-auto relative">
           <Button
             variant="outline"
@@ -884,7 +884,7 @@ export function DailyReportPage() {
       </main>
 
       {/* Fixed Bottom Actions */}
-      <div className="fixed bottom-0 left-0 right-0 z-10 bg-card/80 backdrop-blur-md p-4 safe-area-inset-bottom ring-2 ring-foreground/10 rounded-t-[16px]">
+      <div className="fixed bottom-0 left-0 right-0 z-10 bg-card/60 backdrop-blur-md p-4 safe-area-inset-bottom ring-2 ring-foreground/10 rounded-t-[16px]">
         <div className="max-w-7xl mx-auto flex gap-3 items-center">
           {/* Undo/Redo */}
           <div className="flex-1 flex border border-border rounded-md overflow-hidden">
