@@ -579,6 +579,10 @@ export function DailyReportPage() {
       material: e.material,
       quantity: e.quantity,
     })),
+    photos: photos.map((p, i) => ({
+      index: i,
+      caption: p.caption,
+    })),
     availableEmployees: (employees || []).map((e) => ({ id: e.id, name: e.name, trade: e.trade })),
     availableEquipment: (equipment || []).map((e) => ({ id: e.id, equipmentNumber: e.equipmentNumber, description: e.description })),
     availableCostCodes: (costCodes || []).map((c) => ({ id: c.id, code: c.code, description: c.description })),
@@ -760,6 +764,17 @@ export function DailyReportPage() {
       case 'remove_delivery_entry': {
         const idx = input.index as number;
         setQuiet('deliveryEntries', deliveryEntries.filter((_, i) => i !== idx));
+        break;
+      }
+      case 'set_photo_caption': {
+        const idx = input.index as number;
+        const caption = input.caption as string;
+        if (photos[idx]) {
+          addHighlight(photos[idx].id);
+          const updated = [...photos];
+          updated[idx] = { ...updated[idx], caption };
+          setQuiet('photos', updated);
+        }
         break;
       }
     }

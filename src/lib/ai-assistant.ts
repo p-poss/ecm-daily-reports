@@ -199,6 +199,18 @@ export const assistantTools = [
       required: ['index'],
     },
   },
+  {
+    name: 'set_photo_caption',
+    description: 'Set or update the caption on a photo by index (0-based). The foreman takes photos via the camera UI; the assistant can only edit captions, not add or remove photos.',
+    input_schema: {
+      type: 'object' as const,
+      properties: {
+        index: { type: 'number', description: '0-based index of the photo' },
+        caption: { type: 'string', description: 'New caption text. Pass an empty string to clear the caption.' },
+      },
+      required: ['index', 'caption'],
+    },
+  },
 ];
 
 export interface ReportContext {
@@ -241,6 +253,10 @@ export interface ReportContext {
     material: string;
     quantity: string;
   }>;
+  photos: Array<{
+    index: number;
+    caption?: string;
+  }>;
   availableEmployees: Array<{ id: string; name: string; trade: string }>;
   availableEquipment: Array<{ id: string; equipmentNumber: string; description: string }>;
   availableCostCodes: Array<{ id: string; code: string; description: string }>;
@@ -259,6 +275,7 @@ Current Report State:
 - Diary Entries (${context.diaryEntries.length}): ${context.diaryEntries.length > 0 ? context.diaryEntries.map(e => `[${e.index}] "${e.entryText}"${e.costCode ? ` (${e.costCode})` : ''}`).join('; ') : 'None'}
 - Subcontractors (${context.subcontractorEntries.length}): ${context.subcontractorEntries.length > 0 ? context.subcontractorEntries.map(e => `[${e.index}] ${e.contractorName}: "${e.itemsWorked}"`).join('; ') : 'None'}
 - Deliveries (${context.deliveryEntries.length}): ${context.deliveryEntries.length > 0 ? context.deliveryEntries.map(e => `[${e.index}] ${e.supplier}: ${e.material} (${e.quantity})`).join('; ') : 'None'}
+- Photos (${context.photos.length}): ${context.photos.length > 0 ? context.photos.map(p => `[${p.index}] ${p.caption ? `"${p.caption}"` : '(no caption)'}`).join('; ') : 'None'}
 
 Available Employees:
 ${context.availableEmployees.map(e => `- ${e.name} (ID: ${e.id}, Trade: ${e.trade})`).join('\n')}
