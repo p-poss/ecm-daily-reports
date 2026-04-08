@@ -12,6 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Combobox } from '@/components/ui/combobox';
 import { Card, CardContent } from '@/components/ui/card';
 import { Plus, X, HardHat, Truck } from 'lucide-react';
 import type { SubcontractorWork, MaterialDelivered } from '@/types';
@@ -163,26 +164,25 @@ export function SubcontractorsDeliveriesSection({
                   </div>
                   <div className="space-y-1.5">
                     <Label className="text-xs text-muted-foreground">Cost Code (optional)</Label>
-                    <Select
-                      value={entry.costCodeId || 'none'}
-                      onValueChange={(value) =>
+                    <Combobox
+                      className="w-full text-sm"
+                      value={entry.costCodeId || ''}
+                      onChange={(value) =>
                         updateSubcontractorEntry(index, {
-                          costCodeId: value === 'none' ? undefined : value,
+                          costCodeId: value || undefined,
                         })
                       }
-                    >
-                      <SelectTrigger className="w-full text-sm">
-                        <SelectValue placeholder="Select cost code" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="none">No cost code</SelectItem>
-                        {(costCodes || []).map((cc) => (
-                          <SelectItem key={cc.id} value={cc.id}>
-                            {cc.code} - {cc.description}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                      items={[
+                        { value: '', label: 'No cost code' },
+                        ...(costCodes || []).map((cc) => ({
+                          value: cc.id,
+                          label: cc.code,
+                          detail: cc.description,
+                        })),
+                      ]}
+                      placeholder="Search cost codes…"
+                      emptyText="No cost codes match."
+                    />
                   </div>
                 </div>
               </div>

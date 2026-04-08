@@ -10,6 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Combobox } from '@/components/ui/combobox';
 import { Card, CardContent } from '@/components/ui/card';
 import { Plus, Sheet, X } from 'lucide-react';
 import type { LaborEntry, Trade } from '@/types';
@@ -231,21 +232,19 @@ export function LaborSection({ entries, onChange, dailyReportId, jobId, highligh
                   })}
                   {/* Add cost code column button */}
                   <th rowSpan={3} colSpan={2} className="p-1 pl-2 pr-4 pt-4 align-top w-[160px] min-w-[160px] max-w-[160px]">
-                    <Select
+                    <Combobox
+                      className="h-7 text-xs w-full"
                       value=""
-                      onValueChange={(value) => addCostCodeColumn(value)}
-                    >
-                      <SelectTrigger className="h-7 text-xs w-full">
-                        <SelectValue placeholder={"+\u00A0\u00A0Cost Code"} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {availableCostCodes.map((cc) => (
-                          <SelectItem key={cc.id} value={cc.id}>
-                            {cc.code} - {cc.description}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                      onChange={(value) => { if (value) addCostCodeColumn(value); }}
+                      items={availableCostCodes.map((cc) => ({
+                        value: cc.id,
+                        label: cc.code,
+                        detail: cc.description,
+                      }))}
+                      placeholder={"+\u00A0\u00A0Cost Code"}
+                      emptyText="No cost codes match."
+                      align="end"
+                    />
                   </th>
                 </tr>
 
@@ -410,10 +409,11 @@ function TableRow({
     <tr className={`border-b border-b-border ${highlighted ? 'ai-highlight' : ''}`}>
       {/* Employee */}
       <td className="p-2 pl-4 sticky left-0 z-[1] bg-card shadow-[inset_-2px_0_0_0_var(--border)]">
-        <Select
-          value={entry.employeeId || 'none'}
-          onValueChange={(value) => {
-            if (value === 'none') {
+        <Combobox
+          className="h-8 text-sm w-full"
+          value={entry.employeeId || ''}
+          onChange={(value) => {
+            if (!value) {
               onUpdate({ employeeId: '', trade: 'N/A' });
               return;
             }
@@ -423,19 +423,17 @@ function TableRow({
               trade: emp?.trade || entry.trade,
             });
           }}
-        >
-          <SelectTrigger className="h-8 text-sm w-full">
-            <SelectValue placeholder="N/A" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="none">N/A</SelectItem>
-            {employees.map((emp) => (
-              <SelectItem key={emp.id} value={emp.id}>
-                {emp.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+          items={[
+            { value: '', label: 'N/A' },
+            ...employees.map((emp) => ({
+              value: emp.id,
+              label: emp.name,
+              detail: emp.trade,
+            })),
+          ]}
+          placeholder="Search employees…"
+          emptyText="No employees match."
+        />
       </td>
       {/* Trade */}
       <td className="p-2">

@@ -4,13 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { Combobox } from '@/components/ui/combobox';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Plus, X, List } from 'lucide-react';
@@ -140,22 +134,21 @@ function DiaryEntryForm({
       {/* Cost Code */}
       <div className="space-y-1.5">
         <Label className="text-xs text-muted-foreground">Cost Code (optional)</Label>
-        <Select
-          value={entry.costCodeId || 'none'}
-          onValueChange={(value) => onUpdate({ costCodeId: value === 'none' ? undefined : value })}
-        >
-          <SelectTrigger className="w-full text-sm">
-            <SelectValue placeholder="Select cost code" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="none">No cost code</SelectItem>
-            {costCodes.map((cc) => (
-              <SelectItem key={cc.id} value={cc.id}>
-                {cc.code} - {cc.description}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <Combobox
+          className="w-full text-sm"
+          value={entry.costCodeId || ''}
+          onChange={(value) => onUpdate({ costCodeId: value || undefined })}
+          items={[
+            { value: '', label: 'No cost code' },
+            ...costCodes.map((cc) => ({
+              value: cc.id,
+              label: cc.code,
+              detail: cc.description,
+            })),
+          ]}
+          placeholder="Search cost codes…"
+          emptyText="No cost codes match."
+        />
       </div>
 
       {/* Loads, Yield, Total */}
