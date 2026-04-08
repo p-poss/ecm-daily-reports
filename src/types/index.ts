@@ -6,6 +6,8 @@ export interface Job {
   status: 'Active' | 'Completed' | 'On Hold';
   sector: 'Public' | 'Private';
   address?: string;
+  owner?: string;
+  totalContract?: number;
   airtableId?: string;
 }
 

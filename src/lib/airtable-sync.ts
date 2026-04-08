@@ -96,6 +96,8 @@ async function syncJobs(): Promise<{ pulled: number; upserted: number; skipped: 
         : 'Active',
       sector: sectorRaw === 'Public' ? 'Public' : 'Private',
       address: str(r.fields, 'Address'),
+      owner: str(r.fields, 'Owner'),
+      totalContract: num(r.fields, 'Total Contract'),
     };
     toUpsert.push(job);
   }

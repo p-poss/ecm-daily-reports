@@ -6,8 +6,9 @@ import { useNavigation } from '@/contexts/NavigationContext';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { SyncIndicator } from '@/components/SyncIndicator';
-import { ArrowLeft, MapPin, Images, FileStack } from 'lucide-react';
+import { ArrowLeft, MapPin, Images, FileStack, DollarSign } from 'lucide-react';
 import { generateCombinedReportPDF, type ReportPDFData } from '@/lib/generate-report-pdf';
+import { generateBudgetPDF } from '@/lib/generate-budget-pdf';
 import { PhotoGalleryModal, type GalleryPhoto } from '@/components/PhotoGalleryModal';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/ThemeToggle';
@@ -170,6 +171,36 @@ export function JobsListPage() {
     setGalleryPhotos(photos);
   }
 
+  async function handleViewBudget(jobId: string) {
+    // Open the window synchronously so it isn't blocked as a popup, then
+    // navigate to the generated blob URL once the PDF is ready.
+    const pdfWindow = window.open('', '_blank');
+    const job = jobs?.find((j) => j.id === jobId);
+    if (!job) { pdfWindow?.close(); return; }
+
+    const costCodes = await db.costCodes
+      .where('jobId').equals(jobId)
+      .sortBy('code');
+
+    const blobUrl = generateBudgetPDF({
+      jobNumber: job.jobNumber,
+      jobName: job.jobName,
+      address: job.address,
+      owner: job.owner,
+      totalContract: job.totalContract,
+      costCodes: costCodes.map((c) => ({
+        code: c.code,
+        description: c.description,
+        quantity: c.quantity,
+        uom: c.uom,
+        unitPrice: c.unitPrice,
+        budgetAmount: c.budgetAmount,
+      })),
+    });
+
+    if (pdfWindow) pdfWindow.location.href = blobUrl;
+  }
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -264,6 +295,14 @@ export function JobsListPage() {
                     >
                       <Images className="w-4 h-4 mr-1" />
                       Photos
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="flex-1"
+                      onClick={() => handleViewBudget(job.id)}
+                    >
+                      <DollarSign className="w-4 h-4 mr-1" />
+                      Budget
                     </Button>
                     <Button
                       variant="outline"
