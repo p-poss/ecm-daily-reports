@@ -231,9 +231,11 @@ export function BayerNoiseBackground({
     };
     canvas.addEventListener('pointerdown', onPointerDown);
 
-    const startTime = performance.now();
+    let startTime = performance.now();
+    let elapsedAtPause = 0;
     let raf = 0;
-    const render = () => {
+
+    const drawFrame = () => {
       const t = (performance.now() - startTime) / 1000;
       gl.uniform1f(uTimeLoc, t);
       gl.uniform2fv(uClickPosLoc, clickPositions);
@@ -241,12 +243,37 @@ export function BayerNoiseBackground({
       gl.clearColor(0, 0, 0, 0);
       gl.clear(gl.COLOR_BUFFER_BIT);
       gl.drawArrays(gl.TRIANGLES, 0, 6);
-      raf = requestAnimationFrame(render);
     };
-    render();
+    const tick = () => {
+      drawFrame();
+      raf = requestAnimationFrame(tick);
+    };
+
+    const onVisibilityChange = () => {
+      if (document.hidden) {
+        if (raf) {
+          cancelAnimationFrame(raf);
+          raf = 0;
+          elapsedAtPause = performance.now() - startTime;
+        }
+      } else if (!raf) {
+        startTime = performance.now() - elapsedAtPause;
+        raf = requestAnimationFrame(tick);
+      }
+    };
+    document.addEventListener('visibilitychange', onVisibilityChange);
+
+    if (document.hidden) {
+      // Tab is hidden at mount — render one frame so the canvas isn't blank
+      // when revealed, and wait for visibilitychange to start the loop.
+      drawFrame();
+    } else {
+      raf = requestAnimationFrame(tick);
+    }
 
     return () => {
-      cancelAnimationFrame(raf);
+      if (raf) cancelAnimationFrame(raf);
+      document.removeEventListener('visibilitychange', onVisibilityChange);
       ro.disconnect();
       canvas.removeEventListener('pointerdown', onPointerDown);
       gl.deleteBuffer(vbo);
