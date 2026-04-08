@@ -1,6 +1,7 @@
-import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, useRef, type ReactNode } from 'react';
 import { db, generateId, now } from '@/db/database';
 import type { SyncQueueItem } from '@/types';
+import { syncMasterTables } from '@/lib/airtable-sync';
 
 export type SyncStatus = 'online-synced' | 'online-syncing' | 'offline-pending' | 'error';
 
@@ -12,7 +13,11 @@ interface SyncContextType {
   syncError: string | null;
   addToQueue: (tableName: string, recordId: string, operation: SyncQueueItem['operation'], data: Record<string, unknown>) => Promise<void>;
   triggerSync: () => Promise<void>;
+  triggerMasterSync: () => Promise<void>;
+  triggerAllSync: () => Promise<void>;
 }
+
+const LAST_SYNC_KEY = 'ecm:lastSyncTime';
 
 const SyncContext = createContext<SyncContextType | null>(null);
 
@@ -23,9 +28,21 @@ const AIRTABLE_BASE_ID = import.meta.env.VITE_AIRTABLE_BASE_ID || '';
 export function SyncProvider({ children }: { children: ReactNode }) {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [pendingCount, setPendingCount] = useState(0);
-  const [lastSyncTime, setLastSyncTime] = useState<string | null>(null);
+  const [lastSyncTime, setLastSyncTime] = useState<string | null>(() => {
+    try { return localStorage.getItem(LAST_SYNC_KEY); } catch { return null; }
+  });
   const [syncError, setSyncError] = useState<string | null>(null);
   const [isSyncing, setIsSyncing] = useState(false);
+  // Re-entry guard for the master sync — multiple online events / button
+  // clicks can fire in quick succession; we want at most one in flight.
+  const masterSyncInFlight = useRef(false);
+
+  function recordSyncSuccess() {
+    const ts = now();
+    setLastSyncTime(ts);
+    setSyncError(null);
+    try { localStorage.setItem(LAST_SYNC_KEY, ts); } catch { /* quota */ }
+  }
 
   // Calculate status based on state
   const status: SyncStatus = syncError
@@ -128,7 +145,7 @@ export function SyncProvider({ children }: { children: ReactNode }) {
         }
       }
 
-      setLastSyncTime(now());
+      recordSyncSuccess();
       await updatePendingCount();
     } catch (error) {
       setSyncError(error instanceof Error ? error.message : 'Sync failed');
@@ -136,6 +153,40 @@ export function SyncProvider({ children }: { children: ReactNode }) {
       setIsSyncing(false);
     }
   }
+
+  // Pull master tables from Airtable. Re-entry guarded (multiple online
+  // events or button clicks just no-op if a sync is already in flight).
+  const triggerMasterSync = useCallback(async () => {
+    if (masterSyncInFlight.current) return;
+    masterSyncInFlight.current = true;
+    try {
+      const result = await syncMasterTables();
+      console.log(
+        `[airtable-sync] jobs +${result.jobs.upserted}, employees +${result.employees.upserted}, equipment +${result.equipment.upserted}, subcontractors +${result.subcontractors.upserted}, cost codes +${result.costCodes.upserted}, ${result.durationMs}ms`
+      );
+      recordSyncSuccess();
+    } catch (err) {
+      console.error('[airtable-sync] failed:', err);
+      setSyncError(err instanceof Error ? err.message : 'Master sync failed');
+    } finally {
+      masterSyncInFlight.current = false;
+    }
+  }, []);
+
+  // Manual "Sync now" — drains the upload queue AND refreshes master
+  // tables. Called from the SyncIndicator click handler.
+  const triggerAllSync = useCallback(async () => {
+    await Promise.all([triggerSync(), triggerMasterSync()]);
+  }, [triggerMasterSync]);
+
+  // Run the master sync once on mount (initial app load) and then any
+  // time the browser tells us we just came back online.
+  useEffect(() => {
+    triggerMasterSync();
+    function onOnline() { triggerMasterSync(); }
+    window.addEventListener('online', onOnline);
+    return () => window.removeEventListener('online', onOnline);
+  }, [triggerMasterSync]);
 
   // Maps a local table name to its Airtable table name.
   const tableNameMap: Record<string, string> = {
@@ -290,6 +341,8 @@ export function SyncProvider({ children }: { children: ReactNode }) {
         syncError,
         addToQueue,
         triggerSync,
+        triggerMasterSync,
+        triggerAllSync,
       }}
     >
       {children}

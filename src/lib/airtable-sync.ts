@@ -11,7 +11,7 @@
  * remain in place until those tables get populated upstream.
  */
 import { db, generateId } from '@/db/database';
-import type { Job, CostCode, Employee, Trade } from '@/types';
+import type { Job, CostCode, Employee, Equipment, Subcontractor, Trade } from '@/types';
 
 const AIRTABLE_API_KEY = import.meta.env.VITE_AIRTABLE_API_KEY || '';
 const AIRTABLE_BASE_ID = import.meta.env.VITE_AIRTABLE_BASE_ID || '';
@@ -164,6 +164,70 @@ async function syncEmployees(): Promise<{ pulled: number; upserted: number; skip
   return { pulled: records.length, upserted: toUpsert.length, skipped: false };
 }
 
+async function syncEquipment(): Promise<{ pulled: number; upserted: number; skipped: boolean }> {
+  const records = await fetchAllRecords('Equipment');
+  if (records.length === 0) return { pulled: 0, upserted: 0, skipped: true };
+
+  const existing = await db.equipment.toArray();
+  const byAirtableId = new Map(existing.filter((e) => e.airtableId).map((e) => [e.airtableId!, e]));
+  const incomingAirtableIds = new Set<string>();
+
+  const toUpsert: Equipment[] = [];
+  for (const r of records) {
+    incomingAirtableIds.add(r.id);
+    const prev = byAirtableId.get(r.id);
+    toUpsert.push({
+      id: prev?.id ?? generateId(),
+      airtableId: r.id,
+      equipmentNumber: str(r.fields, 'Equipment Number') || '',
+      description: str(r.fields, 'Description') || '',
+      type: str(r.fields, 'Type') || '',
+    });
+  }
+
+  const toDelete = existing
+    .filter((e) => !e.airtableId || !incomingAirtableIds.has(e.airtableId))
+    .map((e) => e.id);
+
+  await db.transaction('rw', db.equipment, async () => {
+    if (toDelete.length > 0) await db.equipment.bulkDelete(toDelete);
+    await db.equipment.bulkPut(toUpsert);
+  });
+
+  return { pulled: records.length, upserted: toUpsert.length, skipped: false };
+}
+
+async function syncSubcontractors(): Promise<{ pulled: number; upserted: number; skipped: boolean }> {
+  const records = await fetchAllRecords('Subcontractors');
+  if (records.length === 0) return { pulled: 0, upserted: 0, skipped: true };
+
+  const existing = await db.subcontractors.toArray();
+  const byAirtableId = new Map(existing.filter((s) => s.airtableId).map((s) => [s.airtableId!, s]));
+  const incomingAirtableIds = new Set<string>();
+
+  const toUpsert: Subcontractor[] = [];
+  for (const r of records) {
+    incomingAirtableIds.add(r.id);
+    const prev = byAirtableId.get(r.id);
+    toUpsert.push({
+      id: prev?.id ?? generateId(),
+      airtableId: r.id,
+      name: str(r.fields, 'Name') || '',
+    });
+  }
+
+  const toDelete = existing
+    .filter((s) => !s.airtableId || !incomingAirtableIds.has(s.airtableId))
+    .map((s) => s.id);
+
+  await db.transaction('rw', db.subcontractors, async () => {
+    if (toDelete.length > 0) await db.subcontractors.bulkDelete(toDelete);
+    await db.subcontractors.bulkPut(toUpsert);
+  });
+
+  return { pulled: records.length, upserted: toUpsert.length, skipped: false };
+}
+
 async function syncCostCodes(): Promise<{ pulled: number; upserted: number; skipped: boolean }> {
   const records = await fetchAllRecords('Cost Codes');
   if (records.length === 0) return { pulled: 0, upserted: 0, skipped: true };
@@ -220,10 +284,14 @@ async function syncCostCodes(): Promise<{ pulled: number; upserted: number; skip
   return { pulled: records.length, upserted: toUpsert.length, skipped: false };
 }
 
+type TableSyncResult = { pulled: number; upserted: number; skipped: boolean };
+
 export interface MasterSyncResult {
-  jobs: { pulled: number; upserted: number; skipped: boolean };
-  employees: { pulled: number; upserted: number; skipped: boolean };
-  costCodes: { pulled: number; upserted: number; skipped: boolean };
+  jobs: TableSyncResult;
+  employees: TableSyncResult;
+  equipment: TableSyncResult;
+  subcontractors: TableSyncResult;
+  costCodes: TableSyncResult;
   durationMs: number;
 }
 
@@ -236,10 +304,14 @@ export async function syncMasterTables(): Promise<MasterSyncResult> {
   const start = performance.now();
   const jobs = await syncJobs();
   const employees = await syncEmployees();
+  const equipment = await syncEquipment();
+  const subcontractors = await syncSubcontractors();
   const costCodes = await syncCostCodes();
   return {
     jobs,
     employees,
+    equipment,
+    subcontractors,
     costCodes,
     durationMs: Math.round(performance.now() - start),
   };

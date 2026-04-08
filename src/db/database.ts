@@ -115,6 +115,17 @@ class ECMDatabase extends Dexie {
     this.version(5).stores({
       tombstones: 'id, dailyReportId, [dailyReportId+tableName]',
     });
+
+    // v6: equipment and subcontractors now come from Airtable. Wipe the
+    // local seed copies so the downloader rehydrates them with airtableIds.
+    this.version(6)
+      .stores({})
+      .upgrade(async (tx) => {
+        await Promise.all([
+          tx.table('equipment').clear(),
+          tx.table('subcontractors').clear(),
+        ]);
+      });
   }
 }
 
