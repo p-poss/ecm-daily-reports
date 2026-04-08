@@ -220,11 +220,11 @@ export function LaborSection({ entries, onChange, dailyReportId, jobId, highligh
                           <Button
                             type="button"
                             variant="destructive"
-                            size="icon"
+                            size="icon-xs"
                             onClick={() => removeCostCodeColumn(ccId)}
-                            className="h-8 w-8 shrink-0"
+                            className="shrink-0"
                           >
-                            <X className="w-4 h-4" />
+                            <X className="w-3 h-3" />
                           </Button>
                         </div>
                       </th>
