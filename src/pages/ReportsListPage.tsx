@@ -269,7 +269,7 @@ export function ReportsListPage() {
       </header>
 
       {/* Reports List */}
-      <main className="max-w-7xl mx-auto p-4 pt-[200px] space-y-[20px]">
+      <main className="max-w-[82rem] mx-auto p-4 pt-[200px] space-y-[20px]">
         {reports === undefined ? (
           <div className="flex justify-center py-8">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />

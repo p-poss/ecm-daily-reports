@@ -36,6 +36,7 @@ declare global {
 }
 
 const DRAG_THRESHOLD = 8; // pixels moved before it counts as a drag
+const EDGE_GAP = 16; // gap between FAB/panel and viewport edges, header, and footer
 
 function useDraggable(initialPosition: { x: number; y: number }, containerRef?: React.RefObject<HTMLElement | null>) {
   const [position, setPosition] = useState(initialPosition);
@@ -53,9 +54,9 @@ function useDraggable(initialPosition: { x: number; y: number }, containerRef?: 
     // Measure header and footer to keep the element between them
     const header = document.querySelector('header');
     const footer = document.querySelector('[class*="fixed bottom-0"]');
-    const minY = header ? header.getBoundingClientRect().bottom + 4 : 4;
-    const maxY = (footer ? footer.getBoundingClientRect().top : vh) - rect.height - 4;
-    const clampedX = Math.max(4, Math.min(vw - rect.width - 4, x));
+    const minY = header ? header.getBoundingClientRect().bottom + EDGE_GAP : EDGE_GAP;
+    const maxY = (footer ? footer.getBoundingClientRect().top : vh) - rect.height - EDGE_GAP;
+    const clampedX = Math.max(EDGE_GAP, Math.min(vw - rect.width - EDGE_GAP, x));
     const clampedY = Math.max(minY, Math.min(maxY, y));
     return { x: clampedX, y: clampedY };
   }, [containerRef]);
@@ -342,10 +343,10 @@ export function AIAssistant({ context, onToolCall, onBeforeToolCalls }: AIAssist
       setPosition((prev) => {
         const header = document.querySelector('header');
         const footer = document.querySelector('[class*="fixed bottom-0"]');
-        const minY = header ? header.getBoundingClientRect().bottom + 4 : 4;
-        const maxY = (footer ? footer.getBoundingClientRect().top : window.innerHeight) - 60;
+        const minY = header ? header.getBoundingClientRect().bottom + EDGE_GAP : EDGE_GAP;
+        const maxY = (footer ? footer.getBoundingClientRect().top : window.innerHeight) - 60 - EDGE_GAP;
         return {
-          x: Math.max(4, Math.min(prev.x, window.innerWidth - 60)),
+          x: Math.max(EDGE_GAP, Math.min(prev.x, window.innerWidth - 60 - EDGE_GAP)),
           y: Math.max(minY, Math.min(prev.y, maxY)),
         };
       });
@@ -367,8 +368,8 @@ export function AIAssistant({ context, onToolCall, onBeforeToolCalls }: AIAssist
       setPosition((prev) => {
         const header = document.querySelector('header');
         const footer = document.querySelector('[class*="fixed bottom-0"]');
-        const minY = header ? header.getBoundingClientRect().bottom + 8 : 8;
-        const maxY = (footer ? footer.getBoundingClientRect().top : window.innerHeight) - h - 8;
+        const minY = header ? header.getBoundingClientRect().bottom + EDGE_GAP : EDGE_GAP;
+        const maxY = (footer ? footer.getBoundingClientRect().top : window.innerHeight) - h - EDGE_GAP;
         return { x: prev.x, y: Math.max(minY, Math.min(prev.y, maxY)) };
       });
     };
@@ -448,11 +449,10 @@ export function AIAssistant({ context, onToolCall, onBeforeToolCalls }: AIAssist
   const footerEl = document.querySelector('[class*="fixed bottom-0"]');
   const headerBottom = headerEl ? headerEl.getBoundingClientRect().bottom : 0;
   const footerTop = footerEl ? footerEl.getBoundingClientRect().top : window.innerHeight;
-  const panelMargin = 8;
-  const availableHeight = Math.max(200, footerTop - headerBottom - panelMargin * 2);
-  const panelMinY = headerBottom + panelMargin;
-  const panelMaxY = footerTop - measuredPanelHeight - panelMargin;
-  const panelX = Math.min(position.x, window.innerWidth - Math.min(540, window.innerWidth - 48) - 8);
+  const availableHeight = Math.max(200, footerTop - headerBottom - EDGE_GAP * 2);
+  const panelMinY = headerBottom + EDGE_GAP;
+  const panelMaxY = footerTop - measuredPanelHeight - EDGE_GAP;
+  const panelX = Math.max(EDGE_GAP, Math.min(position.x, window.innerWidth - Math.min(540, window.innerWidth - EDGE_GAP * 2) - EDGE_GAP));
   const panelY = Math.max(panelMinY, Math.min(position.y, panelMaxY));
 
   return (

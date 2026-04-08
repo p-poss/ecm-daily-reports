@@ -745,7 +745,7 @@ export function DailyReportPage() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto p-4 pb-24 pt-[200px]">
+      <main className="max-w-[82rem] mx-auto p-4 pb-24 pt-[200px]">
         <Separator className="h-[2px] bg-primary" />
 
         {/* Date and Weather */}
