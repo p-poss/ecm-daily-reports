@@ -507,6 +507,7 @@ export function AIAssistant({ context, onToolCall, onBeforeToolCalls }: AIAssist
               type="button"
               size="icon"
               variant="outline"
+              className="btn-action"
               onClick={handleMicClick}
               disabled={isLoading || !speechSupported}
               title={speechSupported ? (isListening ? 'Stop listening' : 'Start voice input') : 'Voice input not supported in this browser'}
