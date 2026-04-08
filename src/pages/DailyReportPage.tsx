@@ -25,7 +25,7 @@ import { ArrowLeft, BookOpen, Calendar as CalendarIcon, ChevronDown, Undo2, Redo
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import type { ReportContext } from '@/lib/ai-assistant';
-import type { CostCode, DailyReport, LaborEntry, JobDiaryEntry, SubcontractorWork, MaterialDelivered, Weather } from '@/types';
+import type { CostCode, DailyReport, LaborEntry, JobDiaryEntry, SubcontractorWork, MaterialDelivered, Tombstone, Weather } from '@/types';
 import { generateReportPDF, type ReportPDFData } from '@/lib/generate-report-pdf';
 import { useUndoRedo } from '@/hooks/useUndoRedo';
 
@@ -205,75 +205,9 @@ export function DailyReportPage() {
 
   async function saveDraft() {
     if (!foreman || !selectedJobId) return;
-
     setIsSaving(true);
-
     try {
-      const report: DailyReport = {
-        id: existingReport?.id || reportId,
-        jobId: selectedJobId,
-        date,
-        dayOfWeek,
-        foremanId: foreman.id,
-        weather,
-        comments: comments || undefined,
-        status: 'Draft',
-        signatureImage: signature,
-        lastEditorId: foreman.id,
-        editCount: (existingReport?.editCount || 0) + 1,
-        dailyDueBy: deadlines.dailyDueBy,
-        isDailyLate: isDeadlinePassed(deadlines.dailyDueBy),
-        payrollWeekEnding: deadlines.payrollWeekEnding,
-        payrollDueBy: deadlines.payrollDueBy,
-        isPayrollLate: isDeadlinePassed(deadlines.payrollDueBy),
-        syncStatus: 'pending',
-        createdAt: existingReport?.createdAt || now(),
-        updatedAt: now(),
-      };
-
-      // Save report
-      await db.dailyReports.put(report);
-
-      // Save labor entries
-      await db.laborEntries.where('dailyReportId').equals(report.id).delete();
-      if (laborEntries.length > 0) {
-        await db.laborEntries.bulkPut(
-          laborEntries.map((e) => ({ ...e, dailyReportId: report.id }))
-        );
-      }
-
-      // Save diary entries
-      await db.jobDiaryEntries.where('dailyReportId').equals(report.id).delete();
-      if (diaryEntries.length > 0) {
-        await db.jobDiaryEntries.bulkPut(
-          diaryEntries.map((e) => ({ ...e, dailyReportId: report.id }))
-        );
-      }
-
-      // Save subcontractor entries
-      await db.subcontractorWork.where('dailyReportId').equals(report.id).delete();
-      if (subcontractorEntries.length > 0) {
-        await db.subcontractorWork.bulkPut(
-          subcontractorEntries.map((e) => ({ ...e, dailyReportId: report.id }))
-        );
-      }
-
-      // Save delivery entries
-      await db.materialsDelivered.where('dailyReportId').equals(report.id).delete();
-      if (deliveryEntries.length > 0) {
-        await db.materialsDelivered.bulkPut(
-          deliveryEntries.map((e) => ({ ...e, dailyReportId: report.id }))
-        );
-      }
-
-      // Save photos
-      await db.photoAttachments.where('dailyReportId').equals(report.id).delete();
-      if (photos.length > 0) {
-        await db.photoAttachments.bulkPut(
-          photos.map((p) => ({ ...p, dailyReportId: report.id }))
-        );
-      }
-
+      await saveDraftWithoutAlert();
       alert('Draft saved!');
     } catch (error) {
       console.error('Error saving draft:', error);
@@ -310,12 +244,35 @@ export function DailyReportPage() {
         syncStatus: 'pending',
       });
 
-      // Add to sync queue. If the report has already been synced once
-      // (has an airtableId), queue an 'update' so we don't create a
-      // duplicate Airtable record. Note that re-submission still creates
-      // duplicate child rows in Airtable today — see the TODO below.
+      // Add to sync queue. If the report or child entry already has an
+      // airtableId from a previous submission, queue 'update'; otherwise
+      // queue 'create'. Tombstones (children removed during this edit
+      // session) get drained into 'delete' ops first.
       const report = await db.dailyReports.get(reportIdToSubmit);
       if (report) {
+        // Re-fetch children from Dexie so we get the merged airtableIds
+        // saveDraftWithoutAlert just wrote (the React state objects also
+        // carry them, but Dexie is the canonical source post-save).
+        const [childLabor, childDiary, childSubs, childDeliveries] = await Promise.all([
+          db.laborEntries.where('dailyReportId').equals(reportIdToSubmit).toArray(),
+          db.jobDiaryEntries.where('dailyReportId').equals(reportIdToSubmit).toArray(),
+          db.subcontractorWork.where('dailyReportId').equals(reportIdToSubmit).toArray(),
+          db.materialsDelivered.where('dailyReportId').equals(reportIdToSubmit).toArray(),
+        ]);
+
+        // Drain tombstones first — these are children that were removed
+        // during this edit session and had previously synced to Airtable.
+        // Queue a delete op for each, then clear the tombstones.
+        const tombstones = await db.tombstones
+          .where('dailyReportId').equals(reportIdToSubmit).toArray();
+        for (const t of tombstones) {
+          await addToQueue(t.tableName, t.id, 'delete', { airtableId: t.airtableId });
+        }
+        if (tombstones.length > 0) {
+          await db.tombstones.bulkDelete(tombstones.map((t) => t.id));
+        }
+
+        // Parent report
         const reportOp = report.airtableId ? 'update' : 'create';
         await addToQueue('dailyReports', reportIdToSubmit, reportOp, {
           'Job': report.jobId,
@@ -331,16 +288,10 @@ export function DailyReportPage() {
           'Is Payroll Late': report.isPayrollLate,
         });
 
-        // Child rows. TODO(tier-2): the saveDraft pattern wipes and
-        // re-inserts local child entries on every edit, which means a
-        // re-submission queues fresh creates without cleaning up the
-        // previously-synced rows in Airtable. Fix is to either preserve
-        // child UUIDs across drafts or queue deletes for the orphans
-        // before queuing the new creates.
-
-        // Add labor entries to queue
-        for (const entry of laborEntries) {
-          await addToQueue('laborEntries', entry.id, 'create', {
+        // Child rows — use update if airtableId exists, else create.
+        for (const entry of childLabor) {
+          const op = entry.airtableId ? 'update' : 'create';
+          await addToQueue('laborEntries', entry.id, op, {
             'Daily Report': reportIdToSubmit,
             'Employee': entry.employeeId,
             'Trade': entry.trade,
@@ -360,9 +311,9 @@ export function DailyReportPage() {
           });
         }
 
-        // Add diary entries to queue
-        for (const entry of diaryEntries) {
-          await addToQueue('jobDiaryEntries', entry.id, 'create', {
+        for (const entry of childDiary) {
+          const op = entry.airtableId ? 'update' : 'create';
+          await addToQueue('jobDiaryEntries', entry.id, op, {
             'Daily Report': reportIdToSubmit,
             'Entry Text': entry.entryText,
             'Cost Code': entry.costCodeId,
@@ -370,9 +321,9 @@ export function DailyReportPage() {
           });
         }
 
-        // Add subcontractor work to queue
-        for (const entry of subcontractorEntries) {
-          await addToQueue('subcontractorWork', entry.id, 'create', {
+        for (const entry of childSubs) {
+          const op = entry.airtableId ? 'update' : 'create';
+          await addToQueue('subcontractorWork', entry.id, op, {
             'Daily Report': reportIdToSubmit,
             'Contractor': entry.contractorId,
             'Items Worked': entry.itemsWorked,
@@ -380,9 +331,9 @@ export function DailyReportPage() {
           });
         }
 
-        // Add material deliveries to queue
-        for (const entry of deliveryEntries) {
-          await addToQueue('materialsDelivered', entry.id, 'create', {
+        for (const entry of childDeliveries) {
+          const op = entry.airtableId ? 'update' : 'create';
+          await addToQueue('materialsDelivered', entry.id, op, {
             'Daily Report': reportIdToSubmit,
             'Supplier': entry.supplier,
             'Material': entry.material,
@@ -395,7 +346,6 @@ export function DailyReportPage() {
         // field. Base64 in IndexedDB is too large to store in a text
         // field, and Airtable attachments can't accept base64 directly.
         // Photos remain local-only until that infrastructure is built.
-        // for (const photo of photos) { ... }
       }
 
       alert('Report submitted successfully!');
@@ -413,6 +363,12 @@ export function DailyReportPage() {
 
     const report: DailyReport = {
       id: existingReport?.id || reportId,
+      // Preserve fields that aren't part of the form so put() doesn't
+      // wipe them. airtableId is the load-bearing one — without it,
+      // submitReport can't tell that a previously-synced report exists
+      // and ends up creating a duplicate in Airtable on re-submission.
+      airtableId: existingReport?.airtableId,
+      submittedAt: existingReport?.submittedAt,
       jobId: selectedJobId,
       date,
       dayOfWeek,
@@ -434,6 +390,51 @@ export function DailyReportPage() {
     };
 
     await db.dailyReports.put(report);
+
+    // Helper: capture tombstones for any rows that exist in Dexie but
+    // aren't in the new state and have an airtableId. The next submit
+    // will drain these into 'delete' sync ops so the orphaned Airtable
+    // rows get cleaned up.
+    async function captureTombstones<T extends { id: string; airtableId?: string }>(
+      tableName: string,
+      existingFromDexie: T[],
+      newFromState: T[]
+    ): Promise<void> {
+      const newIds = new Set(newFromState.map((e) => e.id));
+      const removedWithAirtableId = existingFromDexie.filter(
+        (e) => !newIds.has(e.id) && e.airtableId
+      );
+      if (removedWithAirtableId.length === 0) return;
+      const tombstones: Tombstone[] = removedWithAirtableId.map((e) => ({
+        id: generateId(),
+        dailyReportId: report.id,
+        tableName,
+        airtableId: e.airtableId!,
+        createdAt: now(),
+      }));
+      await db.tombstones.bulkAdd(tombstones);
+    }
+
+    // Snapshot existing children BEFORE the destructive delete so we can
+    // diff against the new state and create tombstones for the removals.
+    const [
+      existingLabor,
+      existingDiary,
+      existingSubs,
+      existingDeliveries,
+    ] = await Promise.all([
+      db.laborEntries.where('dailyReportId').equals(report.id).toArray(),
+      db.jobDiaryEntries.where('dailyReportId').equals(report.id).toArray(),
+      db.subcontractorWork.where('dailyReportId').equals(report.id).toArray(),
+      db.materialsDelivered.where('dailyReportId').equals(report.id).toArray(),
+    ]);
+
+    await Promise.all([
+      captureTombstones('laborEntries', existingLabor, laborEntries),
+      captureTombstones('jobDiaryEntries', existingDiary, diaryEntries),
+      captureTombstones('subcontractorWork', existingSubs, subcontractorEntries),
+      captureTombstones('materialsDelivered', existingDeliveries, deliveryEntries),
+    ]);
 
     await db.laborEntries.where('dailyReportId').equals(report.id).delete();
     if (laborEntries.length > 0) {

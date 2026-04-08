@@ -171,6 +171,18 @@ export interface EditHistory {
   airtableId?: string;
 }
 
+// Tombstone — captured when a child entry (labor/diary/sub/delivery)
+// is removed during a draft save and the previous version had already
+// been synced to Airtable. The tombstone holds the airtableId so the
+// next submit can queue a delete op for the orphaned Airtable row.
+export interface Tombstone {
+  id: string;
+  dailyReportId: string;
+  tableName: string; // local table name: 'laborEntries' | 'jobDiaryEntries' | 'subcontractorWork' | 'materialsDelivered'
+  airtableId: string;
+  createdAt: string;
+}
+
 // Sync queue item
 export interface SyncQueueItem {
   id: string;

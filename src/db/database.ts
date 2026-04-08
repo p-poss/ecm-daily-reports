@@ -14,6 +14,7 @@ import type {
   PhotoAttachment,
   EditHistory,
   SyncQueueItem,
+  Tombstone,
   AuthSession,
 } from '@/types';
 
@@ -37,6 +38,7 @@ class ECMDatabase extends Dexie {
 
   // App management tables
   syncQueue!: EntityTable<SyncQueueItem, 'id'>;
+  tombstones!: EntityTable<Tombstone, 'id'>;
   authSession!: EntityTable<AuthSession, 'id'>;
 
   constructor() {
@@ -107,6 +109,12 @@ class ECMDatabase extends Dexie {
           tx.table('authSession').clear(),
         ]);
       });
+
+    // v5: tombstones table for tracking child rows that were deleted
+    // locally but still exist in Airtable. Drained on submit.
+    this.version(5).stores({
+      tombstones: 'id, dailyReportId, [dailyReportId+tableName]',
+    });
   }
 }
 

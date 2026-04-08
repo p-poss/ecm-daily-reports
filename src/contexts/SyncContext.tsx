@@ -255,9 +255,17 @@ export function SyncProvider({ children }: { children: ReactNode }) {
         break;
       }
       case 'delete': {
+        // The local record may already be gone (tombstone-tracked
+        // deletes), so accept airtableId from item.data as a fallback.
+        let airtableId: string | undefined;
         const record = await db.table(item.tableName).get(item.recordId);
         if (record?.airtableId) {
-          const response = await fetch(`${baseUrl}/${record.airtableId}`, {
+          airtableId = record.airtableId;
+        } else if (typeof item.data.airtableId === 'string') {
+          airtableId = item.data.airtableId;
+        }
+        if (airtableId) {
+          const response = await fetch(`${baseUrl}/${airtableId}`, {
             method: 'DELETE',
             headers,
           });
@@ -265,6 +273,8 @@ export function SyncProvider({ children }: { children: ReactNode }) {
             throw new Error(await describeError(response, 'delete'));
           }
         }
+        // If no airtableId is available, the record was never synced —
+        // silently succeed so the queue item gets removed.
         break;
       }
     }
