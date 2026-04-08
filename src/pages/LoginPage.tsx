@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card';
+import { BayerNoiseBackground } from '@/components/BayerNoiseBackground';
 
 export function LoginPage() {
   const { login } = useAuth();
@@ -27,8 +28,9 @@ export function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <Card className="w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center bg-background p-4 relative overflow-hidden">
+      <BayerNoiseBackground className="absolute inset-0 w-full h-full" />
+      <Card className="w-full max-w-md relative z-10 bg-card/80 backdrop-blur-md">
         <CardHeader className="text-center">
           <svg viewBox="0 0 724 240" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full mb-2 text-primary">
             <path d="M84.0208 186V53.9952H218.592V86.4464H127.106V104.964H214.926V134.665H127.106V153.549H218.592V186H84.0208Z" fill="currentColor"/>
