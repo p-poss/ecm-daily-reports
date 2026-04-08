@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback, type ComponentPropsWithoutRef } from 'react';
+import { useState, useRef, useEffect, useLayoutEffect, useCallback, type ComponentPropsWithoutRef } from 'react';
 import ReactMarkdown, { type Components } from 'react-markdown';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -154,6 +154,7 @@ export function AIAssistant({ context, onToolCall, onBeforeToolCalls }: AIAssist
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isListening, setIsListening] = useState(false);
+  const [measuredPanelHeight, setMeasuredPanelHeight] = useState(400);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -353,6 +354,30 @@ export function AIAssistant({ context, onToolCall, onBeforeToolCalls }: AIAssist
     return () => window.removeEventListener('resize', onResize);
   }, [setPosition]);
 
+  // Measure the panel after it mounts (and whenever its content grows) so the
+  // position clamp uses the real height instead of a fallback. Also re-clamps
+  // the stored position so drag origins stay in sync with the visual position.
+  useLayoutEffect(() => {
+    if (!isOpen) return;
+    const el = panelRef.current;
+    if (!el) return;
+    const update = () => {
+      const h = el.getBoundingClientRect().height;
+      setMeasuredPanelHeight(h);
+      setPosition((prev) => {
+        const header = document.querySelector('header');
+        const footer = document.querySelector('[class*="fixed bottom-0"]');
+        const minY = header ? header.getBoundingClientRect().bottom + 8 : 8;
+        const maxY = (footer ? footer.getBoundingClientRect().top : window.innerHeight) - h - 8;
+        return { x: prev.x, y: Math.max(minY, Math.min(prev.y, maxY)) };
+      });
+    };
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [isOpen, setPosition]);
+
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
@@ -416,12 +441,17 @@ export function AIAssistant({ context, onToolCall, onBeforeToolCalls }: AIAssist
     );
   }
 
-  // Clamp panel position so it stays between header and footer
+  // Clamp panel position so it stays between header and footer.
+  // Cap the Card's max-height to the available space (viewport minus header
+  // and footer) so the panel can never grow taller than what fits.
   const headerEl = document.querySelector('header');
   const footerEl = document.querySelector('[class*="fixed bottom-0"]');
-  const panelMinY = headerEl ? headerEl.getBoundingClientRect().bottom + 4 : 4;
-  const panelHeight = panelRef.current?.getBoundingClientRect().height ?? 400;
-  const panelMaxY = (footerEl ? footerEl.getBoundingClientRect().top : window.innerHeight) - panelHeight - 4;
+  const headerBottom = headerEl ? headerEl.getBoundingClientRect().bottom : 0;
+  const footerTop = footerEl ? footerEl.getBoundingClientRect().top : window.innerHeight;
+  const panelMargin = 8;
+  const availableHeight = Math.max(200, footerTop - headerBottom - panelMargin * 2);
+  const panelMinY = headerBottom + panelMargin;
+  const panelMaxY = footerTop - measuredPanelHeight - panelMargin;
   const panelX = Math.min(position.x, window.innerWidth - Math.min(540, window.innerWidth - 48) - 8);
   const panelY = Math.max(panelMinY, Math.min(position.y, panelMaxY));
 
@@ -431,7 +461,7 @@ export function AIAssistant({ context, onToolCall, onBeforeToolCalls }: AIAssist
       style={{ left: panelX, top: panelY }}
       className="fixed z-50 w-[540px] max-w-[calc(100vw-3rem)]"
     >
-      <Card className="flex flex-col shadow-2xl p-0 max-h-[70dvh]">
+      <Card style={{ maxHeight: availableHeight }} className="flex flex-col shadow-2xl p-0">
         {/* Header — draggable handle */}
         <div
           {...handlers}
