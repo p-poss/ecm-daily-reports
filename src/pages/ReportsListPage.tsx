@@ -130,7 +130,7 @@ export function ReportsListPage() {
       db.materialsDelivered.where('dailyReportId').equals(reportId).toArray(),
       db.employees.toArray(),
       db.equipment.toArray(),
-      db.costCodes.toArray(),
+      db.costCodes.where('jobId').equals(report.jobId).toArray(),
       db.subcontractors.toArray(),
     ]);
 
@@ -275,7 +275,7 @@ export function ReportsListPage() {
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
           </div>
         ) : reports.length === 0 ? (
-          <div className="py-4 text-center text-sm text-muted-foreground">
+          <div className="text-center text-sm text-muted-foreground">
             <p>No reports yet for this job.</p>
           </div>
         ) : (

@@ -20,11 +20,15 @@ interface JobDiarySectionProps {
   entries: JobDiaryEntry[];
   onChange: (entries: JobDiaryEntry[]) => void;
   dailyReportId: string;
+  jobId: string;
   highlightedIds?: Set<string>;
 }
 
-export function JobDiarySection({ entries, onChange, dailyReportId, highlightedIds }: JobDiarySectionProps) {
-  const costCodes = useLiveQuery(() => db.costCodes.toArray());
+export function JobDiarySection({ entries, onChange, dailyReportId, jobId, highlightedIds }: JobDiarySectionProps) {
+  const costCodes = useLiveQuery(
+    () => db.costCodes.where('jobId').equals(jobId).toArray(),
+    [jobId]
+  );
 
   function addEntry() {
     const newEntry: JobDiaryEntry = {

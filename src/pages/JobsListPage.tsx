@@ -6,7 +6,7 @@ import { useNavigation } from '@/contexts/NavigationContext';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { SyncIndicator } from '@/components/SyncIndicator';
-import { ArrowLeft, Briefcase, MapPin, Images, FileStack } from 'lucide-react';
+import { ArrowLeft, MapPin, Images, FileStack } from 'lucide-react';
 import { generateCombinedReportPDF, type ReportPDFData } from '@/lib/generate-report-pdf';
 import { PhotoGalleryModal, type GalleryPhoto } from '@/components/PhotoGalleryModal';
 import { Button } from '@/components/ui/button';
@@ -26,10 +26,7 @@ export function JobsListPage() {
       .where('status')
       .equals('Active')
       .toArray();
-
-    return allJobs.filter((job) =>
-      foreman.assignedJobIds.includes(job.id)
-    );
+    return allJobs.filter((job) => foreman.assignedJobIds.includes(job.id));
   }, [foreman]);
 
   // Get report counts for each job
@@ -69,7 +66,7 @@ export function JobsListPage() {
     const [employees, equipment, costCodes, subcontractors] = await Promise.all([
       db.employees.toArray(),
       db.equipment.toArray(),
-      db.costCodes.toArray(),
+      db.costCodes.where('jobId').equals(jobId).toArray(),
       db.subcontractors.toArray(),
     ]);
 
@@ -205,10 +202,8 @@ export function JobsListPage() {
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
           </div>
         ) : jobs.length === 0 ? (
-          <div className="py-8 text-center text-muted-foreground">
-            <Briefcase className="w-12 h-12 mx-auto mb-3 opacity-50" />
+          <div className="text-center text-muted-foreground">
             <p>No jobs assigned to you.</p>
-            <p className="text-sm">Contact your supervisor for job assignments.</p>
           </div>
         ) : (
           jobs?.map((job) => {

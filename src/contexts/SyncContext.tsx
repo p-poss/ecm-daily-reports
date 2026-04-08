@@ -137,22 +137,64 @@ export function SyncProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  // Maps a local table name to its Airtable table name.
+  const tableNameMap: Record<string, string> = {
+    costCodes: 'Cost Codes',
+    dailyReports: 'Daily Reports',
+    laborEntries: 'Labor Entries',
+    equipmentUsage: 'Equipment Usage',
+    subcontractorWork: 'Subcontractor Work',
+    materialsDelivered: 'Materials Delivered',
+    jobDiaryEntries: 'Job Diary Entries',
+    photoAttachments: 'Photo Attachments',
+    editHistory: 'Edit History',
+  };
+
+  // Describes how to translate a local foreign-key field (UUID) into the
+  // Airtable Linked Record format (an array of Airtable record IDs).
+  // localField  = the field name in the local data payload
+  // localTable  = the Dexie table to look up the foreign record in
+  // airtableField = the destination field name in Airtable (the Linked Record column)
+  type LinkedFieldSpec = { localField: string; localTable: string; airtableField: string };
+
+  const linkedFieldsByTable: Record<string, LinkedFieldSpec[]> = {
+    costCodes: [
+      { localField: 'jobId', localTable: 'jobs', airtableField: 'Job' },
+    ],
+  };
+
+  // Translate a payload's foreign-key UUIDs into Airtable Linked Record arrays.
+  // Returns a new object — never mutates the input. Throws if a referenced
+  // record is missing its airtableId (meaning it hasn't been synced yet).
+  async function resolveLinkedFields(
+    localTableName: string,
+    data: Record<string, unknown>
+  ): Promise<Record<string, unknown>> {
+    const specs = linkedFieldsByTable[localTableName];
+    if (!specs) return data;
+    const out = { ...data };
+    for (const spec of specs) {
+      const localId = data[spec.localField];
+      // Drop the original local-id field — Airtable doesn't know about it.
+      delete out[spec.localField];
+      if (typeof localId !== 'string' || !localId) continue;
+      const linked = await db.table(spec.localTable).get(localId);
+      if (!linked?.airtableId) {
+        throw new Error(
+          `Cannot link ${localTableName}.${spec.localField}: ` +
+          `${spec.localTable} record ${localId} has no airtableId yet`
+        );
+      }
+      out[spec.airtableField] = [linked.airtableId];
+    }
+    return out;
+  }
+
   async function syncItem(item: SyncQueueItem): Promise<void> {
     if (!AIRTABLE_API_KEY || !AIRTABLE_BASE_ID) {
       console.warn('Airtable not configured, skipping sync');
       return;
     }
-
-    const tableNameMap: Record<string, string> = {
-      dailyReports: 'Daily Reports',
-      laborEntries: 'Labor Entries',
-      equipmentUsage: 'Equipment Usage',
-      subcontractorWork: 'Subcontractor Work',
-      materialsDelivered: 'Materials Delivered',
-      jobDiaryEntries: 'Job Diary Entries',
-      photoAttachments: 'Photo Attachments',
-      editHistory: 'Edit History',
-    };
 
     const airtableTableName = tableNameMap[item.tableName];
     if (!airtableTableName) {
@@ -168,10 +210,11 @@ export function SyncProvider({ children }: { children: ReactNode }) {
 
     switch (item.operation) {
       case 'create': {
+        const fields = await resolveLinkedFields(item.tableName, item.data);
         const response = await fetch(baseUrl, {
           method: 'POST',
           headers,
-          body: JSON.stringify({ fields: item.data }),
+          body: JSON.stringify({ fields }),
         });
         if (!response.ok) {
           throw new Error(`Airtable create failed: ${response.statusText}`);
@@ -187,10 +230,11 @@ export function SyncProvider({ children }: { children: ReactNode }) {
         if (!record?.airtableId) {
           throw new Error('Record not found or missing Airtable ID');
         }
+        const fields = await resolveLinkedFields(item.tableName, item.data);
         const response = await fetch(`${baseUrl}/${record.airtableId}`, {
           method: 'PATCH',
           headers,
-          body: JSON.stringify({ fields: item.data }),
+          body: JSON.stringify({ fields }),
         });
         if (!response.ok) {
           throw new Error(`Airtable update failed: ${response.statusText}`);

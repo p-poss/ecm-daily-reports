@@ -22,6 +22,7 @@ interface SubcontractorsDeliveriesSectionProps {
   onSubcontractorsChange: (entries: SubcontractorWork[]) => void;
   onDeliveriesChange: (entries: MaterialDelivered[]) => void;
   dailyReportId: string;
+  jobId: string;
   highlightedIds?: Set<string>;
 }
 
@@ -31,10 +32,14 @@ export function SubcontractorsDeliveriesSection({
   onSubcontractorsChange,
   onDeliveriesChange,
   dailyReportId,
+  jobId,
   highlightedIds,
 }: SubcontractorsDeliveriesSectionProps) {
   const subcontractors = useLiveQuery(() => db.subcontractors.toArray());
-  const costCodes = useLiveQuery(() => db.costCodes.toArray());
+  const costCodes = useLiveQuery(
+    () => db.costCodes.where('jobId').equals(jobId).toArray(),
+    [jobId]
+  );
 
   function addSubcontractorEntry() {
     const newEntry: SubcontractorWork = {

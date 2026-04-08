@@ -42,23 +42,12 @@ export default defineConfig(({ mode }) => {
           ],
         },
         workbox: {
+          // Precache the static app shell so the app loads offline. We
+          // deliberately do NOT runtime-cache Airtable API responses —
+          // Dexie is the offline source of truth for master/transaction
+          // data, and a second SW-level cache just causes stale-data bugs
+          // (we hit one of those when migrating cost codes).
           globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
-          runtimeCaching: [
-            {
-              urlPattern: /^https:\/\/api\.airtable\.com\/.*/i,
-              handler: 'NetworkFirst',
-              options: {
-                cacheName: 'airtable-api-cache',
-                expiration: {
-                  maxEntries: 100,
-                  maxAgeSeconds: 60 * 60 * 24, // 24 hours
-                },
-                cacheableResponse: {
-                  statuses: [0, 200],
-                },
-              },
-            },
-          ],
         },
       }),
     ],

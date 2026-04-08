@@ -25,7 +25,7 @@ import { ArrowLeft, BookOpen, Calendar as CalendarIcon, ChevronDown, Undo2, Redo
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import type { ReportContext } from '@/lib/ai-assistant';
-import type { DailyReport, LaborEntry, JobDiaryEntry, SubcontractorWork, MaterialDelivered, Weather } from '@/types';
+import type { CostCode, DailyReport, LaborEntry, JobDiaryEntry, SubcontractorWork, MaterialDelivered, Weather } from '@/types';
 import { generateReportPDF, type ReportPDFData } from '@/lib/generate-report-pdf';
 import { useUndoRedo } from '@/hooks/useUndoRedo';
 
@@ -126,7 +126,10 @@ export function DailyReportPage() {
   // Reference data for AI assistant
   const employees = useLiveQuery(() => db.employees.toArray());
   const equipment = useLiveQuery(() => db.equipment.toArray());
-  const costCodes = useLiveQuery(() => db.costCodes.toArray());
+  const costCodes = useLiveQuery<CostCode[]>(
+    () => (selectedJobId ? db.costCodes.where('jobId').equals(selectedJobId).toArray() : Promise.resolve([])),
+    [selectedJobId]
+  );
   const subcontractors = useLiveQuery(() => db.subcontractors.toArray());
 
   // Load existing report data
@@ -831,6 +834,7 @@ export function DailyReportPage() {
           entries={laborEntries}
           onChange={(entries) => set('laborEntries', entries)}
           dailyReportId={currentReportId}
+          jobId={selectedJobId || ''}
           highlightedIds={highlightedIds}
         />
         </div>
@@ -843,6 +847,7 @@ export function DailyReportPage() {
           entries={diaryEntries}
           onChange={(entries) => set('diaryEntries', entries)}
           dailyReportId={currentReportId}
+          jobId={selectedJobId || ''}
           highlightedIds={highlightedIds}
         />
         </div>
@@ -857,6 +862,7 @@ export function DailyReportPage() {
           onSubcontractorsChange={(entries) => set('subcontractorEntries', entries)}
           onDeliveriesChange={(entries) => set('deliveryEntries', entries)}
           dailyReportId={currentReportId}
+          jobId={selectedJobId || ''}
           highlightedIds={highlightedIds}
         />
         </div>

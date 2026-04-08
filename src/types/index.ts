@@ -30,8 +30,13 @@ export interface Equipment {
 
 export interface CostCode {
   id: string;
+  jobId: string;
   code: string;
   description: string;
+  uom?: string;
+  quantity?: number;
+  unitPrice?: number;
+  budgetAmount?: number;
   airtableId?: string;
 }
 

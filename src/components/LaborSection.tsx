@@ -31,6 +31,7 @@ interface LaborSectionProps {
   entries: LaborEntry[];
   onChange: (entries: LaborEntry[]) => void;
   dailyReportId: string;
+  jobId: string;
   highlightedIds?: Set<string>;
 }
 
@@ -84,11 +85,14 @@ function SplitHeaderLabel() {
   );
 }
 
-export function LaborSection({ entries, onChange, dailyReportId, highlightedIds }: LaborSectionProps) {
+export function LaborSection({ entries, onChange, dailyReportId, jobId, highlightedIds }: LaborSectionProps) {
   const [activeCostCodeIds, setActiveCostCodeIds] = useState<string[]>([]);
   const employees = useLiveQuery(() => db.employees.toArray());
   const equipment = useLiveQuery(() => db.equipment.toArray());
-  const costCodes = useLiveQuery(() => db.costCodes.toArray());
+  const costCodes = useLiveQuery(
+    () => db.costCodes.where('jobId').equals(jobId).toArray(),
+    [jobId]
+  );
 
   function addEntry() {
     const newEntry: LaborEntry = {

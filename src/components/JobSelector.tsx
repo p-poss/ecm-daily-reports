@@ -22,16 +22,12 @@ export function JobSelector({ value, onChange }: JobSelectorProps) {
   const jobs = useLiveQuery(async () => {
     if (!foreman) return [];
 
-    // Get all jobs where this foreman is assigned
+    // Filter to only the jobs assigned to this foreman in Airtable.
     const allJobs = await db.jobs
       .where('status')
       .equals('Active')
       .toArray();
-
-    // Filter to only jobs assigned to this foreman
-    return allJobs.filter((job) =>
-      foreman.assignedJobIds.includes(job.id)
-    );
+    return allJobs.filter((job) => foreman.assignedJobIds.includes(job.id));
   }, [foreman]);
 
   const selectedJob = jobs?.find((j) => j.id === value);

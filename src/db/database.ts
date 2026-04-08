@@ -64,6 +64,49 @@ class ECMDatabase extends Dexie {
       syncQueue: 'id, tableName, recordId, createdAt',
       authSession: 'id, foremanId',
     });
+
+    // v2: cost codes belong to a job. Re-index with jobId and clear any
+    // pre-existing global cost codes (test data) so they get re-seeded
+    // per-job on next load.
+    this.version(2)
+      .stores({
+        costCodes: 'id, jobId, code, airtableId, [jobId+code]',
+      })
+      .upgrade(async (tx) => {
+        await tx.table('costCodes').clear();
+      });
+
+    // v3: clean slate for jobs + all transactional/derived data so the
+    // Airtable downloader can repopulate them. We deliberately keep
+    // employees, equipment, and subcontractors so the dev seed for those
+    // sticks around as a fallback.
+    this.version(3)
+      .stores({})
+      .upgrade(async (tx) => {
+        await Promise.all([
+          tx.table('jobs').clear(),
+          tx.table('dailyReports').clear(),
+          tx.table('laborEntries').clear(),
+          tx.table('jobDiaryEntries').clear(),
+          tx.table('subcontractorWork').clear(),
+          tx.table('materialsDelivered').clear(),
+          tx.table('equipmentUsage').clear(),
+          tx.table('photoAttachments').clear(),
+          tx.table('editHistory').clear(),
+        ]);
+      });
+
+    // v4: employees now come from Airtable. Wipe the seeded employees and
+    // any existing auth session so foremen log in fresh with their Airtable
+    // credentials (john/mike/carlos@ecm.com / password123).
+    this.version(4)
+      .stores({})
+      .upgrade(async (tx) => {
+        await Promise.all([
+          tx.table('employees').clear(),
+          tx.table('authSession').clear(),
+        ]);
+      });
   }
 }
 
