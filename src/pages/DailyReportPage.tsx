@@ -33,7 +33,7 @@ import { useUndoRedo } from '@/hooks/useUndoRedo';
 export function DailyReportPage() {
   const { foreman } = useAuth();
   const { addToQueue } = useSync();
-  const { selectedJobId, selectedReportId, copyFromReportId, goBack } = useNavigation();
+  const { selectedJobId, selectedJobLabel, selectedReportId, copyFromReportId, goBack } = useNavigation();
 
   // Form state
   const [reportId] = useState(() => selectedReportId || generateId());
@@ -916,13 +916,9 @@ export function DailyReportPage() {
             <h1 className="text-sm md:text-lg font-bold text-foreground">
               {isEditing ? 'Edit Report' : 'New Report'}
             </h1>
-            {job ? (
-              <p className="text-sm text-muted-foreground truncate">
-                {job.jobNumber} · {job.jobName}
-              </p>
-            ) : (
-              <div className="h-5 w-48 bg-muted rounded animate-pulse mx-auto" />
-            )}
+            <p className="text-sm text-muted-foreground truncate">
+              {job ? `${job.jobNumber} · ${job.jobName}` : selectedJobLabel || '\u00A0'}
+            </p>
             {copiedFrom && (
               <p className="text-sm text-primary mt-1">
                 Copied from {new Date(copiedFrom).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
@@ -938,7 +934,7 @@ export function DailyReportPage() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-[82rem] mx-auto p-4 pb-24 pt-[200px]">
+      <main className="max-w-[82rem] mx-auto p-4 pb-24 pt-[200px] animate-in fade-in duration-200">
         <Separator className="h-[2px] bg-primary" />
 
         {/* Date and Weather */}

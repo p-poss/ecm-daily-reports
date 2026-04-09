@@ -3,7 +3,7 @@ import ReactMarkdown, { type Components } from 'react-markdown';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
-import { Minus, ArrowUp, Loader2, Mic } from 'lucide-react';
+import { Minus, ArrowUp, Loader, Mic } from 'lucide-react';
 import { AIIcon } from '@/components/icons/AIIcon';
 import { sendMessage, type ChatMessage, type ReportContext } from '@/lib/ai-assistant';
 import { cn } from '@/lib/utils';
@@ -509,7 +509,7 @@ export function AIAssistant({ context, onToolCall, onBeforeToolCalls }: AIAssist
           ))}
           {isLoading && (
             <div className="bg-muted rounded-lg px-3 py-2 max-w-[85%] mr-auto flex items-center gap-2 text-sm text-muted-foreground">
-              <Loader2 className="w-3 h-3 animate-spin" />
+              <Loader className="w-3 h-3 animate-spin" />
               Thinking...
             </div>
           )}

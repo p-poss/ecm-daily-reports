@@ -3,10 +3,11 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/db/database';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigation } from '@/contexts/NavigationContext';
+import { useDelayedLoading } from '@/hooks/useDelayedLoading';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { SyncIndicator } from '@/components/SyncIndicator';
-import { ArrowLeft, MapPin, Images, FileStack, DollarSign } from 'lucide-react';
+import { ArrowLeft, MapPin, Images, FileStack, DollarSign, Loader } from 'lucide-react';
 import { generateCombinedReportPDF, type ReportPDFData } from '@/lib/generate-report-pdf';
 import { generateBudgetPDF } from '@/lib/generate-budget-pdf';
 import { PhotoGalleryModal, type GalleryPhoto } from '@/components/PhotoGalleryModal';
@@ -29,6 +30,8 @@ export function JobsListPage() {
       .toArray();
     return allJobs.filter((job) => foreman.assignedJobIds.includes(job.id));
   }, [foreman]);
+
+  const showJobsLoading = useDelayedLoading(jobs === undefined, 300);
 
   // Get report counts for each job
   const reportCounts = useLiveQuery(async () => {
@@ -226,18 +229,20 @@ export function JobsListPage() {
       {/* Jobs List */}
       <main className="max-w-[82rem] mx-auto p-4 pt-[200px] space-y-[20px]">
         {jobs === undefined ? (
-          <div className="flex justify-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
-          </div>
+          showJobsLoading ? (
+            <div className="flex justify-center">
+              <Loader className="w-6 h-6 animate-spin text-primary" />
+            </div>
+          ) : null
         ) : jobs.length === 0 ? (
-          <div className="text-center text-muted-foreground">
+          <div className="text-center text-muted-foreground animate-in fade-in duration-200">
             <p>No jobs assigned to you.</p>
           </div>
         ) : (
           jobs?.map((job) => {
             const counts = reportCounts?.[job.id];
             return (
-              <Card key={job.id} className="overflow-hidden">
+              <Card key={job.id} className="overflow-hidden animate-in fade-in duration-200">
                 <CardContent className="p-0">
                   {/* Job Header */}
                   <div className="px-4 pb-4 border-b">
@@ -304,7 +309,7 @@ export function JobsListPage() {
                     <Button
                       variant="outline"
                       className="flex-1 min-w-0 overflow-hidden btn-action"
-                      onClick={() => navigateToReports(job.id)}
+                      onClick={() => navigateToReports(job.id, `${job.jobNumber} · ${job.jobName}`)}
                     >
                       <span className="truncate">Reports</span>
                     </Button>

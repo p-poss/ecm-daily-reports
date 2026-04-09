@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/db/database';
 import { syncReportsForJob } from '@/lib/airtable-sync';
+import { useDelayedLoading } from '@/hooks/useDelayedLoading';
 import { generateReportPDF, type ReportPDFData } from '@/lib/generate-report-pdf';
 import { PhotoGalleryModal, type GalleryPhoto } from '@/components/PhotoGalleryModal';
 import { useAuth } from '@/contexts/AuthContext';
@@ -25,12 +26,13 @@ import {
   File,
   Images,
   PenLine,
+  Loader,
 } from 'lucide-react';
 
 export function ReportsListPage() {
   const { foreman } = useAuth();
   const { addToQueue } = useSync();
-  const { selectedJobId, navigateToJobs, navigateToReportForm } = useNavigation();
+  const { selectedJobId, selectedJobLabel, navigateToJobs, navigateToReportForm } = useNavigation();
   const [showNewReportModal, setShowNewReportModal] = useState(false);
   const [galleryPhotos, setGalleryPhotos] = useState<GalleryPhoto[] | null>(null);
   const [galleryTitle, setGalleryTitle] = useState('');
@@ -56,6 +58,8 @@ export function ReportsListPage() {
 
   // Employees for looking up foreman names on shared report cards
   const employees = useLiveQuery(() => db.employees.toArray());
+
+  const showReportsLoading = useDelayedLoading(reports === undefined, 300);
 
   // Pull reports for this job from Airtable on mount so we see reports
   // created by other foremen on other devices. Fire-and-forget — Dexie's
@@ -298,17 +302,8 @@ export function ReportsListPage() {
             <span>Jobs</span>
           </Button>
           <div className="flex-1 text-center min-w-0 px-[100px] pt-2 md:pt-0">
-            {job ? (
-              <>
-                <h1 className="text-sm md:text-lg font-bold text-foreground">{job.jobNumber}</h1>
-                <p className="text-sm text-muted-foreground truncate">{job.jobName}</p>
-              </>
-            ) : (
-              <>
-                <div className="h-7 w-24 bg-muted rounded animate-pulse mx-auto" />
-                <div className="h-5 w-40 bg-muted rounded animate-pulse mt-1 mx-auto" />
-              </>
-            )}
+            <h1 className="text-sm md:text-lg font-bold text-foreground">{job?.jobNumber || '\u00A0'}</h1>
+            <p className="text-sm text-muted-foreground truncate">{job?.jobName || selectedJobLabel?.split(' · ')[1] || '\u00A0'}</p>
           </div>
           <div className="flex items-center gap-3 absolute right-0">
             <SyncIndicator />
@@ -321,11 +316,13 @@ export function ReportsListPage() {
       {/* Reports List */}
       <main className="max-w-[82rem] mx-auto p-4 pt-[200px] space-y-[20px]">
         {reports === undefined ? (
-          <div className="flex justify-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
-          </div>
+          showReportsLoading ? (
+            <div className="flex justify-center">
+              <Loader className="w-6 h-6 animate-spin text-primary" />
+            </div>
+          ) : null
         ) : reports.length === 0 ? (
-          <div className="text-center text-sm text-muted-foreground">
+          <div className="text-center text-sm text-muted-foreground animate-in fade-in duration-200">
             <p>No reports yet for this job.</p>
           </div>
         ) : (
@@ -334,7 +331,7 @@ export function ReportsListPage() {
             const timeRemaining = report.status === 'Draft' ? getTimeRemaining(report.payrollDueBy) : null;
 
             return (
-              <Card key={report.id} className="overflow-hidden">
+              <Card key={report.id} className="overflow-hidden animate-in fade-in duration-200">
                 <CardContent className="p-0">
                   {/* Report Header */}
                   <div className="px-4 pb-4 border-b">

@@ -6,20 +6,18 @@ import { LoginPage } from '@/pages/LoginPage';
 import { JobsListPage } from '@/pages/JobsListPage';
 import { ReportsListPage } from '@/pages/ReportsListPage';
 import { DailyReportPage } from '@/pages/DailyReportPage';
+import { useDelayedLoading } from '@/hooks/useDelayedLoading';
 
 function AppContent() {
   const { isAuthenticated, isLoading } = useAuth();
   const { currentPage } = useNavigation();
+  const showLoading = useDelayedLoading(isLoading, 300);
 
   if (isLoading) {
-    return (
-      <div className="min-h-dvh flex items-center justify-center bg-background">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4" />
-          <p className="text-muted-foreground">Loading...</p>
-        </div>
-      </div>
-    );
+    // Still checking auth — show blank bg for <300ms (imperceptible),
+    // then the loading login page if it takes longer.
+    if (!showLoading) return <div className="min-h-dvh bg-background" />;
+    return <LoginPage loading />;
   }
 
   if (!isAuthenticated) {
