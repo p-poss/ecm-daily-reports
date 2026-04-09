@@ -62,7 +62,7 @@ export function LoginPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 autoComplete="email"
-                className="text-base h-10 leading-10"
+                className="text-[16px] h-10 leading-none"
               />
             </div>
 
@@ -75,7 +75,7 @@ export function LoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 autoComplete="current-password"
-                className="text-base h-10 leading-10"
+                className="text-[16px] h-10 leading-none"
               />
             </div>
 
