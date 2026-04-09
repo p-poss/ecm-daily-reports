@@ -26,7 +26,7 @@ export function UpdateBanner() {
 
   return (
     <div className="fixed top-0 left-0 right-0 z-[100] flex items-center justify-center gap-3 bg-primary text-primary-foreground px-4 py-2 text-xs animate-in fade-in slide-in-from-top duration-300">
-      <span>A new version is available</span>
+      <span>Update available</span>
       <Button
         size="xs"
         variant="secondary"
