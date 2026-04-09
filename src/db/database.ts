@@ -126,6 +126,25 @@ class ECMDatabase extends Dexie {
           tx.table('subcontractors').clear(),
         ]);
       });
+
+    // v7: clean slate — wipe all transaction data so Airtable and local
+    // are in sync. Also clears stale sync queue items and tombstones.
+    this.version(7)
+      .stores({})
+      .upgrade(async (tx) => {
+        await Promise.all([
+          tx.table('dailyReports').clear(),
+          tx.table('laborEntries').clear(),
+          tx.table('jobDiaryEntries').clear(),
+          tx.table('subcontractorWork').clear(),
+          tx.table('materialsDelivered').clear(),
+          tx.table('equipmentUsage').clear(),
+          tx.table('photoAttachments').clear(),
+          tx.table('editHistory').clear(),
+          tx.table('syncQueue').clear(),
+          tx.table('tombstones').clear(),
+        ]);
+      });
   }
 }
 

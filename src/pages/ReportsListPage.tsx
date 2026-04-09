@@ -5,6 +5,7 @@ import { syncReportsForJob } from '@/lib/airtable-sync';
 import { generateReportPDF, type ReportPDFData } from '@/lib/generate-report-pdf';
 import { PhotoGalleryModal, type GalleryPhoto } from '@/components/PhotoGalleryModal';
 import { useAuth } from '@/contexts/AuthContext';
+import { useSync } from '@/contexts/SyncContext';
 import { useNavigation } from '@/contexts/NavigationContext';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -28,6 +29,7 @@ import {
 
 export function ReportsListPage() {
   const { foreman } = useAuth();
+  const { addToQueue } = useSync();
   const { selectedJobId, navigateToJobs, navigateToReportForm } = useNavigation();
   const [showNewReportModal, setShowNewReportModal] = useState(false);
   const [galleryPhotos, setGalleryPhotos] = useState<GalleryPhoto[] | null>(null);
@@ -237,13 +239,44 @@ export function ReportsListPage() {
     }
 
     try {
-      // Delete related records first
-      await db.laborEntries.where('dailyReportId').equals(reportId).delete();
-      await db.jobDiaryEntries.where('dailyReportId').equals(reportId).delete();
-      await db.photoAttachments.where('dailyReportId').equals(reportId).delete();
-      await db.editHistory.where('dailyReportId').equals(reportId).delete();
+      // Queue Airtable deletes for the report and all its children.
+      // The sync layer reads airtableId from item.data as a fallback
+      // (since the local records are about to be deleted).
+      const report = await db.dailyReports.get(reportId);
+      const [labor, diary, subs, deliveries] = await Promise.all([
+        db.laborEntries.where('dailyReportId').equals(reportId).toArray(),
+        db.jobDiaryEntries.where('dailyReportId').equals(reportId).toArray(),
+        db.subcontractorWork.where('dailyReportId').equals(reportId).toArray(),
+        db.materialsDelivered.where('dailyReportId').equals(reportId).toArray(),
+      ]);
 
-      // Delete the report itself
+      // Queue child deletes first, then the parent.
+      for (const e of labor) {
+        if (e.airtableId) await addToQueue('laborEntries', e.id, 'delete', { airtableId: e.airtableId });
+      }
+      for (const e of diary) {
+        if (e.airtableId) await addToQueue('jobDiaryEntries', e.id, 'delete', { airtableId: e.airtableId });
+      }
+      for (const e of subs) {
+        if (e.airtableId) await addToQueue('subcontractorWork', e.id, 'delete', { airtableId: e.airtableId });
+      }
+      for (const e of deliveries) {
+        if (e.airtableId) await addToQueue('materialsDelivered', e.id, 'delete', { airtableId: e.airtableId });
+      }
+      if (report?.airtableId) {
+        await addToQueue('dailyReports', reportId, 'delete', { airtableId: report.airtableId });
+      }
+
+      // Delete locally
+      await Promise.all([
+        db.laborEntries.where('dailyReportId').equals(reportId).delete(),
+        db.jobDiaryEntries.where('dailyReportId').equals(reportId).delete(),
+        db.subcontractorWork.where('dailyReportId').equals(reportId).delete(),
+        db.materialsDelivered.where('dailyReportId').equals(reportId).delete(),
+        db.photoAttachments.where('dailyReportId').equals(reportId).delete(),
+        db.editHistory.where('dailyReportId').equals(reportId).delete(),
+        db.tombstones.where('dailyReportId').equals(reportId).delete(),
+      ]);
       await db.dailyReports.delete(reportId);
     } catch (error) {
       console.error('Error deleting report:', error);
