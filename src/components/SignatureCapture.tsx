@@ -88,7 +88,7 @@ export function SignatureCapture({ value, onChange, disabled }: SignatureCapture
         <CardContent className="space-y-3">
         {showImage ? (
           // Show saved signature
-          <div className="space-y-2">
+          <div className="space-y-3">
             <div className="border rounded-s bg-white overflow-hidden">
               <img src={value} alt="Signature" className="w-full h-32 object-contain object-center" />
             </div>
