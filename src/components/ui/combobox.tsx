@@ -92,7 +92,7 @@ export function Combobox({
         {/* z-index needs to live on the Positioner (the absolute-positioned
             wrapper). It's set high enough to win against any sticky table
             cells (z-[1]) and headers (z-10) the trigger might sit inside. */}
-        <BaseCombobox.Positioner sideOffset={4} align={align} className="z-[60]">
+        <BaseCombobox.Positioner sideOffset={4} align={align} className="z-[60] bg-popover rounded-lg">
           <BaseCombobox.Popup
             className={cn(
               'max-h-[300px] min-w-(--anchor-width) max-w-[calc(100dvw-47px)] overflow-y-auto overscroll-contain rounded-lg bg-popover p-1 text-xs text-popover-foreground shadow-md ring-1 ring-foreground/10 outline-hidden',
