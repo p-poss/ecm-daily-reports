@@ -42,7 +42,7 @@ export function LoginPage() {
             <path d="M724 0H668C668 0 713.5 40 713.5 120C713.5 200 668 240 668 240H724V0Z" fill="currentColor"/>
           </svg>
 <CardDescription>
-            Daily Job Report Platform
+            Daily Report Platform
           </CardDescription>
         </CardHeader>
         <CardContent>
