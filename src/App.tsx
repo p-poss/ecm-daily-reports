@@ -8,7 +8,7 @@ import { ReportsListPage } from '@/pages/ReportsListPage';
 import { DailyReportPage } from '@/pages/DailyReportPage';
 import { useDelayedLoading } from '@/hooks/useDelayedLoading';
 import { UpdateBanner } from '@/components/UpdateBanner';
-// PWA update banner v1
+// PWA update banner v2
 
 function AppContent() {
   const { isAuthenticated, isLoading } = useAuth();
