@@ -680,19 +680,34 @@ export function DailyReportPage() {
           itemNumber: diaryEntries.length + 1,
         };
         setQuiet('diaryEntries', [...diaryEntries, newEntry]);
-        addHighlight(newEntry.id);
+        // Highlight every field that has a non-empty value on the new entry.
+        if (newEntry.entryText) addHighlight(`${newEntry.id}.entryText`);
+        if (newEntry.costCodeId) addHighlight(`${newEntry.id}.costCodeId`);
+        if (newEntry.loads !== undefined) addHighlight(`${newEntry.id}.loads`);
+        if (newEntry.yield !== undefined) addHighlight(`${newEntry.id}.yield`);
         break;
       }
       case 'update_diary_entry': {
         const idx = input.index as number;
-        if (diaryEntries[idx]) addHighlight(diaryEntries[idx].id);
         const updated = [...diaryEntries];
         if (updated[idx]) {
           const updates: Partial<JobDiaryEntry> = {};
-          if (input.entryText !== undefined) updates.entryText = input.entryText as string;
-          if (input.costCodeId !== undefined) updates.costCodeId = resolveCostCodeId(input.costCodeId);
-          if (input.loads !== undefined) updates.loads = input.loads as number;
-          if (input.yield !== undefined) updates.yield = input.yield as number;
+          if (input.entryText !== undefined) {
+            updates.entryText = input.entryText as string;
+            addHighlight(`${updated[idx].id}.entryText`);
+          }
+          if (input.costCodeId !== undefined) {
+            updates.costCodeId = resolveCostCodeId(input.costCodeId);
+            addHighlight(`${updated[idx].id}.costCodeId`);
+          }
+          if (input.loads !== undefined) {
+            updates.loads = input.loads as number;
+            addHighlight(`${updated[idx].id}.loads`);
+          }
+          if (input.yield !== undefined) {
+            updates.yield = input.yield as number;
+            addHighlight(`${updated[idx].id}.yield`);
+          }
           updated[idx] = { ...updated[idx], ...updates };
         }
         setQuiet('diaryEntries', updated);
@@ -713,19 +728,33 @@ export function DailyReportPage() {
           costCodeId: resolveCostCodeId(input.costCodeId),
         };
         setQuiet('subcontractorEntries', [...subcontractorEntries, newEntry]);
-        addHighlight(newEntry.id);
+        if (newEntry.contractorId) addHighlight(`${newEntry.id}.contractorId`);
+        if (newEntry.itemsWorked) addHighlight(`${newEntry.id}.itemsWorked`);
+        if (newEntry.production) addHighlight(`${newEntry.id}.production`);
+        if (newEntry.costCodeId) addHighlight(`${newEntry.id}.costCodeId`);
         break;
       }
       case 'update_subcontractor_entry': {
         const idx = input.index as number;
-        if (subcontractorEntries[idx]) addHighlight(subcontractorEntries[idx].id);
         const updated = [...subcontractorEntries];
         if (updated[idx]) {
           const updates: Partial<SubcontractorWork> = {};
-          if (input.contractorId !== undefined) updates.contractorId = input.contractorId as string;
-          if (input.itemsWorked !== undefined) updates.itemsWorked = input.itemsWorked as string;
-          if (input.production !== undefined) updates.production = input.production as string;
-          if (input.costCodeId !== undefined) updates.costCodeId = resolveCostCodeId(input.costCodeId);
+          if (input.contractorId !== undefined) {
+            updates.contractorId = input.contractorId as string;
+            addHighlight(`${updated[idx].id}.contractorId`);
+          }
+          if (input.itemsWorked !== undefined) {
+            updates.itemsWorked = input.itemsWorked as string;
+            addHighlight(`${updated[idx].id}.itemsWorked`);
+          }
+          if (input.production !== undefined) {
+            updates.production = input.production as string;
+            addHighlight(`${updated[idx].id}.production`);
+          }
+          if (input.costCodeId !== undefined) {
+            updates.costCodeId = resolveCostCodeId(input.costCodeId);
+            addHighlight(`${updated[idx].id}.costCodeId`);
+          }
           updated[idx] = { ...updated[idx], ...updates };
         }
         setQuiet('subcontractorEntries', updated);
@@ -745,18 +774,28 @@ export function DailyReportPage() {
           quantity: (input.quantity as string) || '',
         };
         setQuiet('deliveryEntries', [...deliveryEntries, newEntry]);
-        addHighlight(newEntry.id);
+        if (newEntry.supplier) addHighlight(`${newEntry.id}.supplier`);
+        if (newEntry.material) addHighlight(`${newEntry.id}.material`);
+        if (newEntry.quantity) addHighlight(`${newEntry.id}.quantity`);
         break;
       }
       case 'update_delivery_entry': {
         const idx = input.index as number;
-        if (deliveryEntries[idx]) addHighlight(deliveryEntries[idx].id);
         const updated = [...deliveryEntries];
         if (updated[idx]) {
           const updates: Partial<MaterialDelivered> = {};
-          if (input.supplier !== undefined) updates.supplier = input.supplier as string;
-          if (input.material !== undefined) updates.material = input.material as string;
-          if (input.quantity !== undefined) updates.quantity = input.quantity as string;
+          if (input.supplier !== undefined) {
+            updates.supplier = input.supplier as string;
+            addHighlight(`${updated[idx].id}.supplier`);
+          }
+          if (input.material !== undefined) {
+            updates.material = input.material as string;
+            addHighlight(`${updated[idx].id}.material`);
+          }
+          if (input.quantity !== undefined) {
+            updates.quantity = input.quantity as string;
+            addHighlight(`${updated[idx].id}.quantity`);
+          }
           updated[idx] = { ...updated[idx], ...updates };
         }
         setQuiet('deliveryEntries', updated);

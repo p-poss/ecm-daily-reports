@@ -8,6 +8,7 @@ import { Combobox } from '@/components/ui/combobox';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Plus, X, List } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import type { JobDiaryEntry } from '@/types';
 
 interface JobDiarySectionProps {
@@ -62,13 +63,14 @@ export function JobDiarySection({ entries, onChange, dailyReportId, jobId, highl
           </p>
         ) : (
           entries.map((entry, index) => (
-            <div key={entry.id} className={highlightedIds?.has(entry.id) ? 'ai-highlight' : ''}>
+            <div key={entry.id}>
               {index > 0 && <Separator className="mt-[60px] mb-[20px]" />}
               <DiaryEntryForm
                 entry={entry}
                 costCodes={costCodes || []}
                 onUpdate={(updates) => updateEntry(index, updates)}
                 onRemove={() => removeEntry(index)}
+                highlightedIds={highlightedIds}
               />
             </div>
           ))
@@ -94,6 +96,7 @@ interface DiaryEntryFormProps {
   costCodes: { id: string; code: string; description: string }[];
   onUpdate: (updates: Partial<JobDiaryEntry>) => void;
   onRemove: () => void;
+  highlightedIds?: Set<string>;
 }
 
 function DiaryEntryForm({
@@ -101,7 +104,11 @@ function DiaryEntryForm({
   costCodes,
   onUpdate,
   onRemove,
+  highlightedIds,
 }: DiaryEntryFormProps) {
+  const hl = (field: string) =>
+    highlightedIds?.has(`${entry.id}.${field}`) ? 'ai-highlight' : '';
+
   return (
     <div className="space-y-3">
       <div className="flex justify-between items-start">
@@ -128,14 +135,14 @@ function DiaryEntryForm({
         onChange={(e) => onUpdate({ entryText: e.target.value })}
         placeholder="Describe work performed, conditions, or notes..."
         rows={3}
-        className="text-base resize-none"
+        className={cn('text-base resize-none', hl('entryText'))}
       />
 
       {/* Cost Code */}
       <div className="space-y-1.5">
         <Label className="text-xs text-muted-foreground">Cost Code (optional)</Label>
         <Combobox
-          className="w-full text-sm"
+          className={cn('w-full text-sm', hl('costCodeId'))}
           value={entry.costCodeId || ''}
           onChange={(value) => {
             // '' (input cleared) and '__none__' (clicked the sentinel) both clear.
@@ -169,7 +176,7 @@ function DiaryEntryForm({
               onUpdate({ loads, total });
             }}
             placeholder="0"
-            className="text-base"
+            className={cn('text-base', hl('loads'))}
           />
         </div>
         <div className="space-y-1.5">
@@ -184,7 +191,7 @@ function DiaryEntryForm({
               onUpdate({ yield: yieldVal, total });
             }}
             placeholder="0"
-            className="text-base"
+            className={cn('text-base', hl('yield'))}
           />
         </div>
         <div className="space-y-1.5">

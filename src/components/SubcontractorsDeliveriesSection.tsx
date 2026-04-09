@@ -15,6 +15,7 @@ import {
 import { Combobox } from '@/components/ui/combobox';
 import { Card, CardContent } from '@/components/ui/card';
 import { Plus, X, HardHat, Truck } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import type { SubcontractorWork, MaterialDelivered } from '@/types';
 
 interface SubcontractorsDeliveriesSectionProps {
@@ -41,6 +42,10 @@ export function SubcontractorsDeliveriesSection({
     () => db.costCodes.where('jobId').equals(jobId).toArray(),
     [jobId]
   );
+
+  /** Returns the AI highlight class for a specific field on a specific entry. */
+  const hl = (entryId: string, field: string) =>
+    highlightedIds?.has(`${entryId}.${field}`) ? 'ai-highlight' : '';
 
   function addSubcontractorEntry() {
     const newEntry: SubcontractorWork = {
@@ -99,7 +104,7 @@ export function SubcontractorsDeliveriesSection({
             </p>
           ) : (
             subcontractorEntries.map((entry, index) => (
-              <div key={entry.id} className={`space-y-3 ${highlightedIds?.has(entry.id) ? 'ai-highlight' : ''}`}>
+              <div key={entry.id} className="space-y-3">
                 {index > 0 && <Separator className="mt-[60px] mb-[20px]" />}
                 <div className="flex justify-between items-start">
                   <div className="flex items-center gap-2">
@@ -127,7 +132,7 @@ export function SubcontractorsDeliveriesSection({
                     })
                   }
                 >
-                  <SelectTrigger className="w-full text-sm">
+                  <SelectTrigger className={cn('w-full text-sm', hl(entry.id, 'contractorId'))}>
                     <SelectValue placeholder="Select subcontractor" />
                   </SelectTrigger>
                   <SelectContent>
@@ -147,7 +152,7 @@ export function SubcontractorsDeliveriesSection({
                   }
                   placeholder="Items worked on..."
                   rows={2}
-                  className="text-base resize-none"
+                  className={cn('text-base resize-none', hl(entry.id, 'itemsWorked'))}
                 />
 
                 <div className="grid grid-cols-2 gap-3">
@@ -159,13 +164,13 @@ export function SubcontractorsDeliveriesSection({
                         updateSubcontractorEntry(index, { production: e.target.value })
                       }
                       placeholder="e.g. 200 LF"
-                      className="text-base"
+                      className={cn('text-base', hl(entry.id, 'production'))}
                     />
                   </div>
                   <div className="space-y-1.5">
                     <Label className="text-xs text-muted-foreground">Cost Code (optional)</Label>
                     <Combobox
-                      className="w-full text-sm"
+                      className={cn('w-full text-sm', hl(entry.id, 'costCodeId'))}
                       value={entry.costCodeId || ''}
                       onChange={(value) => {
                         // '' (input cleared) and '__none__' (sentinel click) both clear.
@@ -218,7 +223,7 @@ export function SubcontractorsDeliveriesSection({
             </p>
           ) : (
             deliveryEntries.map((entry, index) => (
-              <div key={entry.id} className={`space-y-3 ${highlightedIds?.has(entry.id) ? 'ai-highlight' : ''}`}>
+              <div key={entry.id} className="space-y-3">
                 {index > 0 && <Separator className="mt-[60px] mb-[20px]" />}
                 <div className="flex justify-between items-start">
                   <div className="flex items-center gap-2">
@@ -246,7 +251,7 @@ export function SubcontractorsDeliveriesSection({
                       updateDeliveryEntry(index, { supplier: e.target.value })
                     }
                     placeholder="Supplier name..."
-                    className="text-base"
+                    className={cn('text-base', hl(entry.id, 'supplier'))}
                   />
                 </div>
 
@@ -259,7 +264,7 @@ export function SubcontractorsDeliveriesSection({
                         updateDeliveryEntry(index, { material: e.target.value })
                       }
                       placeholder="Material description..."
-                      className="text-base"
+                      className={cn('text-base', hl(entry.id, 'material'))}
                     />
                   </div>
 
@@ -271,7 +276,7 @@ export function SubcontractorsDeliveriesSection({
                         updateDeliveryEntry(index, { quantity: e.target.value })
                       }
                       placeholder="e.g. 10 CY, 500 LF"
-                      className="text-base"
+                      className={cn('text-base', hl(entry.id, 'quantity'))}
                     />
                   </div>
                 </div>

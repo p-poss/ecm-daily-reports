@@ -196,24 +196,30 @@ export function LaborSection({ entries, onChange, dailyReportId, jobId, highligh
             <table className="w-full text-sm border-collapse">
               {/* Description row above cost code headers */}
               <thead>
-                {/* Top row: section labels + cost code descriptions */}
+                {/* Top row: section labels + cost code descriptions.
+                    Every cell wraps its content in a fixed-height (h-5) flex
+                    container so the X button on cost-code headers doesn't
+                    push the row taller than the text-only cells, which would
+                    cause a layout shift when columns are added/removed. */}
                 <tr className="border-b border-b-border">
                   {/* Employee column spacer */}
-                  <th className="p-2 pl-4 pt-4 sticky left-0 z-[1] bg-card shadow-[inset_-2px_0_0_0_var(--border)]"></th>
+                  <th className="p-2 pl-4 pt-4 sticky left-0 z-[1] bg-card shadow-[inset_-2px_0_0_0_var(--border)]">
+                    <div className="h-5" />
+                  </th>
                   {/* LABOR section header */}
                   <th colSpan={2} className="text-left p-2 pt-4 font-bold text-xs uppercase tracking-wider border-r border-r-border">
-                    Labor
+                    <div className="h-5 flex items-center">Labor</div>
                   </th>
                   {/* EQUIPMENT section header */}
                   <th colSpan={6} className="text-left p-2 pt-4 font-bold text-xs uppercase tracking-wider border-r border-r-border">
-                    Equipment
+                    <div className="h-5 flex items-center">Equipment</div>
                   </th>
                   {/* Cost code description labels */}
                   {allActiveCostCodeIds.map((ccId) => {
                     const cc = (costCodes || []).find((c) => c.id === ccId);
                     return (
                       <th key={ccId} className="text-left p-2 pt-4 font-bold text-xs uppercase tracking-wider border-r border-r-border w-[160px] min-w-[160px] max-w-[160px]">
-                        <div className="flex items-center justify-between overflow-hidden gap-2">
+                        <div className="h-5 flex items-center justify-between overflow-hidden gap-2">
                           <span className="truncate min-w-0" title={cc?.description}>
                             {cc?.description || ''}
                           </span>
