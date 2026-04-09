@@ -530,14 +530,13 @@ export function AIAssistant({ context, onToolCall, onBeforeToolCalls }: AIAssist
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Tell me what to fill out..."
-              className="text-sm"
               disabled={isLoading}
             />
             <Button
               type="button"
               size="icon"
               variant="outline"
-              className="btn-action"
+              className="btn-action size-9 md:size-8"
               onClick={handleMicClick}
               disabled={isLoading || !speechSupported}
               title={speechSupported ? (isListening ? 'Stop listening' : 'Start voice input') : 'Voice input not supported in this browser'}
@@ -560,6 +559,7 @@ export function AIAssistant({ context, onToolCall, onBeforeToolCalls }: AIAssist
             <Button
               type="submit"
               size="icon"
+              className="size-9 md:size-8"
               disabled={isLoading || !input.trim()}
             >
               <ArrowUp className="w-4 h-4" />
