@@ -9,7 +9,14 @@ export function UpdateBanner() {
   const {
     needRefresh: [needRefresh],
     updateServiceWorker,
-  } = useRegisterSW();
+  } = useRegisterSW({
+    onRegisteredSW(_url, registration) {
+      // Check for new versions every 60 seconds
+      if (registration) {
+        setInterval(() => registration.update(), 60_000);
+      }
+    },
+  });
 
   useEffect(() => {
     if (needRefresh) setShow(true);
