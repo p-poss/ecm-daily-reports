@@ -238,6 +238,16 @@ input[type="number"] {
   [role="combobox"] {
     font-size: max(16px, 1em) !important;
   }
+
+  /* Compensate for the larger mobile font by bumping touch targets.
+     36px min-height gives 16px text comfortable room without looking
+     cramped. Icon buttons are excluded so they stay square. */
+  [data-slot="input"],
+  [data-slot="textarea"],
+  [data-slot="select-trigger"],
+  [data-slot="button"]:not([data-size^="icon"]) {
+    min-height: 36px !important;
+  }
 }
 
 html {
