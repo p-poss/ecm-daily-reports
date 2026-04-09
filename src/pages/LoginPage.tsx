@@ -87,7 +87,9 @@ export function LoginPage() {
               </Button>
             </div>
 
-            <div className="pt-[20px] mt-auto border-t text-center text-xs text-muted-foreground">
+            <div className="flex-1 min-h-[20px]" />
+
+            <div className="pt-[20px] border-t text-center text-xs text-muted-foreground">
               <p className="mb-1">For assistance, contact the office:</p>
               <p>
                 <a href="tel:+17148974326" className="text-primary hover:underline">+1 (714) 897-4326</a>
