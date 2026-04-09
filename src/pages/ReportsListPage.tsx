@@ -31,7 +31,7 @@ import {
 
 export function ReportsListPage() {
   const { foreman } = useAuth();
-  const { addToQueue } = useSync();
+  const { addToQueue, triggerSync } = useSync();
   const { selectedJobId, selectedJobLabel, navigateToJobs, navigateToReportForm } = useNavigation();
   const [showNewReportModal, setShowNewReportModal] = useState(false);
   const [modalClosing, setModalClosing] = useState(false);
@@ -300,6 +300,9 @@ export function ReportsListPage() {
         db.tombstones.where('dailyReportId').equals(reportId).delete(),
       ]);
       await db.dailyReports.delete(reportId);
+
+      // Trigger sync immediately to process the delete ops
+      triggerSync();
     } catch (error) {
       console.error('Error deleting report:', error);
       alert('Failed to delete report');
