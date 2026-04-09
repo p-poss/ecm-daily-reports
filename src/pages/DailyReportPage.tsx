@@ -1188,7 +1188,7 @@ export function DailyReportPage() {
             onClick={saveDraft}
             disabled={isSaving}
           >
-            <span className="truncate">{isSaving ? 'Saving...' : 'Save Draft'}</span>
+            <span className="truncate">{isSaving ? 'Saving...' : 'Save'}</span>
           </Button>
           <Button
             className="min-w-0 overflow-hidden"
