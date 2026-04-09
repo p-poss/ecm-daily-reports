@@ -1176,26 +1176,26 @@ export function DailyReportPage() {
           </div>
           <Button
             variant="outline"
-            className="flex-1"
+            className="flex-1 min-w-0 overflow-hidden"
             onClick={handleViewPDF}
           >
-            <File className="w-4 h-4 mr-1" />
-            View PDF
+            <File className="w-4 h-4 shrink-0" />
+            <span className="truncate">PDF</span>
           </Button>
           <Button
             variant="outline"
-            className="flex-1 btn-action"
+            className="flex-1 min-w-0 overflow-hidden btn-action"
             onClick={saveDraft}
             disabled={isSaving}
           >
-            {isSaving ? 'Saving...' : 'Save Draft'}
+            <span className="truncate">{isSaving ? 'Saving...' : 'Save Draft'}</span>
           </Button>
           <Button
-            className="flex-1"
+            className="flex-1 min-w-0 overflow-hidden"
             onClick={submitReport}
             disabled={!signature || isSubmitting}
           >
-            {isSubmitting ? 'Submitting...' : 'Submit'}
+            <span className="truncate">{isSubmitting ? 'Submitting...' : 'Submit'}</span>
           </Button>
         </div>
       </div>
