@@ -87,7 +87,7 @@ export function LoginPage() {
               </Button>
             </div>
 
-            <div className="flex-1 min-h-[40px]" />
+            <div className="flex-1" />
 
             <div className="pt-[20px] border-t text-center text-xs text-muted-foreground">
               <p className="mb-1">For assistance, contact the office:</p>
