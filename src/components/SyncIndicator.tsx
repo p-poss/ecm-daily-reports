@@ -54,10 +54,10 @@ export function SyncIndicator() {
       type="button"
       onClick={triggerAllSync}
       title={syncError || `Click to sync now${lastSyncTime ? ` (last synced ${relativeTime(lastSyncTime)})` : ''}`}
-      className="flex items-center gap-2 text-xs cursor-pointer hover:opacity-80 transition-opacity"
+      className="flex items-center gap-1.5 text-[10px] md:text-xs cursor-pointer hover:opacity-80 transition-opacity"
     >
-      <div className={cn('w-2.5 h-2.5 rounded-full', config.color)} />
-      <span className="text-muted-foreground">{config.label}</span>
+      <div className={cn('w-2 h-2 md:w-2.5 md:h-2.5 rounded-full shrink-0', config.color)} />
+      <span className="text-muted-foreground truncate">{config.label}</span>
       {syncError && (
         <span className="text-xs text-destructive truncate max-w-[150px]">
           {syncError}

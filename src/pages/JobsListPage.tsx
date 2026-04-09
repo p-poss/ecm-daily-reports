@@ -212,7 +212,7 @@ export function JobsListPage() {
             <span>Logout</span>
           </Button>
           <div className="flex-1 text-center">
-            <h1 className="text-lg font-bold text-primary">Current Jobs</h1>
+            <h1 className="text-sm md:text-lg font-bold text-primary">Current Jobs</h1>
             <p className="text-sm text-muted-foreground">{foreman?.name}</p>
           </div>
           <div className="flex items-center gap-3 absolute right-0">

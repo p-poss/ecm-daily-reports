@@ -913,7 +913,7 @@ export function DailyReportPage() {
             <span>Reports</span>
           </Button>
           <div className="flex-1 text-center">
-            <h1 className="text-lg font-bold text-foreground">
+            <h1 className="text-sm md:text-lg font-bold text-foreground">
               {isEditing ? 'Edit Report' : 'New Report'}
             </h1>
             {job ? (

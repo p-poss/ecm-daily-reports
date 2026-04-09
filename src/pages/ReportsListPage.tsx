@@ -300,7 +300,7 @@ export function ReportsListPage() {
           <div className="flex-1 text-center">
             {job ? (
               <>
-                <h1 className="text-lg font-bold text-foreground">{job.jobNumber}</h1>
+                <h1 className="text-sm md:text-lg font-bold text-foreground">{job.jobNumber}</h1>
                 <p className="text-sm text-muted-foreground">{job.jobName}</p>
               </>
             ) : (
