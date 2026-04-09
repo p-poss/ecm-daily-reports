@@ -211,7 +211,7 @@ export function JobsListPage() {
             <ArrowLeft className="w-5 h-5" />
             <span>Logout</span>
           </Button>
-          <div className="flex-1 text-center">
+          <div className="flex-1 text-center pt-2 md:pt-0">
             <h1 className="text-sm md:text-lg font-bold text-primary">Current Jobs</h1>
             <p className="text-sm text-muted-foreground">{foreman?.name}</p>
           </div>
