@@ -95,7 +95,7 @@ export function Combobox({
         <BaseCombobox.Positioner sideOffset={4} align={align} className="z-[60]">
           <BaseCombobox.Popup
             className={cn(
-              'max-h-[300px] min-w-(--anchor-width) overflow-y-auto overscroll-contain rounded-lg bg-popover p-1 text-xs text-popover-foreground shadow-md ring-1 ring-foreground/10 outline-hidden',
+              'max-h-[300px] min-w-(--anchor-width) max-w-[calc(100dvw-40px)] overflow-y-auto overscroll-contain rounded-lg bg-popover p-1 text-xs text-popover-foreground shadow-md ring-1 ring-foreground/10 outline-hidden',
               'data-[starting-style]:opacity-0 data-[ending-style]:opacity-0',
               'transition-opacity duration-100'
             )}
@@ -108,16 +108,16 @@ export function Combobox({
                 <BaseCombobox.Item
                   key={item.value}
                   value={item}
-                  className="relative flex cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-xs select-none data-[highlighted]:bg-input/50 data-[highlighted]:text-foreground"
+                  className="relative flex cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-xs select-none overflow-hidden data-[highlighted]:bg-input/50 data-[highlighted]:text-foreground"
                 >
                   <BaseCombobox.ItemIndicator className="flex size-3.5 shrink-0 items-center justify-center">
                     <Check className="size-3.5" />
                   </BaseCombobox.ItemIndicator>
                   {/* Reserve indicator space when no item is selected */}
                   {selectedItem?.value !== item.value && <span className="size-3.5 shrink-0" />}
-                  <span className="flex-1 truncate">{item.label}</span>
+                  <span className="shrink-0">{item.label}</span>
                   {item.detail && (
-                    <span className="text-muted-foreground truncate ml-2">{item.detail}</span>
+                    <span className="text-muted-foreground truncate min-w-0 ml-2">{item.detail}</span>
                   )}
                 </BaseCombobox.Item>
               )}
