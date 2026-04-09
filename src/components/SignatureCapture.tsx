@@ -13,7 +13,7 @@ interface SignatureCaptureProps {
 export function SignatureCapture({ value, onChange, disabled }: SignatureCaptureProps) {
   const signatureRef = useRef<SignatureCanvas>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const doneTimerRef = useRef<ReturnType<typeof setTimeout>>();
+  const doneTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
   const [isSigning, setIsSigning] = useState(false);
   const [isEmpty, setIsEmpty] = useState(!value);
 
