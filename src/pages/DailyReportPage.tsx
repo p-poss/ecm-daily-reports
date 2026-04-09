@@ -933,7 +933,12 @@ export function DailyReportPage() {
         </div>
       </header>
 
-      {/* Main Content */}
+      {/* Main Content — wait for existing report data to load before
+          rendering so the form fields don't shift as they fill in.
+          New reports (no selectedReportId) render immediately. */}
+      {(selectedReportId && !isLoaded) ? (
+        <main className="max-w-[82rem] mx-auto p-4 pb-24 pt-[200px]" />
+      ) : (
       <main className="max-w-[82rem] mx-auto p-4 pb-24 pt-[200px] animate-in fade-in duration-200">
         <Separator className="h-[2px] bg-primary" />
 
@@ -1147,6 +1152,7 @@ export function DailyReportPage() {
         />
         </div>
       </main>
+      )}
 
       {/* Fixed Bottom Actions */}
       <div className="fixed bottom-0 left-0 right-0 z-10 bg-card/60 backdrop-blur-md p-4 pb-6 md:pb-4 safe-area-inset-bottom ring-2 ring-foreground/10 rounded-t-[16px]">
