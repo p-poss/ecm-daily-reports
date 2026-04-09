@@ -50,7 +50,7 @@ export function SignatureCapture({ value, onChange, disabled }: SignatureCapture
           // Show saved signature
           <div className="space-y-2">
             <div className="border rounded-s bg-white p-2">
-              <img src={value} alt="Signature" className="w-full h-auto" />
+              <img src={value} alt="Signature" className="w-full h-32 object-contain object-center" />
             </div>
             <Button
               type="button"
