@@ -3,7 +3,7 @@ import { db, generateId, now } from '@/db/database';
 import type { SyncQueueItem } from '@/types';
 import { syncMasterTables } from '@/lib/airtable-sync';
 
-export type SyncStatus = 'online-synced' | 'online-syncing' | 'offline-pending' | 'error';
+export type SyncStatus = 'online-synced' | 'online-syncing' | 'offline' | 'offline-pending' | 'error';
 
 interface SyncContextType {
   status: SyncStatus;
@@ -49,6 +49,8 @@ export function SyncProvider({ children }: { children: ReactNode }) {
     ? 'error'
     : !isOnline && pendingCount > 0
     ? 'offline-pending'
+    : !isOnline
+    ? 'offline'
     : isSyncing
     ? 'online-syncing'
     : 'online-synced';

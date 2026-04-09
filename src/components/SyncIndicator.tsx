@@ -37,6 +37,10 @@ export function SyncIndicator() {
       color: 'bg-yellow-500 animate-pulse',
       label: 'Syncing...',
     },
+    'offline': {
+      color: 'bg-orange-500',
+      label: 'Offline',
+    },
     'offline-pending': {
       color: 'bg-orange-500',
       label: `Offline (${pendingCount} pending)`,
