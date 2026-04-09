@@ -2,7 +2,7 @@ import { useRef, useState, useEffect, useCallback } from 'react';
 import SignatureCanvas from 'react-signature-canvas';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { PenTool, RotateCcw, Check } from 'lucide-react';
+import { PenTool, RotateCcw } from 'lucide-react';
 
 interface SignatureCaptureProps {
   value?: string;
@@ -13,6 +13,7 @@ interface SignatureCaptureProps {
 export function SignatureCapture({ value, onChange, disabled }: SignatureCaptureProps) {
   const signatureRef = useRef<SignatureCanvas>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const doneTimerRef = useRef<ReturnType<typeof setTimeout>>();
   const [isSigning, setIsSigning] = useState(false);
   const [isEmpty, setIsEmpty] = useState(!value);
 
@@ -26,12 +27,9 @@ export function SignatureCapture({ value, onChange, disabled }: SignatureCapture
     }
   }, [value]);
 
-  // Redraw the canvas from the saved value after resize. HTML canvas
-  // clears itself whenever its pixel dimensions change, so we need to
-  // restore the content from the data URL.
+  // Redraw the canvas from the saved value after resize.
   const redrawFromValue = useCallback(() => {
     if (!signatureRef.current || !value) return;
-    // Small delay to let the canvas dimensions settle after resize
     setTimeout(() => {
       signatureRef.current?.fromDataURL(value, {
         width: containerRef.current?.clientWidth || 300,
@@ -47,10 +45,15 @@ export function SignatureCapture({ value, onChange, disabled }: SignatureCapture
     return () => ro.disconnect();
   }, [isSigning, redrawFromValue]);
 
-  function handleClear() {
-    signatureRef.current?.clear();
-    setIsEmpty(true);
-    onChange('');
+  // Clean up timer on unmount
+  useEffect(() => {
+    return () => clearTimeout(doneTimerRef.current);
+  }, []);
+
+  function handleBegin() {
+    // Cancel any pending auto-done timer (user is still drawing)
+    clearTimeout(doneTimerRef.current);
+    setIsSigning(true);
   }
 
   function handleEnd() {
@@ -58,20 +61,23 @@ export function SignatureCapture({ value, onChange, disabled }: SignatureCapture
       const dataUrl = signatureRef.current.toDataURL('image/png');
       onChange(dataUrl);
       setIsEmpty(signatureRef.current.isEmpty());
+      // Auto-exit signing mode after 1.5s of no new strokes
+      clearTimeout(doneTimerRef.current);
+      doneTimerRef.current = setTimeout(() => setIsSigning(false), 1500);
     }
   }
 
-  function handleResign() {
-    setIsSigning(true);
+  function handleClear() {
+    clearTimeout(doneTimerRef.current);
+    signatureRef.current?.clear();
+    setIsEmpty(true);
     onChange('');
   }
 
-  function handleDoneSigning() {
-    if (signatureRef.current && !signatureRef.current.isEmpty()) {
-      const dataUrl = signatureRef.current.toDataURL('image/png');
-      onChange(dataUrl);
-    }
-    setIsSigning(false);
+  function handleResign() {
+    clearTimeout(doneTimerRef.current);
+    setIsSigning(true);
+    onChange('');
   }
 
   // Show the saved signature image when we have a value and aren't
@@ -113,34 +119,22 @@ export function SignatureCapture({ value, onChange, disabled }: SignatureCapture
                   className: 'w-full h-32',
                   style: { width: '100%', height: '128px' },
                 }}
+                onBegin={handleBegin}
                 onEnd={handleEnd}
                 backgroundColor="white"
               />
             </div>
 
-            <div className="flex gap-2">
-              <Button
-                type="button"
-                variant="outline"
-                className="flex-1 btn-action"
-                onClick={handleClear}
-                disabled={isEmpty || disabled}
-              >
-                <RotateCcw className="w-4 h-4 mr-2" />
-                Clear
-              </Button>
-              {!isEmpty && (
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="flex-1"
-                  onClick={handleDoneSigning}
-                >
-                  <Check className="w-4 h-4 mr-2" />
-                  Done
-                </Button>
-              )}
-            </div>
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full btn-action"
+              onClick={handleClear}
+              disabled={isEmpty || disabled}
+            >
+              <RotateCcw className="w-4 h-4 mr-2" />
+              Clear
+            </Button>
           </>
         )}
         </CardContent>
