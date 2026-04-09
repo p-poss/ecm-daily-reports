@@ -1154,9 +1154,9 @@ export function DailyReportPage() {
 
       {/* Fixed Bottom Actions */}
       <div className="fixed bottom-0 left-0 right-0 z-10 bg-card/60 backdrop-blur-md p-4 pb-6 md:pb-4 safe-area-inset-bottom ring-2 ring-foreground/10 rounded-t-[16px]">
-        <div className="max-w-7xl mx-auto flex gap-3 items-center">
+        <div className="max-w-7xl mx-auto grid grid-cols-4 gap-3 items-center">
           {/* Undo/Redo */}
-          <div className="flex-1 flex border border-border rounded-md overflow-hidden">
+          <div className="flex border border-border rounded-md overflow-hidden">
             <button
               onClick={undo}
               disabled={!canUndo}
@@ -1176,7 +1176,7 @@ export function DailyReportPage() {
           </div>
           <Button
             variant="outline"
-            className="flex-1 min-w-0 overflow-hidden"
+            className="min-w-0 overflow-hidden"
             onClick={handleViewPDF}
           >
             <File className="w-4 h-4 shrink-0" />
@@ -1184,14 +1184,14 @@ export function DailyReportPage() {
           </Button>
           <Button
             variant="outline"
-            className="flex-1 min-w-0 overflow-hidden btn-action"
+            className="min-w-0 overflow-hidden btn-action"
             onClick={saveDraft}
             disabled={isSaving}
           >
             <span className="truncate">{isSaving ? 'Saving...' : 'Save Draft'}</span>
           </Button>
           <Button
-            className="flex-1 min-w-0 overflow-hidden"
+            className="min-w-0 overflow-hidden"
             onClick={submitReport}
             disabled={!signature || isSubmitting}
           >
