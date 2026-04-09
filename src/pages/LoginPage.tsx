@@ -62,7 +62,8 @@ export function LoginPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 autoComplete="email"
-                className="text-[16px] h-10 leading-none appearance-none py-[11px]"
+                className="text-[16px] !h-10 !leading-none appearance-none !py-[11px] transform-gpu"
+                style={{ fontSize: '16px', lineHeight: '1', height: '40px' }}
               />
             </div>
 
@@ -75,7 +76,8 @@ export function LoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 autoComplete="current-password"
-                className="text-[16px] h-10 leading-none appearance-none py-[11px]"
+                className="text-[16px] !h-10 !leading-none appearance-none !py-[11px] transform-gpu"
+                style={{ fontSize: '16px', lineHeight: '1', height: '40px' }}
               />
             </div>
 
