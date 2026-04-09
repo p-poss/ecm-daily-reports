@@ -25,7 +25,7 @@ import { ArrowLeft, BookOpen, Calendar as CalendarIcon, ChevronDown, Undo2, Redo
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import type { ReportContext } from '@/lib/ai-assistant';
-import type { CostCode, DailyReport, LaborEntry, JobDiaryEntry, SubcontractorWork, MaterialDelivered, EditHistory, Tombstone, Weather } from '@/types';
+import type { CostCode, DailyReport, LaborEntry, LaborCostCodeHours, JobDiaryEntry, SubcontractorWork, MaterialDelivered, EditHistory, Tombstone, Weather } from '@/types';
 import { captureSnapshot, getPreviousSnapshot, diffSnapshots } from '@/lib/edit-history';
 import { generateReportPDF, type ReportPDFData } from '@/lib/generate-report-pdf';
 import { useUndoRedo } from '@/hooks/useUndoRedo';
@@ -209,12 +209,28 @@ export function DailyReportPage() {
         .equals(sourceReportId)
         .toArray();
 
-      const copiedLaborEntries: LaborEntry[] = sourceLaborEntries.map((entry) => ({
-        ...entry,
-        id: generateId(),
-        dailyReportId: reportId,
-        airtableId: undefined,
-      }));
+      // Build new IDs for copied entries, mapping old → new for junction rows
+      const idMap = new Map<string, string>();
+      const copiedLaborEntries: LaborEntry[] = sourceLaborEntries.map((entry) => {
+        const newId = generateId();
+        idMap.set(entry.id, newId);
+        return { ...entry, id: newId, dailyReportId: reportId, airtableId: undefined };
+      });
+
+      // Copy junction rows with new IDs
+      const sourceJunction = await db.laborCostCodeHours
+        .where('laborEntryId')
+        .anyOf(sourceLaborEntries.map((e) => e.id))
+        .toArray();
+      for (const entry of copiedLaborEntries) {
+        const ccHours: Record<string, { st: number; ot: number }> = {};
+        for (const row of sourceJunction) {
+          if (idMap.get(row.laborEntryId) === entry.id) {
+            ccHours[row.costCodeId] = { st: row.stHours, ot: row.otHours };
+          }
+        }
+        entry.costCodeHours = ccHours;
+      }
 
       setQuiet('laborEntries', copiedLaborEntries);
 
@@ -233,6 +249,23 @@ export function DailyReportPage() {
       db.materialsDelivered.where('dailyReportId').equals(id).toArray(),
       db.photoAttachments.where('dailyReportId').equals(id).toArray(),
     ]);
+
+    // Hydrate costCodeHours from junction table
+    if (labor.length > 0) {
+      const junctionRows = await db.laborCostCodeHours
+        .where('laborEntryId')
+        .anyOf(labor.map((e) => e.id))
+        .toArray();
+      const byLabor = new Map<string, Record<string, { st: number; ot: number }>>();
+      for (const row of junctionRows) {
+        if (!byLabor.has(row.laborEntryId)) byLabor.set(row.laborEntryId, {});
+        byLabor.get(row.laborEntryId)![row.costCodeId] = { st: row.stHours, ot: row.otHours };
+      }
+      for (const entry of labor) {
+        entry.costCodeHours = byLabor.get(entry.id) || {};
+      }
+    }
+
     setQuiet('laborEntries', labor);
     setQuiet('diaryEntries', diary);
     setQuiet('subcontractorEntries', subs);
@@ -245,6 +278,34 @@ export function DailyReportPage() {
 
   // Get day of week
   const dayOfWeek = new Date(date).toLocaleDateString('en-US', { weekday: 'long' });
+
+  // Flatten costCodeHours maps into junction rows, preserving existing
+  // ids and airtableIds for rows that already synced.
+  function flattenCostCodeHours(
+    entries: LaborEntry[],
+    existing: LaborCostCodeHours[]
+  ): LaborCostCodeHours[] {
+    const existingMap = new Map(
+      existing.map((r) => [`${r.laborEntryId}:${r.costCodeId}`, r])
+    );
+    const rows: LaborCostCodeHours[] = [];
+    for (const entry of entries) {
+      if (!entry.costCodeHours) continue;
+      for (const [costCodeId, hours] of Object.entries(entry.costCodeHours)) {
+        if (!hours.st && !hours.ot) continue;
+        const prev = existingMap.get(`${entry.id}:${costCodeId}`);
+        rows.push({
+          id: prev?.id ?? generateId(),
+          laborEntryId: entry.id,
+          costCodeId,
+          stHours: hours.st || 0,
+          otHours: hours.ot || 0,
+          airtableId: prev?.airtableId,
+        });
+      }
+    }
+    return rows;
+  }
 
   async function saveDraft() {
     if (!foreman || !selectedJobId) return;
@@ -355,6 +416,23 @@ export function DailyReportPage() {
             'Down OT Hours': entry.downOtHours,
             'Work ST Hours': entry.workStHours,
             'Work OT Hours': entry.workOtHours,
+          });
+        }
+
+        // Junction rows: cost code hours per labor entry
+        const childCCHours = childLabor.length > 0
+          ? await db.laborCostCodeHours
+              .where('laborEntryId')
+              .anyOf(childLabor.map((e) => e.id))
+              .toArray()
+          : [];
+        for (const row of childCCHours) {
+          const op = row.airtableId ? 'update' : 'create';
+          await addToQueue('laborCostCodeHours', row.id, op, {
+            laborEntryId: row.laborEntryId,
+            costCodeId: row.costCodeId,
+            'ST Hours': row.stHours,
+            'OT Hours': row.otHours,
           });
         }
 
@@ -518,6 +596,23 @@ export function DailyReportPage() {
       await db.laborEntries.bulkPut(
         laborEntries.map((e) => ({ ...e, dailyReportId: report.id }))
       );
+    }
+
+    // Persist junction rows from costCodeHours maps.
+    const allLaborIds = [...new Set([
+      ...laborEntries.map((e) => e.id),
+      ...existingLabor.map((e) => e.id),
+    ])];
+    const existingCCHours = allLaborIds.length > 0
+      ? await db.laborCostCodeHours.where('laborEntryId').anyOf(allLaborIds).toArray()
+      : [];
+    const newCCHours = flattenCostCodeHours(laborEntries, existingCCHours);
+    await captureTombstones('laborCostCodeHours', existingCCHours, newCCHours);
+    if (allLaborIds.length > 0) {
+      await db.laborCostCodeHours.where('laborEntryId').anyOf(allLaborIds).delete();
+    }
+    if (newCCHours.length > 0) {
+      await db.laborCostCodeHours.bulkPut(newCCHours);
     }
 
     await db.jobDiaryEntries.where('dailyReportId').equals(report.id).delete();

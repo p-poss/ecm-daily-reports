@@ -108,6 +108,15 @@ export interface LaborEntry {
   airtableId?: string;
 }
 
+export interface LaborCostCodeHours {
+  id: string;
+  laborEntryId: string;
+  costCodeId: string;
+  stHours: number;
+  otHours: number;
+  airtableId?: string;
+}
+
 export interface EquipmentUsage {
   id: string;
   dailyReportId: string;
@@ -185,7 +194,7 @@ export interface EditHistory {
 export interface Tombstone {
   id: string;
   dailyReportId: string;
-  tableName: string; // local table name: 'laborEntries' | 'jobDiaryEntries' | 'subcontractorWork' | 'materialsDelivered'
+  tableName: string; // local table name: 'laborEntries' | 'laborCostCodeHours' | 'jobDiaryEntries' | 'subcontractorWork' | 'materialsDelivered'
   airtableId: string;
   createdAt: string;
 }

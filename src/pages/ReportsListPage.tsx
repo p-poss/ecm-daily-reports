@@ -263,7 +263,13 @@ export function ReportsListPage() {
         db.materialsDelivered.where('dailyReportId').equals(reportId).toArray(),
       ]);
 
-      // Queue child deletes first, then the parent.
+      // Queue child deletes first (junction rows before labor entries), then the parent.
+      const ccHours = labor.length > 0
+        ? await db.laborCostCodeHours.where('laborEntryId').anyOf(labor.map((e) => e.id)).toArray()
+        : [];
+      for (const r of ccHours) {
+        if (r.airtableId) await addToQueue('laborCostCodeHours', r.id, 'delete', { airtableId: r.airtableId });
+      }
       for (const e of labor) {
         if (e.airtableId) await addToQueue('laborEntries', e.id, 'delete', { airtableId: e.airtableId });
       }
@@ -280,7 +286,10 @@ export function ReportsListPage() {
         await addToQueue('dailyReports', reportId, 'delete', { airtableId: report.airtableId });
       }
 
-      // Delete locally
+      // Delete locally (junction rows first)
+      if (labor.length > 0) {
+        await db.laborCostCodeHours.where('laborEntryId').anyOf(labor.map((e) => e.id)).delete();
+      }
       await Promise.all([
         db.laborEntries.where('dailyReportId').equals(reportId).delete(),
         db.jobDiaryEntries.where('dailyReportId').equals(reportId).delete(),

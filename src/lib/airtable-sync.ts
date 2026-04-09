@@ -13,7 +13,7 @@
 import { db, generateId, now } from '@/db/database';
 import type {
   Job, CostCode, Employee, Equipment, Subcontractor, Trade,
-  DailyReport, LaborEntry, JobDiaryEntry, SubcontractorWork, MaterialDelivered,
+  DailyReport, LaborEntry, LaborCostCodeHours, JobDiaryEntry, SubcontractorWork, MaterialDelivered,
 } from '@/types';
 import { calculateDeadlines } from '@/db/database';
 
@@ -444,6 +444,51 @@ export async function syncReportsForJob(jobId: string): Promise<{ reports: numbe
     });
   }
   if (laborToUpsert.length > 0) await db.laborEntries.bulkPut(laborToUpsert);
+
+  // --- Labor Cost Code Hours (junction) ---
+  const laborAirtableToLocal = new Map<string, string>();
+  for (const entry of laborToUpsert) {
+    if (entry.airtableId) laborAirtableToLocal.set(entry.airtableId, entry.id);
+  }
+
+  const ccHoursRecords = await fetchAllRecords('Labor Cost Code Hours');
+  const existingCCHours = await db.laborCostCodeHours.toArray();
+  const ccHoursByAirtableId = new Map(
+    existingCCHours.filter((r) => r.airtableId).map((r) => [r.airtableId!, r])
+  );
+
+  const ccHoursToUpsert: LaborCostCodeHours[] = [];
+  for (const r of ccHoursRecords) {
+    const parentAirtableId = linkedId(r.fields, 'Labor Entry');
+    if (!parentAirtableId) continue;
+    const localLaborEntryId = laborAirtableToLocal.get(parentAirtableId);
+    if (!localLaborEntryId) continue;
+
+    const prev = ccHoursByAirtableId.get(r.id);
+    ccHoursToUpsert.push({
+      id: prev?.id ?? generateId(),
+      airtableId: r.id,
+      laborEntryId: localLaborEntryId,
+      costCodeId: resolve(costCodeMap, linkedId(r.fields, 'Cost Code')),
+      stHours: num(r.fields, 'ST Hours') ?? 0,
+      otHours: num(r.fields, 'OT Hours') ?? 0,
+    });
+  }
+  if (ccHoursToUpsert.length > 0) {
+    await db.laborCostCodeHours.bulkPut(ccHoursToUpsert);
+    // Backfill costCodeHours map on labor entries for local consistency
+    const byLabor = new Map<string, Record<string, { st: number; ot: number }>>();
+    for (const row of ccHoursToUpsert) {
+      if (!byLabor.has(row.laborEntryId)) byLabor.set(row.laborEntryId, {});
+      byLabor.get(row.laborEntryId)![row.costCodeId] = { st: row.stHours, ot: row.otHours };
+    }
+    for (const entry of laborToUpsert) {
+      if (byLabor.has(entry.id)) {
+        entry.costCodeHours = byLabor.get(entry.id)!;
+      }
+    }
+    await db.laborEntries.bulkPut(laborToUpsert);
+  }
 
   // --- Job Diary Entries ---
   const existingDiary = await db.jobDiaryEntries.toArray();

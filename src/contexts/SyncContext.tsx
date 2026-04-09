@@ -209,6 +209,7 @@ export function SyncProvider({ children }: { children: ReactNode }) {
     jobDiaryEntries: 'Job Diary Entries',
     photoAttachments: 'Photo Attachments',
     editHistory: 'Edit History',
+    laborCostCodeHours: 'Labor Cost Code Hours',
   };
 
   // Describes how to translate a local foreign-key field (UUID) into the
@@ -238,6 +239,10 @@ export function SyncProvider({ children }: { children: ReactNode }) {
     subcontractorWork: [
       { localField: 'dailyReportId', localTable: 'dailyReports', airtableField: 'Daily Report' },
       { localField: 'contractorId', localTable: 'subcontractors', airtableField: 'Contractor' },
+    ],
+    laborCostCodeHours: [
+      { localField: 'laborEntryId', localTable: 'laborEntries', airtableField: 'Labor Entry' },
+      { localField: 'costCodeId', localTable: 'costCodes', airtableField: 'Cost Code' },
     ],
     materialsDelivered: [
       { localField: 'dailyReportId', localTable: 'dailyReports', airtableField: 'Daily Report' },

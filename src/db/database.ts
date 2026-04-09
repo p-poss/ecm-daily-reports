@@ -7,6 +7,7 @@ import type {
   Subcontractor,
   DailyReport,
   LaborEntry,
+  LaborCostCodeHours,
   EquipmentUsage,
   SubcontractorWork,
   MaterialDelivered,
@@ -29,6 +30,7 @@ class ECMDatabase extends Dexie {
   // Transaction tables (created in app, synced to Airtable)
   dailyReports!: EntityTable<DailyReport, 'id'>;
   laborEntries!: EntityTable<LaborEntry, 'id'>;
+  laborCostCodeHours!: EntityTable<LaborCostCodeHours, 'id'>;
   equipmentUsage!: EntityTable<EquipmentUsage, 'id'>;
   subcontractorWork!: EntityTable<SubcontractorWork, 'id'>;
   materialsDelivered!: EntityTable<MaterialDelivered, 'id'>;
@@ -144,6 +146,35 @@ class ECMDatabase extends Dexie {
           tx.table('syncQueue').clear(),
           tx.table('tombstones').clear(),
         ]);
+      });
+
+    // v8: Labor Cost Code Hours junction table. Replaces the JSON
+    // costCodeHours map on LaborEntry with relational rows that sync
+    // independently to Airtable for payroll queryability.
+    this.version(8)
+      .stores({
+        laborCostCodeHours: 'id, laborEntryId, costCodeId, airtableId, [laborEntryId+costCodeId]',
+      })
+      .upgrade(async (tx) => {
+        const laborEntries = await tx.table('laborEntries').toArray();
+        const rows: LaborCostCodeHours[] = [];
+        for (const entry of laborEntries) {
+          const ccHours = entry.costCodeHours as Record<string, { st: number; ot: number }> | undefined;
+          if (!ccHours) continue;
+          for (const [costCodeId, hours] of Object.entries(ccHours)) {
+            if (!hours.st && !hours.ot) continue;
+            rows.push({
+              id: crypto.randomUUID(),
+              laborEntryId: entry.id,
+              costCodeId,
+              stHours: hours.st || 0,
+              otHours: hours.ot || 0,
+            });
+          }
+        }
+        if (rows.length > 0) {
+          await tx.table('laborCostCodeHours').bulkAdd(rows);
+        }
       });
   }
 }
