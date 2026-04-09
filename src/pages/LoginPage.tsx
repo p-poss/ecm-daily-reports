@@ -30,7 +30,7 @@ export function LoginPage() {
   }
 
   return (
-    <div className="min-h-dvh flex items-center justify-center bg-background p-4 relative overflow-hidden">
+    <div className="min-h-dvh flex items-start justify-center bg-background p-4 pt-[15vh] relative overflow-hidden">
       <BayerNoiseBackground className="absolute inset-0 w-full h-full" color={theme === 'dark' ? '#FFFFFF' : '#351F09'} />
       <Card className="w-full max-w-md relative z-10 bg-card/60 backdrop-blur-md">
         <CardHeader className="text-center">
