@@ -463,67 +463,38 @@ export function ReportsListPage() {
 
                   </div>
                   {/* Action Buttons */}
-                  <div className="flex gap-2 px-4 pt-4">
-                    {report.status === 'Draft' ? (
-                        <>
-                          <Button
-                            variant="outline"
-                            className="flex-1 min-w-0 overflow-hidden"
-                            onClick={() => handleViewPDF(report.id)}
-                          >
-                            <File className="w-4 h-4 shrink-0" />
-                            <span className="truncate">PDF</span>
-                          </Button>
-                          <Button
-                            variant="outline"
-                            className="flex-1 min-w-0 overflow-hidden"
-                            onClick={() => handleViewPhotos(report.id)}
-                          >
-                            <Images className="w-4 h-4 shrink-0" />
-                            <span className="truncate">Photos</span>
-                          </Button>
-                          <Button
-                            variant="outline"
-                            className="flex-1 min-w-0 overflow-hidden btn-action"
-                            onClick={() => selectedJobId && navigateToReportForm(selectedJobId, report.id)}
-                          >
-                            <span className="truncate">Edit</span>
-                          </Button>
-                          <Button
-                            className="flex-1 min-w-0 overflow-hidden"
-                            onClick={() => selectedJobId && navigateToReportForm(selectedJobId, report.id)}
-                          >
-                            <span className="truncate">Submit</span>
-                          </Button>
-                        </>
-                      ) : (
-                        <>
-                          <Button
-                            variant="outline"
-                            className="flex-1 min-w-0 overflow-hidden"
-                            onClick={() => handleViewPDF(report.id)}
-                          >
-                            <File className="w-4 h-4 shrink-0" />
-                            <span className="truncate">PDF</span>
-                          </Button>
-                          <Button
-                            variant="outline"
-                            className="flex-1 min-w-0 overflow-hidden"
-                            onClick={() => handleViewPhotos(report.id)}
-                          >
-                            <Images className="w-4 h-4 shrink-0" />
-                            <span className="truncate">Photos</span>
-                          </Button>
-                          <Button
-                            variant="outline"
-                            className="flex-1 min-w-0 overflow-hidden btn-action"
-                            onClick={() => selectedJobId && navigateToReportForm(selectedJobId, report.id)}
-                          >
-                            <span className="truncate">Edit</span>
-                          </Button>
-                          <div className="flex-1" />
-                        </>
-                      )}
+                  <div className="grid grid-cols-4 gap-2 px-4 pt-4">
+                    <Button
+                      variant="outline"
+                      className="min-w-0 overflow-hidden"
+                      onClick={() => handleViewPDF(report.id)}
+                    >
+                      <File className="w-4 h-4 shrink-0" />
+                      <span className="truncate">PDF</span>
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="min-w-0 overflow-hidden"
+                      onClick={() => handleViewPhotos(report.id)}
+                    >
+                      <Images className="w-4 h-4 shrink-0" />
+                      <span className="truncate">Photos</span>
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="min-w-0 overflow-hidden btn-action"
+                      onClick={() => selectedJobId && navigateToReportForm(selectedJobId, report.id)}
+                    >
+                      <span className="truncate">Edit</span>
+                    </Button>
+                    {report.status === 'Draft' && (
+                      <Button
+                        className="min-w-0 overflow-hidden"
+                        onClick={() => selectedJobId && navigateToReportForm(selectedJobId, report.id)}
+                      >
+                        <span className="truncate">Submit</span>
+                      </Button>
+                    )}
                   </div>
                 </CardContent>
               </Card>
