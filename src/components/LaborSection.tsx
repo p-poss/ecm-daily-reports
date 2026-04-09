@@ -193,7 +193,7 @@ export function LaborSection({ entries, onChange, dailyReportId, jobId, highligh
         /* Table View - PDF-matching layout */
         <Card className="overflow-hidden p-0">
           <div className="overflow-x-auto">
-            <table className="w-full text-sm border-collapse table-fixed">
+            <table className="w-full text-sm border-collapse">
               {/* Description row above cost code headers */}
               <thead>
                 {/* Top row: section labels + cost code descriptions.
