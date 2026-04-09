@@ -227,6 +227,19 @@ input[type="number"] {
   -moz-appearance: textfield;
 }
 
+/* Prevent iOS auto-zoom on focus. iOS Safari/Chrome zoom in on any
+   input with font-size < 16px. This global rule catches everything
+   including inputs inside third-party components (Base UI Combobox,
+   etc.) without needing per-component overrides. */
+@media (max-width: 767px) {
+  input,
+  textarea,
+  select,
+  [role="combobox"] {
+    font-size: max(16px, 1em) !important;
+  }
+}
+
 html {
   background-color: var(--background);
 }
