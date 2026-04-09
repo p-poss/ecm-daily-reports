@@ -237,7 +237,7 @@ export function LaborSection({ entries, onChange, dailyReportId, jobId, highligh
                     );
                   })}
                   {/* Add cost code column button */}
-                  <th rowSpan={3} colSpan={2} className="p-1 pl-2 pr-4 pt-4 align-top w-[160px] min-w-[160px] max-w-[160px]">
+                  <th rowSpan={3} colSpan={2} className="p-1 pl-2 pr-4 pt-4 align-top w-[170px] min-w-[170px] max-w-[170px]">
                     <Combobox
                       className="h-9 md:h-8 text-xs w-full"
                       value=""

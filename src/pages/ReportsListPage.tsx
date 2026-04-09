@@ -34,6 +34,15 @@ export function ReportsListPage() {
   const { addToQueue } = useSync();
   const { selectedJobId, selectedJobLabel, navigateToJobs, navigateToReportForm } = useNavigation();
   const [showNewReportModal, setShowNewReportModal] = useState(false);
+  const [modalClosing, setModalClosing] = useState(false);
+
+  function closeModal() {
+    setModalClosing(true);
+    setTimeout(() => {
+      setShowNewReportModal(false);
+      setModalClosing(false);
+    }, 200);
+  }
   const [galleryPhotos, setGalleryPhotos] = useState<GalleryPhoto[] | null>(null);
   const [galleryTitle, setGalleryTitle] = useState('');
 
@@ -323,7 +332,7 @@ export function ReportsListPage() {
           ) : null
         ) : reports.length === 0 ? (
           <div className="text-center text-sm text-muted-foreground animate-in fade-in duration-300">
-            <p>No reports yet for this job.</p>
+            <p>No reports yet.</p>
           </div>
         ) : (
           reports?.map((report) => {
@@ -513,14 +522,14 @@ export function ReportsListPage() {
 
       {/* New Report Modal */}
       {showNewReportModal && (
-        <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 p-4">
-          <Card className="w-full max-w-md max-h-[80dvh] overflow-hidden flex flex-col">
+        <div className={`fixed inset-0 bg-primary/50 flex items-center justify-center z-50 p-4 transition-opacity duration-200 ${modalClosing ? 'opacity-0' : 'animate-in fade-in duration-200'}`}>
+          <Card className={`w-full max-w-md max-h-[80dvh] overflow-hidden flex flex-col transition-opacity duration-200 ${modalClosing ? 'opacity-0' : 'animate-in fade-in duration-200'}`}>
             <div className="flex items-center justify-between px-4 pb-3 border-b">
               <h2 className="text-lg font-semibold">New Report</h2>
               <Button
                 variant="outline"
                 size="icon"
-                onClick={() => setShowNewReportModal(false)}
+                onClick={closeModal}
               >
                 <X className="w-5 h-5" />
               </Button>
@@ -533,7 +542,7 @@ export function ReportsListPage() {
                 title="Start Blank"
                 description="Create a new empty report"
                 onClick={() => {
-                  setShowNewReportModal(false);
+                  closeModal();
                   selectedJobId && navigateToReportForm(selectedJobId);
                 }}
               />
@@ -568,7 +577,7 @@ export function ReportsListPage() {
                         }
                         description="Copy all entries"
                         onClick={() => {
-                          setShowNewReportModal(false);
+                          closeModal();
                           selectedJobId && navigateToReportForm(selectedJobId, undefined, report.id);
                         }}
                       />
