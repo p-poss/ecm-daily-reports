@@ -49,7 +49,7 @@ export function LoginPage() {
           <form onSubmit={handleSubmit} className="flex flex-col flex-1">
             <div className="space-y-4">
               {error && (
-                <div className="p-3 text-sm text-destructive bg-destructive/10 rounded-md border border-destructive/20">
+                <div className="flex items-center h-9 md:h-8 px-2 text-base md:text-xs/relaxed text-destructive bg-destructive/10 rounded-md border border-destructive/20">
                   {error}
                 </div>
               )}
