@@ -1161,7 +1161,7 @@ export function DailyReportPage() {
               onClick={undo}
               disabled={!canUndo}
               title="Undo (Ctrl+Z)"
-              className="flex-1 flex items-center justify-center h-9 md:h-7 hover:bg-input/50 disabled:opacity-50 disabled:pointer-events-none cursor-pointer border-r border-border"
+              className="flex-1 flex items-center justify-center h-9 md:h-8 hover:bg-input/50 disabled:opacity-50 disabled:pointer-events-none cursor-pointer border-r border-border"
             >
               <Undo2 className="w-4 h-4" />
             </button>
@@ -1169,7 +1169,7 @@ export function DailyReportPage() {
               onClick={redo}
               disabled={!canRedo}
               title="Redo (Ctrl+Shift+Z)"
-              className="flex-1 flex items-center justify-center h-9 md:h-7 hover:bg-input/50 disabled:opacity-50 disabled:pointer-events-none cursor-pointer"
+              className="flex-1 flex items-center justify-center h-9 md:h-8 hover:bg-input/50 disabled:opacity-50 disabled:pointer-events-none cursor-pointer"
             >
               <Redo2 className="w-4 h-4" />
             </button>
