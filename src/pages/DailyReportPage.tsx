@@ -912,7 +912,7 @@ export function DailyReportPage() {
             <ArrowLeft className="w-5 h-5" />
             <span className="md:hidden">Back</span><span className="hidden md:inline">Reports</span>
           </Button>
-          <div className="flex-1 text-center min-w-0 px-[100px]">
+          <div className="flex-1 text-center min-w-0 px-[100px] pt-2 md:pt-0">
             <h1 className="text-sm md:text-lg font-bold text-foreground">
               {isEditing ? 'Edit Report' : 'New Report'}
             </h1>
