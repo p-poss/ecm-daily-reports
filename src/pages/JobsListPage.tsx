@@ -277,36 +277,36 @@ export function JobsListPage() {
                   <div className="flex gap-2 px-4 pt-4">
                     <Button
                       variant="outline"
-                      className="flex-1"
+                      className="flex-1 min-w-0 overflow-hidden"
                       onClick={() => handleViewPDF(job.id)}
                       disabled={!counts?.total}
                     >
-                      <FileStack className="w-4 h-4 mr-1" />
-                      View PDF
+                      <FileStack className="w-4 h-4 shrink-0" />
+                      <span className="truncate">PDF</span>
                     </Button>
                     <Button
                       variant="outline"
-                      className="flex-1"
+                      className="flex-1 min-w-0 overflow-hidden"
                       onClick={() => handleViewPhotos(job.id)}
                       disabled={!counts?.total}
                     >
-                      <Images className="w-4 h-4 mr-1" />
-                      Photos
+                      <Images className="w-4 h-4 shrink-0" />
+                      <span className="truncate">Photos</span>
                     </Button>
                     <Button
                       variant="outline"
-                      className="flex-1"
+                      className="flex-1 min-w-0 overflow-hidden"
                       onClick={() => handleViewBudget(job.id)}
                     >
-                      <DollarSign className="w-4 h-4 mr-1" />
-                      Budget
+                      <DollarSign className="w-4 h-4 shrink-0" />
+                      <span className="truncate">Budget</span>
                     </Button>
                     <Button
                       variant="outline"
-                      className="flex-1 btn-action"
+                      className="flex-1 min-w-0 overflow-hidden btn-action"
                       onClick={() => navigateToReports(job.id)}
                     >
-                      Reports
+                      <span className="truncate">Reports</span>
                     </Button>
                   </div>
                 </CardContent>
