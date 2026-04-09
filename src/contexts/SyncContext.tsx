@@ -232,6 +232,10 @@ export function SyncProvider({ children }: { children: ReactNode }) {
     materialsDelivered: [
       { localField: 'dailyReportId', localTable: 'dailyReports', airtableField: 'Daily Report' },
     ],
+    editHistory: [
+      { localField: 'dailyReportId', localTable: 'dailyReports', airtableField: 'Daily Report' },
+      { localField: 'editorId', localTable: 'employees', airtableField: 'Editor' },
+    ],
   };
 
   // Translate a payload's foreign-key UUIDs into Airtable Linked Record arrays.

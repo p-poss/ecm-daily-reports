@@ -21,11 +21,12 @@ import { SignatureCapture } from '@/components/SignatureCapture';
 import { PhotoAttachments } from '@/components/PhotoAttachments';
 import { DeadlineIndicator } from '@/components/DeadlineIndicator';
 import { AIAssistant } from '@/components/AIAssistant';
-import { ArrowLeft, BookOpen, Calendar as CalendarIcon, ChevronDown, Undo2, Redo2, File } from 'lucide-react';
+import { ArrowLeft, BookOpen, Calendar as CalendarIcon, ChevronDown, Undo2, Redo2, File, History, RotateCcw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import type { ReportContext } from '@/lib/ai-assistant';
-import type { CostCode, DailyReport, LaborEntry, JobDiaryEntry, SubcontractorWork, MaterialDelivered, Tombstone, Weather } from '@/types';
+import type { CostCode, DailyReport, LaborEntry, JobDiaryEntry, SubcontractorWork, MaterialDelivered, EditHistory, Tombstone, Weather } from '@/types';
+import { captureSnapshot, getPreviousSnapshot, diffSnapshots } from '@/lib/edit-history';
 import { generateReportPDF, type ReportPDFData } from '@/lib/generate-report-pdf';
 import { useUndoRedo } from '@/hooks/useUndoRedo';
 
@@ -131,6 +132,50 @@ export function DailyReportPage() {
     [selectedJobId]
   );
   const subcontractors = useLiveQuery(() => db.subcontractors.toArray());
+
+  // Edit history for the current report
+  const editHistory = useLiveQuery(async () => {
+    const id = existingReport?.id || reportId;
+    const entries = await db.editHistory.where('dailyReportId').equals(id).toArray();
+    return entries.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+  }, [existingReport, reportId]);
+
+  const [showHistory, setShowHistory] = useState(false);
+
+  async function handleRevert(snapshotJson: string) {
+    if (!confirm('Revert this report to the selected version? Your current changes will be replaced.')) return;
+    try {
+      const snapshot = JSON.parse(snapshotJson) as import('@/lib/edit-history').ReportSnapshot;
+      setQuiet('date', snapshot.report.date);
+      setQuiet('weather', snapshot.report.weather as Weather | undefined);
+      setQuiet('comments', snapshot.report.comments || '');
+      setQuiet('signature', snapshot.report.signatureImage || '');
+      setQuiet('laborEntries', snapshot.laborEntries.map((e) => ({
+        ...e,
+        dailyReportId: existingReport?.id || reportId,
+        airtableId: undefined,
+      })) as LaborEntry[]);
+      setQuiet('diaryEntries', snapshot.diaryEntries.map((e) => ({
+        ...e,
+        dailyReportId: existingReport?.id || reportId,
+        airtableId: undefined,
+      })) as JobDiaryEntry[]);
+      setQuiet('subcontractorEntries', snapshot.subcontractorEntries.map((e) => ({
+        ...e,
+        dailyReportId: existingReport?.id || reportId,
+        airtableId: undefined,
+      })) as SubcontractorWork[]);
+      setQuiet('deliveryEntries', snapshot.deliveryEntries.map((e) => ({
+        ...e,
+        dailyReportId: existingReport?.id || reportId,
+        airtableId: undefined,
+      })) as MaterialDelivered[]);
+      alert('Report reverted. Review the changes and submit when ready.');
+    } catch (error) {
+      console.error('Revert failed:', error);
+      alert('Failed to revert. The snapshot may be corrupted.');
+    }
+  }
 
   // Load existing report data
   useEffect(() => {
@@ -350,6 +395,36 @@ export function DailyReportPage() {
         // field. Base64 in IndexedDB is too large to store in a text
         // field, and Airtable attachments can't accept base64 directly.
         // Photos remain local-only until that infrastructure is built.
+
+        // Record edit history — capture a snapshot of the current state
+        // and diff it against the previous snapshot (if any).
+        const currentSnapshot = await captureSnapshot(reportIdToSubmit);
+        if (currentSnapshot) {
+          const prevSnapshot = await getPreviousSnapshot(reportIdToSubmit);
+          const changes = await diffSnapshots(prevSnapshot, currentSnapshot);
+          const historyEntry: EditHistory = {
+            id: generateId(),
+            dailyReportId: reportIdToSubmit,
+            timestamp: now(),
+            editorId: foreman.id,
+            changes: JSON.stringify(changes),
+            snapshot: JSON.stringify(currentSnapshot),
+          };
+          await db.editHistory.add(historyEntry);
+          await addToQueue('editHistory', historyEntry.id, 'create', {
+            dailyReportId: reportIdToSubmit,
+            editorId: foreman.id,
+            'Timestamp': historyEntry.timestamp,
+            'Changes': changes.map((c) =>
+              c.oldValue != null && c.newValue != null
+                ? `${c.field}: ${c.oldValue} → ${c.newValue}`
+                : c.oldValue != null
+                ? `${c.field}: removed ${c.oldValue}`
+                : `${c.field}: ${c.newValue || ''}`
+            ).join('\n'),
+            'Snapshot': historyEntry.snapshot,
+          });
+        }
       }
 
       alert('Report submitted successfully!');
@@ -992,6 +1067,79 @@ export function DailyReportPage() {
           dailyReportId={currentReportId}
         />
         </div>
+
+        {/* Edit History */}
+        {editHistory && editHistory.length > 0 && (
+          <>
+            <Separator className="h-[2px] bg-primary mt-[90px]" />
+            <div className="mt-[20px] space-y-[20px]">
+              <button
+                type="button"
+                onClick={() => setShowHistory(!showHistory)}
+                className="text-lg font-semibold flex items-center gap-2 px-4 text-primary cursor-pointer hover:opacity-80 w-full text-left"
+              >
+                <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground">
+                  <History className="w-3 h-3" />
+                </span>
+                Edit History ({editHistory.length})
+                <ChevronDown className={cn('w-4 h-4 ml-auto transition-transform', showHistory && 'rotate-180')} />
+              </button>
+              {showHistory && (
+                <Card>
+                  <CardContent className="space-y-0 divide-y">
+                    {editHistory.map((entry, idx) => {
+                      const changes: import('@/types').EditHistoryChange[] = (() => {
+                        try { return JSON.parse(entry.changes); } catch { return []; }
+                      })();
+                      const editor = (employees || []).find((e) => e.id === entry.editorId);
+                      const isLatest = idx === 0;
+                      return (
+                        <div key={entry.id} className="py-3 first:pt-0 last:pb-0">
+                          <div className="flex items-center justify-between mb-1">
+                            <div className="text-xs">
+                              <span className="font-medium">{editor?.name || 'Unknown'}</span>
+                              <span className="text-muted-foreground ml-2">
+                                {new Date(entry.timestamp).toLocaleString('en-US', {
+                                  month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit',
+                                })}
+                              </span>
+                              {isLatest && <span className="text-muted-foreground ml-2">(current)</span>}
+                            </div>
+                            {!isLatest && (
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="xs"
+                                onClick={() => handleRevert(entry.snapshot)}
+                                className="text-[10px] gap-1"
+                              >
+                                <RotateCcw className="w-2.5 h-2.5" />
+                                Revert
+                              </Button>
+                            )}
+                          </div>
+                          <ul className="text-xs text-muted-foreground space-y-0.5">
+                            {changes.map((c, i) => (
+                              <li key={i}>
+                                {c.oldValue != null && c.newValue != null ? (
+                                  <>{c.field}: <span className="line-through opacity-60">{c.oldValue}</span> → <span className="text-foreground">{c.newValue}</span></>
+                                ) : c.oldValue != null ? (
+                                  <>{c.field}: <span className="line-through opacity-60">{c.oldValue}</span></>
+                                ) : (
+                                  <>{c.field}{c.newValue ? `: ${c.newValue}` : ''}</>
+                                )}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      );
+                    })}
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          </>
+        )}
 
         <Separator className="h-[2px] bg-primary mt-[90px]" />
 

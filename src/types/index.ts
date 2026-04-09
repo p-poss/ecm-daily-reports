@@ -160,14 +160,21 @@ export interface PhotoAttachment {
   airtableId?: string;
 }
 
+export interface EditHistoryChange {
+  field: string;      // e.g., "Weather", "ST Hours (Jose Garcia)", "Added diary entry"
+  oldValue?: string;
+  newValue?: string;
+}
+
 export interface EditHistory {
   id: string;
   dailyReportId: string;
   timestamp: string;
   editorId: string;
-  fieldChanged: string;
-  oldValue?: string;
-  newValue?: string;
+  /** JSON array of {field, oldValue?, newValue?} — human-readable change summary */
+  changes: string;
+  /** JSON blob of the full report + children state for all-or-nothing revert */
+  snapshot: string;
   airtableId?: string;
 }
 
