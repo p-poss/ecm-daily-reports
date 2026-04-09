@@ -507,7 +507,7 @@ export function ReportsListPage() {
             );
           })
         )}
-        {/* Create New Report Button — only show after reports have loaded */}
+        {/* New Report Button — only show after reports have loaded */}
         {reports !== undefined && (
           <Button
             variant="outline"
@@ -515,7 +515,7 @@ export function ReportsListPage() {
             onClick={() => setShowNewReportModal(true)}
           >
             <Plus className="w-4 h-4 mr-2" />
-            Create New Report
+            New Report
           </Button>
         )}
       </main>
