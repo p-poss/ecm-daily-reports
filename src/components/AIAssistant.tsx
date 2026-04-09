@@ -151,6 +151,7 @@ interface AIAssistantProps {
 
 export function AIAssistant({ context, onToolCall, onBeforeToolCalls }: AIAssistantProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -427,24 +428,15 @@ export function AIAssistant({ context, onToolCall, onBeforeToolCalls }: AIAssist
     }
   }
 
-  if (!isOpen) {
-    return (
-      <button
-        {...handlers}
-        onClick={() => {
-          if (!wasDragged.current) setIsOpen(true);
-        }}
-        style={{ left: position.x, top: position.y, boxShadow: '0 8px 24px rgba(0,0,0,0.25), 0 2px 8px rgba(0,0,0,0.15)' }}
-        className="fixed z-50 w-14 h-14 rounded-[16px] bg-primary text-primary-foreground hover:bg-primary/90 flex items-center justify-center cursor-grab active:cursor-grabbing touch-none select-none"
-      >
-        <AIIcon className="w-9 h-9 pointer-events-none" />
-      </button>
-    );
+  function handleClose() {
+    setIsClosing(true);
+    setTimeout(() => {
+      setIsOpen(false);
+      setIsClosing(false);
+    }, 150);
   }
 
   // Clamp panel position so it stays between header and footer.
-  // Cap the Card's max-height to the available space (viewport minus header
-  // and footer) so the panel can never grow taller than what fits.
   const headerEl = document.querySelector('header');
   const footerEl = document.querySelector('[class*="fixed bottom-0"]');
   const headerBottom = headerEl ? headerEl.getBoundingClientRect().bottom : 0;
@@ -455,12 +447,29 @@ export function AIAssistant({ context, onToolCall, onBeforeToolCalls }: AIAssist
   const panelX = Math.max(EDGE_GAP, Math.min(position.x, window.innerWidth - Math.min(540, window.innerWidth - EDGE_GAP * 2) - EDGE_GAP));
   const panelY = Math.max(panelMinY, Math.min(position.y, panelMaxY));
 
+  const showPanel = isOpen && !isClosing;
+
   return (
-    <div
-      ref={panelRef}
-      style={{ left: panelX, top: panelY }}
-      className="fixed z-50 w-[540px] max-w-[calc(100vw-3rem)]"
-    >
+    <>
+      {/* FAB button — fades out when panel opens, fades in when closing */}
+      <button
+        {...handlers}
+        onClick={() => {
+          if (!wasDragged.current) setIsOpen(true);
+        }}
+        style={{ left: position.x, top: position.y, boxShadow: '0 8px 24px rgba(0,0,0,0.25), 0 2px 8px rgba(0,0,0,0.15)' }}
+        className={`fixed z-50 w-14 h-14 rounded-[16px] bg-primary text-primary-foreground hover:bg-primary/90 flex items-center justify-center cursor-grab active:cursor-grabbing touch-none select-none transition-opacity duration-150 ${isOpen && !isClosing ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+      >
+        <AIIcon className="w-9 h-9 pointer-events-none" />
+      </button>
+
+      {/* Panel */}
+      {isOpen && (
+      <div
+        ref={panelRef}
+        style={{ left: panelX, top: panelY }}
+        className={`fixed z-50 w-[540px] max-w-[calc(100vw-3rem)] transition-opacity duration-150 ${isClosing ? 'opacity-0' : 'animate-in fade-in duration-150'}`}
+      >
       <Card style={{ maxHeight: availableHeight }} className="flex flex-col shadow-2xl p-0">
         {/* Header — draggable handle */}
         <div
@@ -476,7 +485,7 @@ export function AIAssistant({ context, onToolCall, onBeforeToolCalls }: AIAssist
             size="icon-sm"
             className="pointer-events-auto"
             onPointerDown={(e) => e.stopPropagation()}
-            onClick={() => setIsOpen(false)}
+            onClick={handleClose}
           >
             <Minus className="w-4 h-4" />
           </Button>
@@ -568,5 +577,7 @@ export function AIAssistant({ context, onToolCall, onBeforeToolCalls }: AIAssist
         </div>
       </Card>
     </div>
+      )}
+    </>
   );
 }
