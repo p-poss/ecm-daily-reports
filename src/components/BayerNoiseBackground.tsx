@@ -76,17 +76,30 @@ float fbm2(vec2 uv, float t) {
   return sum * 0.5 + 0.5;
 }
 
+// Circle mask: each dithered cell renders as a circle whose radius
+// is proportional to coverage, giving a halftone-print look.
+float maskCircle(vec2 p, float cov) {
+  float r = sqrt(cov) * 0.38;
+  float d = length(p - 0.5) - r;
+  float aa = 0.5 * fwidth(d);
+  return cov * (1.0 - smoothstep(-aa, aa, d * 2.0));
+}
+
 void main() {
   float pixelSize = uPixelSize;
   vec2 fragCoord = gl_FragCoord.xy - uResolution * 0.5;
   float aspectRatio = uResolution.x / uResolution.y;
+
+  vec2 pixelUV = fract(fragCoord / pixelSize);
 
   float cellPixelSize = 8.0 * pixelSize;
   vec2 cellId = floor(fragCoord / cellPixelSize);
   vec2 cellCoord = cellId * cellPixelSize;
   vec2 uv = cellCoord / uResolution * vec2(aspectRatio, 1.0);
 
-  float feed = fbm2(uv, uTime * 0.05);
+  // Diagonal drift — dust carried by wind across a job site
+  vec2 driftUV = uv + vec2(uTime * 0.01, uTime * 0.02);
+  float feed = fbm2(driftUV, uTime * 0.05);
   feed = feed * 0.5 - 0.65;
 
   const float speed = 0.30;
@@ -109,7 +122,12 @@ void main() {
   float bayer = Bayer8(fragCoord / uPixelSize) - 0.5;
   float bw = step(0.5, feed + bayer);
 
-  fragColor = vec4(uColor, bw);
+  // Apply circle mask for a halftone-dot look instead of square pixels.
+  // Modulate opacity by the feed value so some dots are faint (distant)
+  // and some are bold (close) — creates a sense of depth.
+  float M = maskCircle(pixelUV, bw);
+  float depthOpacity = 0.13 + 0.87 * smoothstep(-0.3, 0.3, feed);
+  fragColor = vec4(uColor, M * depthOpacity);
 }
 `;
 
@@ -143,7 +161,7 @@ interface BayerNoiseBackgroundProps {
 export function BayerNoiseBackground({
   className,
   color = '#351F09',
-  pixelSize = 4,
+  pixelSize = 5,
 }: BayerNoiseBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
