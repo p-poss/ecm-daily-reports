@@ -212,6 +212,26 @@ export function SyncProvider({ children }: { children: ReactNode }) {
     costCodes: [
       { localField: 'jobId', localTable: 'jobs', airtableField: 'Job' },
     ],
+    dailyReports: [
+      { localField: 'jobId', localTable: 'jobs', airtableField: 'Job' },
+      { localField: 'foremanId', localTable: 'employees', airtableField: 'Foreman' },
+    ],
+    laborEntries: [
+      { localField: 'dailyReportId', localTable: 'dailyReports', airtableField: 'Daily Report' },
+      { localField: 'employeeId', localTable: 'employees', airtableField: 'Employee' },
+      { localField: 'equipmentId', localTable: 'equipment', airtableField: 'Equipment' },
+    ],
+    jobDiaryEntries: [
+      { localField: 'dailyReportId', localTable: 'dailyReports', airtableField: 'Daily Report' },
+      { localField: 'costCodeId', localTable: 'costCodes', airtableField: 'Cost Code' },
+    ],
+    subcontractorWork: [
+      { localField: 'dailyReportId', localTable: 'dailyReports', airtableField: 'Daily Report' },
+      { localField: 'contractorId', localTable: 'subcontractors', airtableField: 'Contractor' },
+    ],
+    materialsDelivered: [
+      { localField: 'dailyReportId', localTable: 'dailyReports', airtableField: 'Daily Report' },
+    ],
   };
 
   // Translate a payload's foreign-key UUIDs into Airtable Linked Record arrays.
@@ -236,7 +256,9 @@ export function SyncProvider({ children }: { children: ReactNode }) {
           `${spec.localTable} record ${localId} has no airtableId yet`
         );
       }
-      out[spec.airtableField] = [linked.airtableId];
+      // Send as a plain string for text-typed FK fields. When we
+      // convert to real Linked Records this becomes [linked.airtableId].
+      out[spec.airtableField] = linked.airtableId;
     }
     return out;
   }

@@ -10,8 +10,12 @@
  * untouched — this lets the dev seed for employees/equipment/subcontractors
  * remain in place until those tables get populated upstream.
  */
-import { db, generateId } from '@/db/database';
-import type { Job, CostCode, Employee, Equipment, Subcontractor, Trade } from '@/types';
+import { db, generateId, now } from '@/db/database';
+import type {
+  Job, CostCode, Employee, Equipment, Subcontractor, Trade,
+  DailyReport, LaborEntry, JobDiaryEntry, SubcontractorWork, MaterialDelivered,
+} from '@/types';
+import { calculateDeadlines } from '@/db/database';
 
 const AIRTABLE_API_KEY = import.meta.env.VITE_AIRTABLE_API_KEY || '';
 const AIRTABLE_BASE_ID = import.meta.env.VITE_AIRTABLE_BASE_ID || '';
@@ -26,7 +30,7 @@ interface AirtableListResponse {
   offset?: string;
 }
 
-async function fetchAllRecords(tableName: string): Promise<AirtableRecord[]> {
+async function fetchAllRecords(tableName: string, filterFormula?: string): Promise<AirtableRecord[]> {
   if (!AIRTABLE_API_KEY || !AIRTABLE_BASE_ID) {
     throw new Error('Airtable not configured');
   }
@@ -37,6 +41,7 @@ async function fetchAllRecords(tableName: string): Promise<AirtableRecord[]> {
       `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(tableName)}`
     );
     url.searchParams.set('pageSize', '100');
+    if (filterFormula) url.searchParams.set('filterByFormula', filterFormula);
     if (offset) url.searchParams.set('offset', offset);
     const response = await fetch(url, {
       headers: { Authorization: `Bearer ${AIRTABLE_API_KEY}` },
@@ -283,6 +288,233 @@ async function syncCostCodes(): Promise<{ pulled: number; upserted: number; skip
 
   return { pulled: records.length, upserted: toUpsert.length, skipped: false };
 }
+
+// ---------------------------------------------------------------------------
+// Transaction-table downloader: pull reports for a specific job
+// ---------------------------------------------------------------------------
+
+/** Helper: build a lookup map of airtableId → local UUID for a Dexie table. */
+async function buildReverseMap(
+  tableName: 'jobs' | 'employees' | 'equipment' | 'costCodes' | 'subcontractors' | 'dailyReports'
+): Promise<Map<string, string>> {
+  const all = await db.table(tableName).toArray();
+  return new Map(
+    all
+      .filter((r: { airtableId?: string }) => r.airtableId)
+      .map((r: { id: string; airtableId?: string }) => [r.airtableId!, r.id])
+  );
+}
+
+/**
+ * Pull all Daily Reports (and their children) for a specific job from
+ * Airtable into local Dexie. Uses upsert-by-airtableId so re-pulls
+ * don't duplicate. Called when the user navigates to a job's reports
+ * page.
+ *
+ * The FK fields in Airtable contain airtableIds (not local UUIDs),
+ * which we translate back to local UUIDs for storage in Dexie.
+ */
+export async function syncReportsForJob(jobId: string): Promise<{ reports: number; durationMs: number }> {
+  const start = performance.now();
+
+  // We need the job's airtableId to filter Daily Reports in Airtable.
+  const job = await db.jobs.get(jobId);
+  if (!job?.airtableId) {
+    return { reports: 0, durationMs: 0 };
+  }
+
+  // Build reverse-lookup maps: airtableId → local UUID.
+  const [employeeMap, equipmentMap, costCodeMap, subcontractorMap] = await Promise.all([
+    buildReverseMap('employees'),
+    buildReverseMap('equipment'),
+    buildReverseMap('costCodes'),
+    buildReverseMap('subcontractors'),
+  ]);
+
+  // Resolve an airtableId FK to a local UUID. Returns the raw value as
+  // fallback if no match (graceful degradation for unsynced references).
+  function resolve(map: Map<string, string>, airtableId: string | undefined): string {
+    if (!airtableId) return '';
+    return map.get(airtableId) ?? airtableId;
+  }
+
+  // 1. Fetch Daily Reports for this job.
+  const reportRecords = await fetchAllRecords(
+    'Daily Reports',
+    `{Job} = '${job.airtableId}'`
+  );
+
+  if (reportRecords.length === 0) {
+    return { reports: 0, durationMs: Math.round(performance.now() - start) };
+  }
+
+  // Existing local reports keyed by airtableId for UUID preservation.
+  const existingReports = await db.dailyReports.where('jobId').equals(jobId).toArray();
+  const reportByAirtableId = new Map(
+    existingReports.filter((r) => r.airtableId).map((r) => [r.airtableId!, r])
+  );
+
+  // Build a map from Airtable report ID → local report UUID (needed for children).
+  const reportAirtableToLocal = new Map<string, string>();
+
+  const reportsToUpsert: DailyReport[] = [];
+  for (const r of reportRecords) {
+    const prev = reportByAirtableId.get(r.id);
+    const localId = prev?.id ?? generateId();
+    reportAirtableToLocal.set(r.id, localId);
+
+    const date = str(r.fields, 'Date') || '';
+    const deadlines = date ? calculateDeadlines(date) : {
+      dailyDueBy: '', payrollWeekEnding: '', payrollDueBy: '',
+    };
+
+    reportsToUpsert.push({
+      id: localId,
+      airtableId: r.id,
+      jobId,
+      date,
+      dayOfWeek: str(r.fields, 'Day of Week') || '',
+      foremanId: resolve(employeeMap, str(r.fields, 'Foreman')),
+      weather: str(r.fields, 'Weather') as DailyReport['weather'],
+      comments: str(r.fields, 'Comments'),
+      status: (str(r.fields, 'Status') as DailyReport['status']) || 'Draft',
+      submittedAt: str(r.fields, 'Submitted At'),
+      signatureImage: str(r.fields, 'Signature'),
+      lastEditorId: resolve(employeeMap, str(r.fields, 'Foreman')),
+      editCount: prev?.editCount ?? 0,
+      dailyDueBy: deadlines.dailyDueBy,
+      isDailyLate: r.fields['Is Daily Late'] === true,
+      payrollWeekEnding: deadlines.payrollWeekEnding,
+      payrollDueBy: deadlines.payrollDueBy,
+      isPayrollLate: r.fields['Is Payroll Late'] === true,
+      syncStatus: 'synced',
+      createdAt: prev?.createdAt ?? now(),
+      updatedAt: now(),
+    });
+  }
+
+  await db.dailyReports.bulkPut(reportsToUpsert);
+
+  // 2. Fetch and upsert children for each report.
+  // We filter children by their 'Daily Report' FK which now contains
+  // the parent's airtableId (thanks to the upload change in step 1).
+  const reportAirtableIds = reportRecords.map((r) => r.id);
+
+  // Fetch ALL children in one pass per table (more efficient than per-report).
+  const [laborRecords, diaryRecords, subRecords, deliveryRecords] = await Promise.all([
+    fetchAllRecords('Labor Entries'),
+    fetchAllRecords('Job Diary Entries'),
+    fetchAllRecords('Subcontractor Work'),
+    fetchAllRecords('Materials Delivered'),
+  ]);
+
+  // Filter to only children of these reports + build local rows.
+  const reportIdSet = new Set(reportAirtableIds);
+
+  // --- Labor Entries ---
+  const existingLabor = await db.laborEntries.toArray();
+  const laborByAirtableId = new Map(
+    existingLabor.filter((e) => e.airtableId).map((e) => [e.airtableId!, e])
+  );
+  const laborToUpsert: LaborEntry[] = [];
+  for (const r of laborRecords) {
+    const parentAirtableId = str(r.fields, 'Daily Report');
+    if (!parentAirtableId || !reportIdSet.has(parentAirtableId)) continue;
+    const prev = laborByAirtableId.get(r.id);
+    laborToUpsert.push({
+      id: prev?.id ?? generateId(),
+      airtableId: r.id,
+      dailyReportId: reportAirtableToLocal.get(parentAirtableId) || '',
+      employeeId: resolve(employeeMap, str(r.fields, 'Employee')),
+      trade: (str(r.fields, 'Trade') || 'LB') as Trade,
+      stHours: num(r.fields, 'ST Hours') ?? 0,
+      otHours: num(r.fields, 'OT Hours') ?? 0,
+      equipmentId: resolve(equipmentMap, str(r.fields, 'Equipment')) || undefined,
+      rentalCompany: str(r.fields, 'Rental Company'),
+      equipmentDescription: undefined,
+      idleStHours: num(r.fields, 'Idle ST Hours') ?? 0,
+      idleOtHours: num(r.fields, 'Idle OT Hours') ?? 0,
+      downStHours: num(r.fields, 'Down ST Hours') ?? 0,
+      downOtHours: num(r.fields, 'Down OT Hours') ?? 0,
+      workStHours: num(r.fields, 'Work ST Hours') ?? 0,
+      workOtHours: num(r.fields, 'Work OT Hours') ?? 0,
+      costCodeHours: prev?.costCodeHours ?? {},
+    });
+  }
+  if (laborToUpsert.length > 0) await db.laborEntries.bulkPut(laborToUpsert);
+
+  // --- Job Diary Entries ---
+  const existingDiary = await db.jobDiaryEntries.toArray();
+  const diaryByAirtableId = new Map(
+    existingDiary.filter((e) => e.airtableId).map((e) => [e.airtableId!, e])
+  );
+  const diaryToUpsert: JobDiaryEntry[] = [];
+  for (const r of diaryRecords) {
+    const parentAirtableId = str(r.fields, 'Daily Report');
+    if (!parentAirtableId || !reportIdSet.has(parentAirtableId)) continue;
+    const prev = diaryByAirtableId.get(r.id);
+    diaryToUpsert.push({
+      id: prev?.id ?? generateId(),
+      airtableId: r.id,
+      dailyReportId: reportAirtableToLocal.get(parentAirtableId) || '',
+      entryText: str(r.fields, 'Entry Text') || '',
+      costCodeId: resolve(costCodeMap, str(r.fields, 'Cost Code')) || undefined,
+      itemNumber: num(r.fields, 'Item Number') ?? 0,
+    });
+  }
+  if (diaryToUpsert.length > 0) await db.jobDiaryEntries.bulkPut(diaryToUpsert);
+
+  // --- Subcontractor Work ---
+  const existingSubs = await db.subcontractorWork.toArray();
+  const subsByAirtableId = new Map(
+    existingSubs.filter((e) => e.airtableId).map((e) => [e.airtableId!, e])
+  );
+  const subsToUpsert: SubcontractorWork[] = [];
+  for (const r of subRecords) {
+    const parentAirtableId = str(r.fields, 'Daily Report');
+    if (!parentAirtableId || !reportIdSet.has(parentAirtableId)) continue;
+    const prev = subsByAirtableId.get(r.id);
+    subsToUpsert.push({
+      id: prev?.id ?? generateId(),
+      airtableId: r.id,
+      dailyReportId: reportAirtableToLocal.get(parentAirtableId) || '',
+      contractorId: resolve(subcontractorMap, str(r.fields, 'Contractor')),
+      itemsWorked: str(r.fields, 'Items Worked') || '',
+      production: str(r.fields, 'Production'),
+    });
+  }
+  if (subsToUpsert.length > 0) await db.subcontractorWork.bulkPut(subsToUpsert);
+
+  // --- Materials Delivered ---
+  const existingDeliveries = await db.materialsDelivered.toArray();
+  const deliveriesByAirtableId = new Map(
+    existingDeliveries.filter((e) => e.airtableId).map((e) => [e.airtableId!, e])
+  );
+  const deliveriesToUpsert: MaterialDelivered[] = [];
+  for (const r of deliveryRecords) {
+    const parentAirtableId = str(r.fields, 'Daily Report');
+    if (!parentAirtableId || !reportIdSet.has(parentAirtableId)) continue;
+    const prev = deliveriesByAirtableId.get(r.id);
+    deliveriesToUpsert.push({
+      id: prev?.id ?? generateId(),
+      airtableId: r.id,
+      dailyReportId: reportAirtableToLocal.get(parentAirtableId) || '',
+      supplier: str(r.fields, 'Supplier') || '',
+      material: str(r.fields, 'Material') || '',
+      quantity: str(r.fields, 'Quantity') || '',
+    });
+  }
+  if (deliveriesToUpsert.length > 0) await db.materialsDelivered.bulkPut(deliveriesToUpsert);
+
+  return {
+    reports: reportsToUpsert.length,
+    durationMs: Math.round(performance.now() - start),
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Master-table sync
+// ---------------------------------------------------------------------------
 
 type TableSyncResult = { pulled: number; upserted: number; skipped: boolean };
 

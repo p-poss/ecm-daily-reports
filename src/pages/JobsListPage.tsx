@@ -40,8 +40,7 @@ export function JobsListPage() {
       const reports = await db.dailyReports
         .where('jobId')
         .equals(job.id)
-        .filter((r) => r.foremanId === foreman.id)
-        .toArray();
+                .toArray();
 
       counts[job.id] = {
         total: reports.length,
@@ -59,8 +58,7 @@ export function JobsListPage() {
 
     const reports = await db.dailyReports
       .where('jobId').equals(jobId)
-      .filter((r) => r.foremanId === foreman.id)
-      .sortBy('date');
+            .sortBy('date');
 
     if (reports.length === 0) { pdfWindow?.close(); return; }
 
@@ -148,8 +146,7 @@ export function JobsListPage() {
 
     const reports = await db.dailyReports
       .where('jobId').equals(jobId)
-      .filter((r) => r.foremanId === foreman.id)
-      .sortBy('date');
+            .sortBy('date');
 
     const photos: GalleryPhoto[] = [];
     for (const report of reports) {

@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/db/database';
+import { syncReportsForJob } from '@/lib/airtable-sync';
 import { generateReportPDF, type ReportPDFData } from '@/lib/generate-report-pdf';
 import { PhotoGalleryModal, type GalleryPhoto } from '@/components/PhotoGalleryModal';
 import { useAuth } from '@/contexts/AuthContext';
@@ -38,19 +39,35 @@ export function ReportsListPage() {
     return db.jobs.get(selectedJobId);
   }, [selectedJobId]);
 
-  // Get all reports for this job
+  // Get all reports for this job (visible to everyone assigned, not just the creator)
   const reports = useLiveQuery(async () => {
     if (!selectedJobId || !foreman) return [];
 
     const allReports = await db.dailyReports
       .where('jobId')
       .equals(selectedJobId)
-      .filter((r) => r.foremanId === foreman.id)
       .toArray();
 
     // Sort by date descending (newest first)
     return allReports.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   }, [selectedJobId, foreman]);
+
+  // Employees for looking up foreman names on shared report cards
+  const employees = useLiveQuery(() => db.employees.toArray());
+
+  // Pull reports for this job from Airtable on mount so we see reports
+  // created by other foremen on other devices. Fire-and-forget — Dexie's
+  // reactive hooks pick up the new rows once they land.
+  useEffect(() => {
+    if (!selectedJobId) return;
+    syncReportsForJob(selectedJobId)
+      .then((r) => {
+        if (r.reports > 0) {
+          console.log(`[airtable-sync] pulled ${r.reports} reports for job, ${r.durationMs}ms`);
+        }
+      })
+      .catch((err) => console.error('[airtable-sync] report pull failed:', err));
+  }, [selectedJobId]);
 
   function formatDate(dateStr: string): string {
     return new Date(dateStr).toLocaleDateString('en-US', {
@@ -318,6 +335,16 @@ export function ReportsListPage() {
 
                   {/* Report Details */}
                   <div className="px-4 divide-y">
+                    {/* Creator — show who made/last edited this report */}
+                    {(() => {
+                      const creator = (employees || []).find((e) => e.id === report.foremanId);
+                      return creator ? (
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground py-2">
+                          <span>by {creator.name}</span>
+                        </div>
+                      ) : null;
+                    })()}
+
                     {/* Submitted Date */}
                     {report.submittedAt && (
                       <div className="flex items-center justify-between text-sm py-3">

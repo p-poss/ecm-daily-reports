@@ -272,13 +272,16 @@ export function DailyReportPage() {
           await db.tombstones.bulkDelete(tombstones.map((t) => t.id));
         }
 
-        // Parent report
+        // Parent report. FK fields use camelCase keys (jobId, foremanId)
+        // so resolveLinkedFields can find them, translate to airtableIds,
+        // and rename to the Airtable display name ('Job', 'Foreman').
+        // Non-FK fields use Title Case directly (passed through as-is).
         const reportOp = report.airtableId ? 'update' : 'create';
         await addToQueue('dailyReports', reportIdToSubmit, reportOp, {
-          'Job': report.jobId,
+          jobId: report.jobId,
+          foremanId: report.foremanId,
           'Date': report.date,
           'Day of Week': report.dayOfWeek,
-          'Foreman': report.foremanId,
           'Weather': report.weather,
           'Comments': report.comments,
           'Status': 'Submitted',
@@ -288,16 +291,20 @@ export function DailyReportPage() {
           'Is Payroll Late': report.isPayrollLate,
         });
 
-        // Child rows — use update if airtableId exists, else create.
+        // Child rows — FK fields as camelCase, non-FK as Title Case.
+        // The resolver translates dailyReportId → 'Daily Report',
+        // employeeId → 'Employee', etc. at sync time (lazy resolution).
+        // If the parent hasn't been synced yet, the resolver throws and
+        // the queue item gets retried once the parent has its airtableId.
         for (const entry of childLabor) {
           const op = entry.airtableId ? 'update' : 'create';
           await addToQueue('laborEntries', entry.id, op, {
-            'Daily Report': reportIdToSubmit,
-            'Employee': entry.employeeId,
+            dailyReportId: reportIdToSubmit,
+            employeeId: entry.employeeId,
+            equipmentId: entry.equipmentId,
             'Trade': entry.trade,
             'ST Hours': entry.stHours,
             'OT Hours': entry.otHours,
-            'Equipment': entry.equipmentId,
             'Rental Company': entry.rentalCompany,
             'Idle ST Hours': entry.idleStHours,
             'Idle OT Hours': entry.idleOtHours,
@@ -305,18 +312,15 @@ export function DailyReportPage() {
             'Down OT Hours': entry.downOtHours,
             'Work ST Hours': entry.workStHours,
             'Work OT Hours': entry.workOtHours,
-            // 'Cost Code Hours' intentionally omitted — Airtable can't
-            // store the per-cost-code-hours JSON object as a single
-            // field. TODO(tier-2): split into a junction table.
           });
         }
 
         for (const entry of childDiary) {
           const op = entry.airtableId ? 'update' : 'create';
           await addToQueue('jobDiaryEntries', entry.id, op, {
-            'Daily Report': reportIdToSubmit,
+            dailyReportId: reportIdToSubmit,
+            costCodeId: entry.costCodeId,
             'Entry Text': entry.entryText,
-            'Cost Code': entry.costCodeId,
             'Item Number': entry.itemNumber,
           });
         }
@@ -324,8 +328,8 @@ export function DailyReportPage() {
         for (const entry of childSubs) {
           const op = entry.airtableId ? 'update' : 'create';
           await addToQueue('subcontractorWork', entry.id, op, {
-            'Daily Report': reportIdToSubmit,
-            'Contractor': entry.contractorId,
+            dailyReportId: reportIdToSubmit,
+            contractorId: entry.contractorId,
             'Items Worked': entry.itemsWorked,
             'Production': entry.production,
           });
@@ -334,7 +338,7 @@ export function DailyReportPage() {
         for (const entry of childDeliveries) {
           const op = entry.airtableId ? 'update' : 'create';
           await addToQueue('materialsDelivered', entry.id, op, {
-            'Daily Report': reportIdToSubmit,
+            dailyReportId: reportIdToSubmit,
             'Supplier': entry.supplier,
             'Material': entry.material,
             'Quantity': entry.quantity,
