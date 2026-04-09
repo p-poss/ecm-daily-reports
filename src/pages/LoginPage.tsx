@@ -37,7 +37,7 @@ export function LoginPage({ loading = false }: LoginPageProps) {
   return (
     <div className="min-h-dvh flex items-center justify-center bg-background p-4 relative overflow-hidden">
       <BayerNoiseBackground className="absolute inset-0 w-full h-full" color={theme === 'dark' ? '#FFFFFF' : '#351F09'} />
-      <Card className="w-full max-w-md relative z-10 bg-card/60 backdrop-blur-md aspect-[3/4] md:aspect-[7/8] flex flex-col animate-in fade-in duration-300">
+      <Card className="w-full max-w-md relative z-10 bg-card/60 backdrop-blur-md aspect-[3/4] md:aspect-[7/8] flex flex-col">
         <CardHeader className="text-center">
           <svg viewBox="0 0 724 240" fill="none" xmlns="http://www.w3.org/2000/svg" onClick={toggleTheme} role="button" aria-label="Toggle theme" className="w-full mb-2 text-primary cursor-pointer">
             <path d="M84.0208 186V53.9952H218.592V86.4464H127.106V104.964H214.926V134.665H127.106V153.549H218.592V186H84.0208Z" fill="currentColor"/>
