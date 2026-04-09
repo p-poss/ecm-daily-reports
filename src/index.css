@@ -243,9 +243,10 @@ input[type="number"] {
      36px min-height gives 16px text comfortable room without looking
      cramped. Icon buttons are excluded so they stay square. */
   [data-slot="input"],
-  [data-slot="textarea"],
   [data-slot="select-trigger"],
-  [data-slot="button"]:not([data-size^="icon"]) {
+  [data-slot="button"]:not([data-size^="icon"]),
+  [data-slot="popover-trigger"],
+  [role="combobox"] {
     min-height: 36px !important;
   }
 }

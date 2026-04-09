@@ -71,7 +71,7 @@ export function Combobox({
       <BaseCombobox.InputGroup
         className={cn(
           'flex w-fit items-center justify-between gap-1.5 rounded-md border border-input bg-input/20 px-2 py-1.5 text-sm md:text-xs/relaxed transition-colors focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/30 dark:bg-input/30 dark:hover:bg-input/50',
-          size === 'default' ? 'h-7' : 'h-6',
+          size === 'default' ? 'h-9 md:h-7' : 'h-8 md:h-6',
           className
         )}
       >

@@ -133,7 +133,7 @@ function DiaryEntryForm({
       <Textarea
         value={entry.entryText}
         onChange={(e) => onUpdate({ entryText: e.target.value })}
-        placeholder="Describe work performed, conditions, or notes..."
+        placeholder="Add notes..."
         rows={3}
         className={cn('text-base resize-none', hl('entryText'))}
       />
