@@ -30,7 +30,7 @@ export function UpdateBanner() {
       <Card className="w-72 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
         <CardContent className="flex flex-col items-center gap-3 text-center">
           <RefreshCw className="w-5 h-5 text-muted-foreground" />
-          <p className="text-sm font-medium">Update available</p>
+          <p className="text-sm font-medium">A new version is available</p>
           <div className="flex gap-2 w-full">
             <Button
               variant="outline"
