@@ -49,7 +49,7 @@ function SplitHoursCell({
   onOtChange: (v: number) => void;
 }) {
   return (
-    <div className="flex items-center border border-input bg-input/20 rounded-md overflow-hidden h-7 w-[90px] mx-auto">
+    <div className="flex items-center border border-input bg-input/20 rounded-md overflow-hidden h-9 md:h-7 w-[90px] mx-auto">
       <Input
         type="number"
         min="0"
@@ -57,7 +57,7 @@ function SplitHoursCell({
         step="0.5"
         value={stValue || ''}
         onChange={(e) => onStChange(parseFloat(e.target.value) || 0)}
-        className="h-7 text-sm text-center flex-1 min-w-0 border-0 rounded-none bg-transparent focus-visible:ring-0 px-1"
+        className="h-9 md:h-7 text-sm text-center flex-1 min-w-0 border-0 rounded-none bg-transparent focus-visible:ring-0 px-1"
         placeholder="ST"
       />
       <div className="w-px h-full bg-border shrink-0" />
@@ -68,7 +68,7 @@ function SplitHoursCell({
         step="0.5"
         value={otValue || ''}
         onChange={(e) => onOtChange(parseFloat(e.target.value) || 0)}
-        className="h-7 text-sm text-center flex-1 min-w-0 border-0 rounded-none bg-transparent focus-visible:ring-0 px-1"
+        className="h-9 md:h-7 text-sm text-center flex-1 min-w-0 border-0 rounded-none bg-transparent focus-visible:ring-0 px-1"
         placeholder="OT"
       />
     </div>
