@@ -6,8 +6,13 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card';
 import { BayerNoiseBackground } from '@/components/BayerNoiseBackground';
+import { Loader } from 'lucide-react';
 
-export function LoginPage() {
+interface LoginPageProps {
+  loading?: boolean;
+}
+
+export function LoginPage({ loading = false }: LoginPageProps) {
   const { login } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const [email, setEmail] = useState('');
@@ -42,7 +47,7 @@ export function LoginPage() {
             <path d="M724 0H668C668 0 713.5 40 713.5 120C713.5 200 668 240 668 240H724V0Z" fill="currentColor"/>
           </svg>
 <CardDescription>
-            Daily Report Platform
+            {loading ? <span className="flex items-center justify-center gap-2"><Loader className="w-4 h-4 animate-spin" /> Loading...</span> : 'Daily Report Platform'}
           </CardDescription>
         </CardHeader>
         <CardContent className="flex-1 flex flex-col">
@@ -63,6 +68,7 @@ export function LoginPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   autoComplete="email"
+                  disabled={loading}
                 />
               </div>
 
@@ -75,13 +81,14 @@ export function LoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   autoComplete="current-password"
+                  disabled={loading}
                 />
               </div>
 
               <Button
                 type="submit"
                 className="w-full"
-                disabled={isSubmitting}
+                disabled={loading || isSubmitting}
               >
                 {isSubmitting ? 'Signing in...' : 'Sign In'}
               </Button>
