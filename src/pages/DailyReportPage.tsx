@@ -954,14 +954,14 @@ export function DailyReportPage() {
                     <Button
                       variant="outline"
                       className={cn(
-                        "w-full justify-between text-left font-normal text-sm md:text-xs/relaxed bg-input/20 border-input hover:bg-input/20 hover:text-current",
+                        "w-full justify-between text-left font-normal text-sm md:text-xs/relaxed bg-input/20 border-input hover:bg-input/20 hover:text-current overflow-hidden",
                         !date && "text-muted-foreground",
                         highlightedIds.has('__date__') && "ai-highlight"
                       )}
                       disabled={isEditing && existingReport?.status === 'Submitted'}
                     >
-                      <span className="flex items-center">
-                        <CalendarIcon className="mr-2 h-4 w-4" />
+                      <span className="flex items-center min-w-0 truncate">
+                        <CalendarIcon className="mr-2 h-4 w-4 shrink-0" />
                         {date ? (
                           <>
                             {format(new Date(date + 'T00:00:00'), "MM/dd/yyyy")} - {dayOfWeek}
