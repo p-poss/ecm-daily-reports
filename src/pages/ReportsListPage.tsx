@@ -468,58 +468,58 @@ export function ReportsListPage() {
                         <>
                           <Button
                             variant="outline"
-                            className="flex-1"
+                            className="flex-1 min-w-0 overflow-hidden"
                             onClick={() => handleViewPDF(report.id)}
                           >
-                            <File className="w-4 h-4 mr-1" />
-                            View PDF
+                            <File className="w-4 h-4 shrink-0" />
+                            <span className="truncate">PDF</span>
                           </Button>
                           <Button
                             variant="outline"
-                            className="flex-1"
+                            className="flex-1 min-w-0 overflow-hidden"
                             onClick={() => handleViewPhotos(report.id)}
                           >
-                            <Images className="w-4 h-4 mr-1" />
-                            Photos
+                            <Images className="w-4 h-4 shrink-0" />
+                            <span className="truncate">Photos</span>
                           </Button>
                           <Button
                             variant="outline"
-                            className="flex-1 btn-action"
+                            className="flex-1 min-w-0 overflow-hidden btn-action"
                             onClick={() => selectedJobId && navigateToReportForm(selectedJobId, report.id)}
                           >
-                            Edit
+                            <span className="truncate">Edit</span>
                           </Button>
                           <Button
-                            className="flex-1"
+                            className="flex-1 min-w-0 overflow-hidden"
                             onClick={() => selectedJobId && navigateToReportForm(selectedJobId, report.id)}
                           >
-                            Submit
+                            <span className="truncate">Submit</span>
                           </Button>
                         </>
                       ) : (
                         <>
                           <Button
                             variant="outline"
-                            className="flex-1"
+                            className="flex-1 min-w-0 overflow-hidden"
                             onClick={() => handleViewPDF(report.id)}
                           >
-                            <File className="w-4 h-4 mr-1" />
-                            View PDF
+                            <File className="w-4 h-4 shrink-0" />
+                            <span className="truncate">PDF</span>
                           </Button>
                           <Button
                             variant="outline"
-                            className="flex-1"
+                            className="flex-1 min-w-0 overflow-hidden"
                             onClick={() => handleViewPhotos(report.id)}
                           >
-                            <Images className="w-4 h-4 mr-1" />
-                            Photos
+                            <Images className="w-4 h-4 shrink-0" />
+                            <span className="truncate">Photos</span>
                           </Button>
                           <Button
                             variant="outline"
-                            className="flex-1 btn-action"
+                            className="flex-1 min-w-0 overflow-hidden btn-action"
                             onClick={() => selectedJobId && navigateToReportForm(selectedJobId, report.id)}
                           >
-                            Edit
+                            <span className="truncate">Edit</span>
                           </Button>
                           <div className="flex-1" />
                         </>
