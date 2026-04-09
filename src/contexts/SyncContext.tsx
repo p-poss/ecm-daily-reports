@@ -121,9 +121,7 @@ export function SyncProvider({ children }: { children: ReactNode }) {
     setSyncError(null);
 
     try {
-      // Get pending items ordered by creation time, skip items that have failed too many times
       const items = await db.syncQueue.orderBy('createdAt').toArray();
-      const retryableItems = items.filter(item => item.attempts < 5);
 
       // Remove items that have exceeded max retries
       const failedItems = items.filter(item => item.attempts >= 5);
@@ -132,13 +130,23 @@ export function SyncProvider({ children }: { children: ReactNode }) {
         await db.syncQueue.delete(item.id);
       }
 
+      // Exponential backoff: skip items whose wait period hasn't elapsed.
+      // Delays: 2s, 4s, 8s, 16s (attempts 0-3 after first failure).
+      const nowMs = Date.now();
+      const retryableItems = items
+        .filter(item => item.attempts < 5)
+        .filter(item => {
+          if (item.attempts === 0 || !item.lastAttempt) return true;
+          const backoffMs = Math.min(2000 * Math.pow(2, item.attempts - 1), 16_000);
+          const lastMs = new Date(item.lastAttempt).getTime();
+          return nowMs - lastMs >= backoffMs;
+        });
+
       for (const item of retryableItems) {
         try {
           await syncItem(item);
-          // Remove from queue on success
           await db.syncQueue.delete(item.id);
         } catch (error) {
-          // Update attempt count and error
           await db.syncQueue.update(item.id, {
             attempts: item.attempts + 1,
             lastAttempt: now(),

@@ -447,8 +447,6 @@ export function AIAssistant({ context, onToolCall, onBeforeToolCalls }: AIAssist
   const panelX = Math.max(EDGE_GAP, Math.min(position.x, window.innerWidth - Math.min(540, window.innerWidth - EDGE_GAP * 2) - EDGE_GAP));
   const panelY = Math.max(panelMinY, Math.min(position.y, panelMaxY));
 
-  const showPanel = isOpen && !isClosing;
-
   return (
     <>
       {/* FAB button — fades out when panel opens, fades in when closing */}
