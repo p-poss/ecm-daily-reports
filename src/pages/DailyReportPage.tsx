@@ -140,7 +140,7 @@ export function DailyReportPage() {
     return entries.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
   }, [existingReport, reportId]);
 
-  const [showHistory, setShowHistory] = useState(false);
+  const [showHistory, setShowHistory] = useState(true);
 
   async function handleRevert(snapshotJson: string) {
     if (!confirm('Revert this report to the selected version? Your current changes will be replaced.')) return;
