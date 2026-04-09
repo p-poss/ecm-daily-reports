@@ -168,12 +168,12 @@ export function LaborSection({ entries, onChange, dailyReportId, jobId, highligh
           <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground"><Sheet className="w-3 h-3" /></span>
           Labor + Equipment
           {entries.length > 0 && (
-            <span className="text-sm font-normal text-muted-foreground">
+            <span className="text-sm font-normal text-muted-foreground hidden md:inline">
               ({entries.length} row{entries.length !== 1 ? 's' : ''})
             </span>
           )}
         </h2>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 hidden md:flex">
           {entries.length > 0 && (
             <div className="text-sm text-muted-foreground mr-2">
               <span className="font-medium">{totalST}</span> ST / <span className="font-medium">{totalOT}</span> OT
