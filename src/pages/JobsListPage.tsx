@@ -235,14 +235,14 @@ export function JobsListPage() {
             </div>
           ) : null
         ) : jobs.length === 0 ? (
-          <div className="text-center text-muted-foreground animate-in fade-in duration-200">
+          <div className="text-center text-muted-foreground animate-in fade-in duration-300">
             <p>No jobs assigned to you.</p>
           </div>
         ) : (
           jobs?.map((job) => {
             const counts = reportCounts?.[job.id];
             return (
-              <Card key={job.id} className="overflow-hidden animate-in fade-in duration-200">
+              <Card key={job.id} className="overflow-hidden animate-in fade-in duration-300">
                 <CardContent className="p-0">
                   {/* Job Header */}
                   <div className="px-4 pb-4 border-b">

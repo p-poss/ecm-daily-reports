@@ -939,7 +939,7 @@ export function DailyReportPage() {
       {(selectedReportId && !isLoaded) ? (
         <main className="max-w-[82rem] mx-auto p-4 pb-24 pt-[200px]" />
       ) : (
-      <main className="max-w-[82rem] mx-auto p-4 pb-24 pt-[200px] animate-in fade-in duration-200">
+      <main className="max-w-[82rem] mx-auto p-4 pb-24 pt-[200px] animate-in fade-in duration-300">
         <Separator className="h-[2px] bg-primary" />
 
         {/* Date and Weather */}

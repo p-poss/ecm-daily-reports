@@ -322,7 +322,7 @@ export function ReportsListPage() {
             </div>
           ) : null
         ) : reports.length === 0 ? (
-          <div className="text-center text-sm text-muted-foreground animate-in fade-in duration-200">
+          <div className="text-center text-sm text-muted-foreground animate-in fade-in duration-300">
             <p>No reports yet for this job.</p>
           </div>
         ) : (
@@ -331,7 +331,7 @@ export function ReportsListPage() {
             const timeRemaining = report.status === 'Draft' ? getTimeRemaining(report.payrollDueBy) : null;
 
             return (
-              <Card key={report.id} className="overflow-hidden animate-in fade-in duration-200">
+              <Card key={report.id} className="overflow-hidden animate-in fade-in duration-300">
                 <CardContent className="p-0">
                   {/* Report Header */}
                   <div className="px-4 pb-4 border-b">
