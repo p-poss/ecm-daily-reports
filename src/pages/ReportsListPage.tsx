@@ -297,11 +297,11 @@ export function ReportsListPage() {
             <ArrowLeft className="w-5 h-5" />
             <span>Jobs</span>
           </Button>
-          <div className="flex-1 text-center">
+          <div className="flex-1 text-center min-w-0">
             {job ? (
               <>
                 <h1 className="text-sm md:text-lg font-bold text-foreground">{job.jobNumber}</h1>
-                <p className="text-sm text-muted-foreground">{job.jobName}</p>
+                <p className="text-sm text-muted-foreground truncate">{job.jobName}</p>
               </>
             ) : (
               <>

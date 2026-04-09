@@ -917,7 +917,7 @@ export function DailyReportPage() {
               {isEditing ? 'Edit Report' : 'New Report'}
             </h1>
             {job ? (
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-muted-foreground truncate">
                 {job.jobNumber} · {job.jobName}
               </p>
             ) : (
