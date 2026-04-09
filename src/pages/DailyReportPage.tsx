@@ -910,7 +910,7 @@ export function DailyReportPage() {
             className="flex items-center gap-2 absolute left-0"
           >
             <ArrowLeft className="w-5 h-5" />
-            <span>Reports</span>
+            <span className="md:hidden">Back</span><span className="hidden md:inline">Reports</span>
           </Button>
           <div className="flex-1 text-center min-w-0 px-[100px]">
             <h1 className="text-sm md:text-lg font-bold text-foreground">
