@@ -7,6 +7,7 @@ import { JobsListPage } from '@/pages/JobsListPage';
 import { ReportsListPage } from '@/pages/ReportsListPage';
 import { DailyReportPage } from '@/pages/DailyReportPage';
 import { useDelayedLoading } from '@/hooks/useDelayedLoading';
+import { UpdateBanner } from '@/components/UpdateBanner';
 
 function AppContent() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -39,6 +40,7 @@ function AppContent() {
 function App() {
   return (
     <ThemeProvider>
+      <UpdateBanner />
       <AuthProvider>
         <SyncProvider>
           <NavigationProvider>
