@@ -513,9 +513,9 @@ export function ReportsListPage() {
 
       {/* New Report Modal */}
       {showNewReportModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 p-4">
           <Card className="w-full max-w-md max-h-[80dvh] overflow-hidden flex flex-col">
-            <div className="flex items-center justify-between p-4 border-b">
+            <div className="flex items-center justify-between px-4 pt-4 pb-3 border-b">
               <h2 className="text-lg font-semibold">New Report</h2>
               <Button
                 variant="outline"
@@ -547,7 +547,7 @@ export function ReportsListPage() {
                     </div>
                     <div className="relative flex justify-center">
                       <span className="bg-card px-2 text-sm text-muted-foreground">
-                        or copy from previous
+                        or copy previous
                       </span>
                     </div>
                   </div>
@@ -566,7 +566,7 @@ export function ReportsListPage() {
                             </Badge>
                           </span>
                         }
-                        description={`${report.dayOfWeek} • Copy labor entries`}
+                        description="Copy all entries"
                         onClick={() => {
                           setShowNewReportModal(false);
                           selectedJobId && navigateToReportForm(selectedJobId, undefined, report.id);
