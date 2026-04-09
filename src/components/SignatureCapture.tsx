@@ -89,7 +89,7 @@ export function SignatureCapture({ value, onChange, disabled }: SignatureCapture
         {showImage ? (
           // Show saved signature
           <div className="space-y-2">
-            <div className="border rounded-s bg-white p-2">
+            <div className="border rounded-s bg-white overflow-hidden">
               <img src={value} alt="Signature" className="w-full h-32 object-contain object-center" />
             </div>
             <Button
