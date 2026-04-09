@@ -95,7 +95,7 @@ export function Combobox({
         <BaseCombobox.Positioner sideOffset={4} align={align} className="z-[60]">
           <BaseCombobox.Popup
             className={cn(
-              'max-h-[300px] min-w-(--anchor-width) max-w-[calc(100dvw-40px)] overflow-y-auto overscroll-contain rounded-lg bg-popover p-1 text-xs text-popover-foreground shadow-md ring-1 ring-foreground/10 outline-hidden',
+              'max-h-[300px] min-w-(--anchor-width) max-w-[calc(100dvw-47px)] overflow-y-auto overscroll-contain rounded-lg bg-popover p-1 text-xs text-popover-foreground shadow-md ring-1 ring-foreground/10 outline-hidden',
               'data-[starting-style]:opacity-0 data-[ending-style]:opacity-0',
               'transition-opacity duration-100'
             )}
