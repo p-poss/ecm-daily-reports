@@ -338,10 +338,12 @@ export async function syncReportsForJob(jobId: string): Promise<{ reports: numbe
     return map.get(airtableId) ?? airtableId;
   }
 
-  // 1. Fetch Daily Reports for this job.
+  // 1. Fetch Daily Reports for this job. With Linked Records, the
+  // formula {Job} returns the linked record's primary-field display
+  // value (Job Number), not the airtableId.
   const reportRecords = await fetchAllRecords(
     'Daily Reports',
-    `{Job} = '${job.airtableId}'`
+    `{Job} = '${job.jobNumber}'`
   );
 
   if (reportRecords.length === 0) {
@@ -374,13 +376,13 @@ export async function syncReportsForJob(jobId: string): Promise<{ reports: numbe
       jobId,
       date,
       dayOfWeek: str(r.fields, 'Day of Week') || '',
-      foremanId: resolve(employeeMap, str(r.fields, 'Foreman')),
+      foremanId: resolve(employeeMap, linkedId(r.fields, 'Foreman')),
       weather: str(r.fields, 'Weather') as DailyReport['weather'],
       comments: str(r.fields, 'Comments'),
       status: (str(r.fields, 'Status') as DailyReport['status']) || 'Draft',
       submittedAt: str(r.fields, 'Submitted At'),
       signatureImage: str(r.fields, 'Signature'),
-      lastEditorId: resolve(employeeMap, str(r.fields, 'Foreman')),
+      lastEditorId: resolve(employeeMap, linkedId(r.fields, 'Foreman')),
       editCount: prev?.editCount ?? 0,
       dailyDueBy: deadlines.dailyDueBy,
       isDailyLate: r.fields['Is Daily Late'] === true,
@@ -418,18 +420,18 @@ export async function syncReportsForJob(jobId: string): Promise<{ reports: numbe
   );
   const laborToUpsert: LaborEntry[] = [];
   for (const r of laborRecords) {
-    const parentAirtableId = str(r.fields, 'Daily Report');
+    const parentAirtableId = linkedId(r.fields, 'Daily Report');
     if (!parentAirtableId || !reportIdSet.has(parentAirtableId)) continue;
     const prev = laborByAirtableId.get(r.id);
     laborToUpsert.push({
       id: prev?.id ?? generateId(),
       airtableId: r.id,
       dailyReportId: reportAirtableToLocal.get(parentAirtableId) || '',
-      employeeId: resolve(employeeMap, str(r.fields, 'Employee')),
+      employeeId: resolve(employeeMap, linkedId(r.fields, 'Employee')),
       trade: (str(r.fields, 'Trade') || 'LB') as Trade,
       stHours: num(r.fields, 'ST Hours') ?? 0,
       otHours: num(r.fields, 'OT Hours') ?? 0,
-      equipmentId: resolve(equipmentMap, str(r.fields, 'Equipment')) || undefined,
+      equipmentId: resolve(equipmentMap, linkedId(r.fields, 'Equipment')) || undefined,
       rentalCompany: str(r.fields, 'Rental Company'),
       equipmentDescription: undefined,
       idleStHours: num(r.fields, 'Idle ST Hours') ?? 0,
@@ -450,7 +452,7 @@ export async function syncReportsForJob(jobId: string): Promise<{ reports: numbe
   );
   const diaryToUpsert: JobDiaryEntry[] = [];
   for (const r of diaryRecords) {
-    const parentAirtableId = str(r.fields, 'Daily Report');
+    const parentAirtableId = linkedId(r.fields, 'Daily Report');
     if (!parentAirtableId || !reportIdSet.has(parentAirtableId)) continue;
     const prev = diaryByAirtableId.get(r.id);
     diaryToUpsert.push({
@@ -458,7 +460,7 @@ export async function syncReportsForJob(jobId: string): Promise<{ reports: numbe
       airtableId: r.id,
       dailyReportId: reportAirtableToLocal.get(parentAirtableId) || '',
       entryText: str(r.fields, 'Entry Text') || '',
-      costCodeId: resolve(costCodeMap, str(r.fields, 'Cost Code')) || undefined,
+      costCodeId: resolve(costCodeMap, linkedId(r.fields, 'Cost Code')) || undefined,
       itemNumber: num(r.fields, 'Item Number') ?? 0,
     });
   }
@@ -471,14 +473,14 @@ export async function syncReportsForJob(jobId: string): Promise<{ reports: numbe
   );
   const subsToUpsert: SubcontractorWork[] = [];
   for (const r of subRecords) {
-    const parentAirtableId = str(r.fields, 'Daily Report');
+    const parentAirtableId = linkedId(r.fields, 'Daily Report');
     if (!parentAirtableId || !reportIdSet.has(parentAirtableId)) continue;
     const prev = subsByAirtableId.get(r.id);
     subsToUpsert.push({
       id: prev?.id ?? generateId(),
       airtableId: r.id,
       dailyReportId: reportAirtableToLocal.get(parentAirtableId) || '',
-      contractorId: resolve(subcontractorMap, str(r.fields, 'Contractor')),
+      contractorId: resolve(subcontractorMap, linkedId(r.fields, 'Contractor')),
       itemsWorked: str(r.fields, 'Items Worked') || '',
       production: str(r.fields, 'Production'),
     });
@@ -492,7 +494,7 @@ export async function syncReportsForJob(jobId: string): Promise<{ reports: numbe
   );
   const deliveriesToUpsert: MaterialDelivered[] = [];
   for (const r of deliveryRecords) {
-    const parentAirtableId = str(r.fields, 'Daily Report');
+    const parentAirtableId = linkedId(r.fields, 'Daily Report');
     if (!parentAirtableId || !reportIdSet.has(parentAirtableId)) continue;
     const prev = deliveriesByAirtableId.get(r.id);
     deliveriesToUpsert.push({

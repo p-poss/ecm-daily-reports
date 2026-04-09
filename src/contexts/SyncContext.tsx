@@ -256,9 +256,8 @@ export function SyncProvider({ children }: { children: ReactNode }) {
           `${spec.localTable} record ${localId} has no airtableId yet`
         );
       }
-      // Send as a plain string for text-typed FK fields. When we
-      // convert to real Linked Records this becomes [linked.airtableId].
-      out[spec.airtableField] = linked.airtableId;
+      // Linked Record fields expect an array of airtable record IDs.
+      out[spec.airtableField] = [linked.airtableId];
     }
     return out;
   }
