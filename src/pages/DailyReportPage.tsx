@@ -954,7 +954,7 @@ export function DailyReportPage() {
                     <Button
                       variant="outline"
                       className={cn(
-                        "w-full justify-between text-left font-normal text-sm md:text-xs/relaxed bg-input/20 border-input hover:bg-input/20 hover:text-current overflow-hidden",
+                        "w-full justify-between text-left font-normal text-base md:text-xs/relaxed bg-input/20 border-input hover:bg-input/20 hover:text-current overflow-hidden",
                         !date && "text-muted-foreground",
                         highlightedIds.has('__date__') && "ai-highlight"
                       )}
