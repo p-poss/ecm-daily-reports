@@ -256,7 +256,7 @@ export function LaborSection({ entries, onChange, dailyReportId, jobId, highligh
 
                 {/* Column headers row */}
                 <tr className="border-b border-b-border">
-                  <th className="text-left p-2 pl-4 font-medium text-muted-foreground text-xs min-w-[170px] sticky left-0 z-[1] bg-card shadow-[inset_-2px_0_0_0_var(--border)]">Employee</th>
+                  <th className="text-left p-2 pl-4 font-medium text-muted-foreground text-xs w-[170px] min-w-[170px] max-w-[170px] sticky left-0 z-[1] bg-card shadow-[inset_-2px_0_0_0_var(--border)]">Employee</th>
                   <th className="text-left p-2 font-medium text-muted-foreground text-xs">Trade</th>
                   <th className="text-center p-2 font-medium text-muted-foreground text-xs border-r border-r-border min-w-[90px]">
                     ST / OT
