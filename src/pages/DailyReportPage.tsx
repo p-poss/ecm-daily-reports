@@ -184,16 +184,14 @@ export function DailyReportPage() {
       setQuiet('weather', existingReport.weather);
       setQuiet('comments', existingReport.comments || '');
       setQuiet('signature', existingReport.signatureImage || '');
-      loadReportData(existingReport.id);
-      setIsLoaded(true);
+      loadReportData(existingReport.id).then(() => setIsLoaded(true));
     }
   }, [existingReport, isLoaded]);
 
   // Copy from previous report
   useEffect(() => {
     if (copyFromReportId && !isLoaded && !selectedReportId) {
-      copyFromPreviousReport(copyFromReportId);
-      setIsLoaded(true);
+      copyFromPreviousReport(copyFromReportId).then(() => setIsLoaded(true));
     }
   }, [copyFromReportId, isLoaded, selectedReportId]);
 
