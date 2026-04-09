@@ -408,7 +408,7 @@ export function ReportsListPage() {
                     )}
 
                     {/* Revised Date — only if updated after submission */}
-                    {report.submittedAt && report.updatedAt && new Date(report.updatedAt) > new Date(report.submittedAt) && (
+                    {report.submittedAt && report.updatedAt && report.editCount > 1 && (
                       <div className="flex items-center justify-between text-sm py-3">
                         <span className="flex items-center gap-2 text-muted-foreground">
                           <PenLine className="w-4 h-4" />
