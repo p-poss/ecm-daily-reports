@@ -32,7 +32,7 @@ export function LoginPage() {
   return (
     <div className="min-h-dvh flex items-start justify-center bg-background p-4 pt-[15vh] relative overflow-hidden">
       <BayerNoiseBackground className="absolute inset-0 w-full h-full" color={theme === 'dark' ? '#FFFFFF' : '#351F09'} />
-      <Card className="w-full max-w-md relative z-10 bg-card/60 backdrop-blur-md">
+      <Card className="w-full max-w-md relative z-10 bg-card/60 backdrop-blur-md aspect-[7/8] flex flex-col">
         <CardHeader className="text-center">
           <svg viewBox="0 0 724 240" fill="none" xmlns="http://www.w3.org/2000/svg" onClick={toggleTheme} role="button" aria-label="Toggle theme" className="w-full mb-2 text-primary cursor-pointer">
             <path d="M84.0208 186V53.9952H218.592V86.4464H127.106V104.964H214.926V134.665H127.106V153.549H218.592V186H84.0208Z" fill="currentColor"/>
@@ -45,47 +45,49 @@ export function LoginPage() {
             Daily Report Platform
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {error && (
-              <div className="p-3 text-sm text-destructive bg-destructive/10 rounded-md border border-destructive/20">
-                {error}
+        <CardContent className="flex-1 flex flex-col">
+          <form onSubmit={handleSubmit} className="flex flex-col flex-1">
+            <div className="space-y-4">
+              {error && (
+                <div className="p-3 text-sm text-destructive bg-destructive/10 rounded-md border border-destructive/20">
+                  {error}
+                </div>
+              )}
+
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  autoComplete="email"
+                />
               </div>
-            )}
 
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                autoComplete="email"
-              />
+              <div className="space-y-2">
+                <Label htmlFor="password">Password</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  autoComplete="current-password"
+                />
+              </div>
+
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? 'Signing in...' : 'Sign In'}
+              </Button>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                autoComplete="current-password"
-              />
-            </div>
-
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? 'Signing in...' : 'Sign In'}
-            </Button>
-
-            <div className="pt-[20px] mt-[90px] border-t text-center text-xs text-muted-foreground">
+            <div className="pt-[20px] mt-auto border-t text-center text-xs text-muted-foreground">
               <p className="mb-1">For assistance, contact the office:</p>
               <p>
                 <a href="tel:+17148974326" className="text-primary hover:underline">+1 (714) 897-4326</a>
