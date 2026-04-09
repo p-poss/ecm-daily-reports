@@ -193,7 +193,7 @@ export function LaborSection({ entries, onChange, dailyReportId, jobId, highligh
         /* Table View - PDF-matching layout */
         <Card className="overflow-hidden p-0">
           <div className="overflow-x-auto">
-            <table className="w-full text-sm border-collapse">
+            <table className="w-full text-sm border-collapse table-fixed">
               {/* Description row above cost code headers */}
               <thead>
                 {/* Top row: section labels + cost code descriptions.
@@ -203,7 +203,7 @@ export function LaborSection({ entries, onChange, dailyReportId, jobId, highligh
                     cause a layout shift when columns are added/removed. */}
                 <tr className="border-b border-b-border">
                   {/* Employee column spacer */}
-                  <th className="p-2 pl-4 pt-4 sticky left-0 z-[1] bg-card shadow-[inset_-2px_0_0_0_var(--border)]">
+                  <th className="p-2 pl-4 pt-4 w-[170px] min-w-[170px] max-w-[170px] sticky left-0 z-[1] bg-card shadow-[inset_-2px_0_0_0_var(--border)]">
                     <div className="h-5" />
                   </th>
                   {/* LABOR section header */}
@@ -280,7 +280,7 @@ export function LaborSection({ entries, onChange, dailyReportId, jobId, highligh
 
                 {/* ST|OT sub-header row */}
                 <tr className="border-b border-b-border">
-                  <th className="p-0 pl-4 sticky left-0 z-[1] bg-card shadow-[inset_-2px_0_0_0_var(--border)]"></th>
+                  <th className="p-0 pl-4 w-[170px] min-w-[170px] max-w-[170px] sticky left-0 z-[1] bg-card shadow-[inset_-2px_0_0_0_var(--border)]"></th>
                   <th className="p-0"></th>
                   <th className="p-0 border-r border-r-border"><SplitHeaderLabel /></th>
                   <th className="p-0"></th>
@@ -311,7 +311,7 @@ export function LaborSection({ entries, onChange, dailyReportId, jobId, highligh
                 ))}
                 {/* Totals Row */}
                 <tr className="border-t-2 border-t-border font-medium">
-                  <td className="p-2 pl-4 pb-4 sticky left-0 z-[1] bg-card shadow-[inset_-2px_0_0_0_var(--border)]"></td>
+                  <td className="p-2 pl-4 pb-4 w-[170px] min-w-[170px] max-w-[170px] sticky left-0 z-[1] bg-card shadow-[inset_-2px_0_0_0_var(--border)]"></td>
                   <td className="p-2 pb-4">Totals</td>
                   <td className="p-2 pb-4 border-r border-r-border">
                     <div className="flex items-center justify-center w-[90px] mx-auto text-xs">
@@ -414,7 +414,7 @@ function TableRow({
   return (
     <tr className={`border-b border-b-border ${highlighted ? 'ai-highlight' : ''}`}>
       {/* Employee */}
-      <td className="p-2 pl-4 sticky left-0 z-[1] bg-card shadow-[inset_-2px_0_0_0_var(--border)]">
+      <td className="p-2 pl-4 w-[170px] min-w-[170px] max-w-[170px] sticky left-0 z-[1] bg-card shadow-[inset_-2px_0_0_0_var(--border)]">
         <Combobox
           className="h-8 text-sm w-full"
           value={entry.employeeId || ''}
