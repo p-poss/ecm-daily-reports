@@ -302,7 +302,7 @@ export function ReportsListPage() {
             <span>Jobs</span>
           </Button>
           <div className="flex-1 text-center min-w-0 px-[100px] pt-2 md:pt-0">
-            <h1 className="text-sm md:text-lg font-bold text-foreground">{job?.jobNumber || '\u00A0'}</h1>
+            <h1 className="text-sm md:text-lg font-bold text-foreground">{job?.jobNumber || selectedJobLabel?.split(' · ')[0] || '\u00A0'}</h1>
             <p className="text-sm text-muted-foreground truncate">{job?.jobName || selectedJobLabel?.split(' · ')[1] || '\u00A0'}</p>
           </div>
           <div className="flex items-center gap-3 absolute right-0">
@@ -498,15 +498,17 @@ export function ReportsListPage() {
             );
           })
         )}
-        {/* Create New Report Button */}
-        <Button
-          variant="outline"
-          className="w-full btn-action"
-          onClick={() => setShowNewReportModal(true)}
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          Create New Report
-        </Button>
+        {/* Create New Report Button — only show after reports have loaded */}
+        {reports !== undefined && (
+          <Button
+            variant="outline"
+            className="w-full btn-action animate-in fade-in duration-300"
+            onClick={() => setShowNewReportModal(true)}
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Create New Report
+          </Button>
+        )}
       </main>
 
       {/* New Report Modal */}
