@@ -402,10 +402,12 @@ export function DailyReportPage() {
         // the queue item gets retried once the parent has its airtableId.
         for (const entry of childLabor) {
           const op = entry.airtableId ? 'update' : 'create';
+          const empName = employees?.find((e) => e.id === entry.employeeId)?.name || '';
           await addToQueue('laborEntries', entry.id, op, {
             dailyReportId: reportIdToSubmit,
             employeeId: entry.employeeId,
             equipmentId: entry.equipmentId,
+            'Cost Codes': `${empName} - ${entry.stHours}ST/${entry.otHours}OT`,
             'Trade': entry.trade,
             'ST Hours': entry.stHours,
             'OT Hours': entry.otHours,
@@ -428,9 +430,13 @@ export function DailyReportPage() {
           : [];
         for (const row of childCCHours) {
           const op = row.airtableId ? 'update' : 'create';
+          const laborEntry = childLabor.find((e) => e.id === row.laborEntryId);
+          const empName = laborEntry ? employees?.find((e) => e.id === laborEntry.employeeId)?.name || '' : '';
+          const ccCode = costCodes?.find((c) => c.id === row.costCodeId)?.code || '';
           await addToQueue('laborCostCodeHours', row.id, op, {
             laborEntryId: row.laborEntryId,
             costCodeId: row.costCodeId,
+            'Name': `${empName} - ${ccCode} - ${row.stHours}ST/${row.otHours}OT`,
             'ST Hours': row.stHours,
             'OT Hours': row.otHours,
           });
@@ -490,6 +496,7 @@ export function DailyReportPage() {
           await addToQueue('editHistory', historyEntry.id, 'create', {
             dailyReportId: reportIdToSubmit,
             editorId: foreman.id,
+            'Daily Report (old)': `${foreman.name} - ${new Date(historyEntry.timestamp).toLocaleString()}`,
             'Timestamp': historyEntry.timestamp,
             'Changes': changes.map((c) =>
               c.oldValue != null && c.newValue != null
