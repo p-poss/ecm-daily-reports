@@ -203,7 +203,7 @@ export function LaborSection({ entries, onChange, dailyReportId, jobId, highligh
                     cause a layout shift when columns are added/removed. */}
                 <tr className="border-b border-b-border">
                   {/* Employee column spacer */}
-                  <th className="p-2 pl-4 pt-4 w-[170px] min-w-[170px] max-w-[170px] sticky left-0 z-[1] bg-card shadow-[inset_-2px_0_0_0_var(--border)]">
+                  <th className="p-2 pl-4 pt-4 w-[160px] min-w-[160px] max-w-[160px] sticky left-0 z-[1] bg-card shadow-[inset_-2px_0_0_0_var(--border)]">
                     <div className="h-5" />
                   </th>
                   {/* LABOR section header */}
@@ -237,7 +237,7 @@ export function LaborSection({ entries, onChange, dailyReportId, jobId, highligh
                     );
                   })}
                   {/* Add cost code column button */}
-                  <th rowSpan={3} colSpan={2} className="p-1 pl-2 pr-4 pt-4 align-top w-[170px] min-w-[170px] max-w-[170px]">
+                  <th rowSpan={3} colSpan={2} className="p-1 pl-2 pr-4 pt-4 align-top w-[160px] min-w-[160px] max-w-[160px]">
                     <Combobox
                       className="h-9 md:h-8 text-xs w-full"
                       value=""
@@ -256,7 +256,7 @@ export function LaborSection({ entries, onChange, dailyReportId, jobId, highligh
 
                 {/* Column headers row */}
                 <tr className="border-b border-b-border">
-                  <th className="text-left p-2 pl-4 font-medium text-muted-foreground text-xs w-[170px] min-w-[170px] max-w-[170px] sticky left-0 z-[1] bg-card shadow-[inset_-2px_0_0_0_var(--border)]">Employee</th>
+                  <th className="text-left p-2 pl-4 font-medium text-muted-foreground text-xs w-[160px] min-w-[160px] max-w-[160px] sticky left-0 z-[1] bg-card shadow-[inset_-2px_0_0_0_var(--border)]">Employee</th>
                   <th className="text-left p-2 font-medium text-muted-foreground text-xs">Trade</th>
                   <th className="text-center p-2 font-medium text-muted-foreground text-xs border-r border-r-border min-w-[90px]">
                     ST / OT
@@ -280,7 +280,7 @@ export function LaborSection({ entries, onChange, dailyReportId, jobId, highligh
 
                 {/* ST|OT sub-header row */}
                 <tr className="border-b border-b-border">
-                  <th className="p-0 pl-4 w-[170px] min-w-[170px] max-w-[170px] sticky left-0 z-[1] bg-card shadow-[inset_-2px_0_0_0_var(--border)]"></th>
+                  <th className="p-0 pl-4 w-[160px] min-w-[160px] max-w-[160px] sticky left-0 z-[1] bg-card shadow-[inset_-2px_0_0_0_var(--border)]"></th>
                   <th className="p-0"></th>
                   <th className="p-0 border-r border-r-border"><SplitHeaderLabel /></th>
                   <th className="p-0"></th>
@@ -311,7 +311,7 @@ export function LaborSection({ entries, onChange, dailyReportId, jobId, highligh
                 ))}
                 {/* Totals Row */}
                 <tr className="border-t-2 border-t-border font-medium">
-                  <td className="p-2 pl-4 pb-4 w-[170px] min-w-[170px] max-w-[170px] sticky left-0 z-[1] bg-card shadow-[inset_-2px_0_0_0_var(--border)]"></td>
+                  <td className="p-2 pl-4 pb-4 w-[160px] min-w-[160px] max-w-[160px] sticky left-0 z-[1] bg-card shadow-[inset_-2px_0_0_0_var(--border)]"></td>
                   <td className="p-2 pb-4">Totals</td>
                   <td className="p-2 pb-4 border-r border-r-border">
                     <div className="flex items-center justify-center w-[90px] mx-auto text-xs">
@@ -414,7 +414,7 @@ function TableRow({
   return (
     <tr className={`border-b border-b-border ${highlighted ? 'ai-highlight' : ''}`}>
       {/* Employee */}
-      <td className="p-2 pl-4 w-[170px] min-w-[170px] max-w-[170px] sticky left-0 z-[1] bg-card shadow-[inset_-2px_0_0_0_var(--border)]">
+      <td className="p-2 pl-4 w-[160px] min-w-[160px] max-w-[160px] sticky left-0 z-[1] bg-card shadow-[inset_-2px_0_0_0_var(--border)]">
         <Combobox
           className="h-8 text-sm w-full"
           value={entry.employeeId || ''}
