@@ -847,6 +847,19 @@ export function DailyReportPage() {
         setQuiet('laborEntries', laborEntries.filter((_, i) => i !== idx));
         break;
       }
+      case 'set_cost_code_hours': {
+        const ccIdx = input.laborEntryIndex as number;
+        const ccId = resolveCostCodeId(input.costCodeId);
+        if (ccId != null && laborEntries[ccIdx]) {
+          const updated = [...laborEntries];
+          const newHours = { ...updated[ccIdx].costCodeHours };
+          newHours[ccId] = { st: (input.stHours as number) || 0, ot: (input.otHours as number) || 0 };
+          updated[ccIdx] = { ...updated[ccIdx], costCodeHours: newHours };
+          setQuiet('laborEntries', updated);
+          addHighlight(updated[ccIdx].id);
+        }
+        break;
+      }
       case 'add_diary_entry': {
         const newEntry: JobDiaryEntry = {
           id: generateId(),

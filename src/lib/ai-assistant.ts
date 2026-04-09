@@ -200,6 +200,20 @@ export const assistantTools = [
     },
   },
   {
+    name: 'set_cost_code_hours',
+    description: 'Set ST/OT hours for a specific cost code on a labor entry. This allocates a portion of the employee\'s daily hours to that cost code.',
+    input_schema: {
+      type: 'object' as const,
+      properties: {
+        laborEntryIndex: { type: 'number', description: '0-based index of the labor entry' },
+        costCodeId: { type: 'string', description: 'Cost code number (e.g. "1100") from Available Cost Codes' },
+        stHours: { type: 'number', description: 'Straight time hours to allocate' },
+        otHours: { type: 'number', description: 'Overtime hours to allocate (default 0)' },
+      },
+      required: ['laborEntryIndex', 'costCodeId', 'stHours'],
+    },
+  },
+  {
     name: 'set_photo_caption',
     description: 'Set or update the caption on a photo by index (0-based). The foreman takes photos via the camera UI; the assistant can only edit captions, not add or remove photos.',
     input_schema: {
@@ -353,7 +367,7 @@ export async function sendMessage(
 
   while (true) {
     const response = await callClaude({
-      model: 'claude-sonnet-4-20250514',
+      model: 'claude-sonnet-4-6-20250514',
       max_tokens: 1024,
       system: buildSystemPrompt(context),
       tools: assistantTools,
