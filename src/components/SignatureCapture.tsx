@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, useCallback } from 'react';
 import SignatureCanvas from 'react-signature-canvas';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -12,6 +12,8 @@ interface SignatureCaptureProps {
 
 export function SignatureCapture({ value, onChange, disabled }: SignatureCaptureProps) {
   const signatureRef = useRef<SignatureCanvas>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isSigning, setIsSigning] = useState(false);
   const [isEmpty, setIsEmpty] = useState(!value);
 
   // Sync internal state when value changes externally (e.g. undo)
@@ -23,6 +25,27 @@ export function SignatureCapture({ value, onChange, disabled }: SignatureCapture
       setIsEmpty(false);
     }
   }, [value]);
+
+  // Redraw the canvas from the saved value after resize. HTML canvas
+  // clears itself whenever its pixel dimensions change, so we need to
+  // restore the content from the data URL.
+  const redrawFromValue = useCallback(() => {
+    if (!signatureRef.current || !value) return;
+    // Small delay to let the canvas dimensions settle after resize
+    setTimeout(() => {
+      signatureRef.current?.fromDataURL(value, {
+        width: containerRef.current?.clientWidth || 300,
+        height: 128,
+      });
+    }, 50);
+  }, [value]);
+
+  useEffect(() => {
+    if (!isSigning || !containerRef.current) return;
+    const ro = new ResizeObserver(() => redrawFromValue());
+    ro.observe(containerRef.current);
+    return () => ro.disconnect();
+  }, [isSigning, redrawFromValue]);
 
   function handleClear() {
     signatureRef.current?.clear();
@@ -38,6 +61,23 @@ export function SignatureCapture({ value, onChange, disabled }: SignatureCapture
     }
   }
 
+  function handleResign() {
+    setIsSigning(true);
+    onChange('');
+  }
+
+  function handleDoneSigning() {
+    if (signatureRef.current && !signatureRef.current.isEmpty()) {
+      const dataUrl = signatureRef.current.toDataURL('image/png');
+      onChange(dataUrl);
+    }
+    setIsSigning(false);
+  }
+
+  // Show the saved signature image when we have a value and aren't
+  // actively signing. Otherwise show the canvas.
+  const showImage = !!value && !isSigning;
+
   return (
     <div className="space-y-[20px]">
       <h2 className="text-lg font-semibold flex items-center gap-2 px-4 text-primary">
@@ -46,7 +86,7 @@ export function SignatureCapture({ value, onChange, disabled }: SignatureCapture
       </h2>
       <Card>
         <CardContent className="space-y-3">
-        {value && !signatureRef.current ? (
+        {showImage ? (
           // Show saved signature
           <div className="space-y-2">
             <div className="border rounded-s bg-white p-2">
@@ -56,7 +96,7 @@ export function SignatureCapture({ value, onChange, disabled }: SignatureCapture
               type="button"
               variant="outline"
               className="w-full"
-              onClick={() => onChange('')}
+              onClick={handleResign}
               disabled={disabled}
             >
               <RotateCcw className="w-4 h-4 mr-2" />
@@ -66,7 +106,7 @@ export function SignatureCapture({ value, onChange, disabled }: SignatureCapture
         ) : (
           // Signature canvas
           <>
-            <div className="border rounded-s bg-white overflow-hidden touch-none">
+            <div ref={containerRef} className="border rounded-s bg-white overflow-hidden touch-none">
               <SignatureCanvas
                 ref={signatureRef}
                 canvasProps={{
@@ -90,10 +130,15 @@ export function SignatureCapture({ value, onChange, disabled }: SignatureCapture
                 Clear
               </Button>
               {!isEmpty && (
-                <div className="flex items-center text-xs text-green-600">
-                  <Check className="w-4 h-4 mr-1" />
-                  Signed
-                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="flex-1"
+                  onClick={handleDoneSigning}
+                >
+                  <Check className="w-4 h-4 mr-2" />
+                  Done
+                </Button>
               )}
             </div>
           </>
