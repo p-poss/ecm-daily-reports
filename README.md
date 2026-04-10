@@ -16,9 +16,7 @@ Replacing handwritten paper forms with an offline-first mobile application that 
 
 For 30+ years, paper daily reports made sense — the cost of building and maintaining digital systems wasn't worth it for a company this size. You'd need developers, servers, IT staff — the paper worked.
 
-But AI changes the math. It's not just about efficiency anymore — it's about integrated systems that can talk to each other. Companies with structured data will have AI agents handling cost forecasting, catching invoice discrepancies, and optimizing bids. Paper forms are a dead end — decades of operational data locked in filing cabinets, completely invisible to AI.
-
-Every day, foremen fill out reports tracking labor hours, equipment usage, cost code allocations, subcontractor work, materials delivered, and job diary entries — all by hand.
+But AI changes the math. It's not just about efficiency anymore — it's about integrated systems that can talk to each other. Companies with structured data will have AI agents handling cost forecasting, catching invoice discrepancies, and optimizing bids. Every day, foremen fill out reports tracking labor hours, equipment usage, cost code allocations, subcontractor work, materials delivered, and job diary entries — all by hand, on paper.
 
 <p align="center">
   <img src="problem-readme.png" alt="Paper daily report form" width="600" />
