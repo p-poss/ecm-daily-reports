@@ -188,5 +188,5 @@ ANTHROPIC_API_KEY=your_anthropic_api_key  # Server-side only (Vercel)
 ---
 
 <p align="center">
-  <img src="public/ECM-LOGO.svg" alt="ECM" width="100%" />
+  <img src="ecm-logo-readme.svg" alt="ECM" width="100%" />
 </p>
