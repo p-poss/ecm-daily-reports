@@ -22,11 +22,11 @@ This app is the first step in a broader AI integration strategy for construction
 
 **Today** -- An embedded AI assistant (Claude 4.6 Sonnet) helps foremen fill out reports faster using natural language and voice input. It understands the form context and uses tool calls to populate labor entries, cost codes, diary notes, and more.
 
-**Near-term** -- With structured daily report data flowing into Airtable, the next layer is automated insights: cost code budget burn-rate alerts, labor productivity trends across jobs, weather-adjusted scheduling recommendations, and anomaly detection (e.g., flagging unusually high equipment idle hours).
+**Near-term** -- With structured, higher-quality daily report data flowing into Airtable, the next layer is automated insights: cost code budget burn-rate alerts, labor productivity trends across jobs, weather-adjusted scheduling recommendations, and anomaly detection (e.g., flagging unusually high equipment idle hours).
 
-**Long-term** -- The data pipeline this app establishes feeds into predictive models for project cost forecasting, resource allocation optimization, and automated compliance reporting. Every report submitted today trains the dataset that makes tomorrow's AI tools more accurate.
+**Long-term** -- The data pipeline this app establishes feeds into predictive models for project cost forecasting, resource allocation optimization, job bidding, and automated compliance reporting. Every report submitted builds the dataset that gives future ECM AI agents greater context and accuracy.
 
-The key insight: **AI in construction doesn't start with models -- it starts with data capture.** Paper forms are a dead end. This app turns every foreman's daily routine into a structured data stream that compounds in value over time.
+**The bigger picture** -- Industries that have been slow to digitize can't benefit from AI without first building the digital infrastructure to give it context. Earthwork construction is one of these industries — and this app is the bridge. It meets foremen where they are, replaces a familiar paper workflow with something faster, and quietly builds the structured dataset and integrated system that makes every future AI capability possible.
 
 ---
 
