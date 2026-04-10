@@ -2,6 +2,10 @@
 
 A Progressive Web App for construction field crews to digitize superintendent daily reports. Built for **ECM (Earth Construction Mining)**, replacing handwritten paper forms with an offline-first mobile application that syncs to Airtable for office review and payroll processing. Part of a broader AI adoption strategy — digitizing field data to create the structured foundation for predictive analytics, cost forecasting, and automated compliance reporting.
 
+<p align="center">
+  <img src="demo.gif" alt="ECM Daily Reports - Login Screen" width="400" />
+</p>
+
 ## The Problem
 
 Construction foremen fill out daily reports on paper forms tracking labor hours, equipment usage, cost code allocations, subcontractor work, materials delivered, and job diary entries. These forms are error-prone, hard to read, and require manual collection + data entry into payroll systems. Reports must be submitted daily by 5pm the next day, with payroll summaries due Monday at noon.
