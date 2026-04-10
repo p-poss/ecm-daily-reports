@@ -18,6 +18,8 @@ Construction foremen fill out daily reports on paper forms tracking labor hours,
 
 A mobile-first PWA that works offline in remote job sites, syncs automatically when connectivity returns, and structures data for direct export to payroll software.
 
+**[Live Demo](https://ecm-jobs.vercel.app/)**
+
 ---
 
 ## AI Adoption Strategy
