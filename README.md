@@ -2,7 +2,7 @@
 
 <img src="divider.svg" width="100%" />
 
-# ECM  Daily Report Platform
+# ECM - Daily Report Platform
 
 A Progressive Web App for construction field crews to digitize superintendent daily reports. Built for **[Earth Construction & Mining (ECM)](https://4ecm.com/)** — a multi-disciplined General Engineering Contractor specializing in complex earthwork, habitat restoration, public works, and site development projects throughout Southern California since 1992.
 
