@@ -42,28 +42,28 @@ This app is the first step in a broader AI integration strategy for construction
                         Offline-First Architecture
 
                                           Airtable (REST API)
-                                     +<img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" />--+
+                                     +--------------------------+
                           Pull       |                          |
                        Master Data   |  Master Data (read-only) |
-                    +<img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" />-|  Jobs, Employees,        |
+                    +----------------|  Jobs, Employees,        |
                     |                |  Equipment, Cost Codes,  |
                     v                |  Subcontractors          |
-   +<img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" />--+         |                          |
+   +-----------------------+         |                          |
    |    React + Vite PWA   |         |  Transaction Data        |
    |                       | Upload  |  Daily Reports,          |
-   |  +<img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" />--+  | Queue   |  Labor Entries,          |
-   |  |     Dexie       |--|<img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" />-->|  CC Hours, Diary,        |
+   |  +-----------------+  | Queue   |  Labor Entries,          |
+   |  |     Dexie       |--|-------->|  CC Hours, Diary,        |
    |  |   (IndexedDB)   |  |         |  Subs, Deliveries,       |
    |  |                 |  |  Pull   |  Edit History            |
-   |  |  Primary store  |<-|<img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" />|                          |
-   |  |  for all data   |  |         +<img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" />--+
-   |  +<img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" />--+  |
+   |  |  Primary store  |<-|---------|                          |
+   |  |  for all data   |  |         +--------------------------+
+   |  +-----------------+  |
    |                       |
-   |    Service Worker     |         +<img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" />--+
+   |    Service Worker     |         +--------------------------+
    |    (Workbox PWA)      |         |    Anthropic API         |
-   +<img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" />--+  Proxy  |    (Claude 4.6 Sonnet)   |
-   |  Vercel Serverless    |<img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" />-->|                          |
-   +<img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" />--+         +<img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" />--+
+   +-----------------------+  Proxy  |    (Claude 4.6 Sonnet)   |
+   |  Vercel Serverless    |-------->|                          |
+   +-----------------------+         +--------------------------+
 ```
 
 ### Data Flow
