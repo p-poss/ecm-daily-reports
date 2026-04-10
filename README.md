@@ -14,7 +14,11 @@ Replacing handwritten paper forms with an offline-first mobile application that 
 
 ## The Problem
 
-Construction foremen fill out daily reports on paper forms tracking labor hours, equipment usage, cost code allocations, subcontractor work, materials delivered, and job diary entries. These forms are error-prone, hard to read, and require manual collection + data entry into payroll systems. Reports must be submitted daily by 5pm the next day, with payroll summaries due Monday at noon.
+For 30+ years, paper daily reports made sense — the cost of building and maintaining digital systems wasn't worth it for a company this size. You'd need developers, servers, IT staff — the paper worked.
+
+But AI changes the math. It's not just about efficiency anymore — it's about integrated systems that can talk to each other. Companies with structured data will have AI agents handling cost forecasting, catching invoice discrepancies, and optimizing bids. Paper forms are a dead end — decades of operational data locked in filing cabinets, completely invisible to AI.
+
+Every day, foremen fill out reports tracking labor hours, equipment usage, cost code allocations, subcontractor work, materials delivered, and job diary entries — all by hand.
 
 <p align="center">
   <img src="problem-readme.png" alt="Paper daily report form" width="600" />
@@ -22,7 +26,7 @@ Construction foremen fill out daily reports on paper forms tracking labor hours,
 
 ## The Solution
 
-A mobile-first PWA that works offline in remote job sites, syncs automatically when connectivity returns, and structures data for direct export to payroll software.
+A mobile-first PWA that turns paper forms into structured data that an AI assistant can fill out through conversation and connect directly to the office's accounting systems. Works offline in remote job sites, syncs automatically when connectivity returns.
 
 **[Live Site](https://ecm-jobs.vercel.app/)**
 
