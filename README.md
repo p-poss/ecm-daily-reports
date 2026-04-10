@@ -31,30 +31,38 @@ The key insight: **AI in construction doesn't start with models -- it starts wit
 ```
                         Offline-First Architecture
 
-   +-----------------------+          +--------------------+
-   |    React + Vite PWA   |          |      Airtable      |
-   |                       |          |  (Source of Truth)  |
-   |  +-----------------+  |  Upload  |                    |
-   |  |     Dexie       |  |  Queue   |  Jobs, Employees,  |
-   |  |   (IndexedDB)   |--|--------->|  Cost Codes,       |
-   |  |                 |  |          |  Daily Reports,    |
-   |  |  Local-first    |  |  Pull    |  Labor Entries,    |
-   |  |  storage        |<-|----------|  CC Hours, etc.    |
-   |  +-----------------+  |          |                    |
-   |                       |          +--------------------+
-   |  Service Worker       |
-   |  (Workbox)            |          +--------------------+
-   +-----------------------+          |   Anthropic API    |
-   |  Vercel Serverless    |--------->|   (Claude 4.6)     |
-   +-----------------------+          +--------------------+
+                                          Airtable (REST API)
+                                     +--------------------------+
+                              Pull   |                          |
+                      Master Data    |  Master Data (read-only) |
+                    +----------------|  Jobs, Employees,        |
+                    |                |  Equipment, Cost Codes,  |
+                    v                |  Subcontractors          |
+   +-----------------------+        |                          |
+   |    React + Vite PWA   |        |  Transaction Data        |
+   |                       | Upload |  Daily Reports,          |
+   |  +-----------------+  | Queue  |  Labor Entries,          |
+   |  |     Dexie       |--|------->|  CC Hours, Diary,        |
+   |  |   (IndexedDB)   |  |        |  Subs, Deliveries,      |
+   |  |                 |  | Pull   |  Edit History            |
+   |  |  Primary store  |<-|--------|                          |
+   |  |  for all data   |  |        +--------------------------+
+   |  +-----------------+  |
+   |                       |
+   |  Service Worker       |         +--------------------------+
+   |  (Workbox PWA)        |         |    Anthropic API         |
+   +-----------------------+ Proxy   |    (Claude 4.6 Sonnet)   |
+   |  Vercel Serverless    |-------->|                          |
+   +-----------------------+         +--------------------------+
 ```
 
 ### Data Flow
 
-1. **Master data** (Jobs, Employees, Equipment, Cost Codes) flows **Airtable -> App** on startup and when coming online
-2. **Transaction data** (Reports, Labor, Diary, etc.) flows **App -> Airtable** via a sync queue with exponential backoff
-3. **Foreign keys** are translated between local UUIDs and Airtable record IDs at sync boundaries
+1. **Master data** (Jobs, Employees, Equipment, Cost Codes) is managed in Airtable and pulled to the app on startup and when coming online. Airtable is the source of truth for these tables.
+2. **Transaction data** (Reports, Labor, Diary, etc.) is created locally in Dexie first, then pushed to Airtable via a sync queue with exponential backoff. The local DB is the primary store — Airtable serves as the remote archive for office access and payroll export.
+3. **Foreign keys** are translated between local UUIDs and Airtable record IDs at sync boundaries via `resolveLinkedFields`
 4. **Offline edits** are persisted in IndexedDB immediately, queued for upload, and sent when connectivity returns
+5. **AI requests** are proxied through a Vercel serverless function to keep the Anthropic API key server-side. All Airtable calls go directly from the client.
 
 ---
 
