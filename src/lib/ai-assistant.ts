@@ -368,7 +368,7 @@ export async function sendMessage(
   while (true) {
     const response = await callClaude({
       model: 'claude-sonnet-4-6',
-      max_tokens: 1024,
+      max_tokens: 16384,
       system: buildSystemPrompt(context),
       tools: assistantTools,
       messages: currentMessages,
