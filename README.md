@@ -33,25 +33,25 @@ The key insight: **AI in construction doesn't start with models -- it starts wit
 
                                           Airtable (REST API)
                                      +--------------------------+
-                              Pull   |                          |
-                      Master Data    |  Master Data (read-only) |
+                          Pull       |                          |
+                       Master Data   |  Master Data (read-only) |
                     +----------------|  Jobs, Employees,        |
                     |                |  Equipment, Cost Codes,  |
                     v                |  Subcontractors          |
-   +-----------------------+        |                          |
-   |    React + Vite PWA   |        |  Transaction Data        |
-   |                       | Upload |  Daily Reports,          |
-   |  +-----------------+  | Queue  |  Labor Entries,          |
-   |  |     Dexie       |--|------->|  CC Hours, Diary,        |
-   |  |   (IndexedDB)   |  |        |  Subs, Deliveries,      |
-   |  |                 |  | Pull   |  Edit History            |
-   |  |  Primary store  |<-|--------|                          |
-   |  |  for all data   |  |        +--------------------------+
+   +-----------------------+         |                          |
+   |    React + Vite PWA   |         |  Transaction Data        |
+   |                       | Upload  |  Daily Reports,          |
+   |  +-----------------+  | Queue   |  Labor Entries,          |
+   |  |     Dexie       |--|-------->|  CC Hours, Diary,        |
+   |  |   (IndexedDB)   |  |         |  Subs, Deliveries,       |
+   |  |                 |  |  Pull   |  Edit History            |
+   |  |  Primary store  |<-|---------|                          |
+   |  |  for all data   |  |         +--------------------------+
    |  +-----------------+  |
    |                       |
-   |  Service Worker       |         +--------------------------+
-   |  (Workbox PWA)        |         |    Anthropic API         |
-   +-----------------------+ Proxy   |    (Claude 4.6 Sonnet)   |
+   |    Service Worker     |         +--------------------------+
+   |    (Workbox PWA)      |         |    Anthropic API         |
+   +-----------------------+  Proxy  |    (Claude 4.6 Sonnet)   |
    |  Vercel Serverless    |-------->|                          |
    +-----------------------+         +--------------------------+
 ```
