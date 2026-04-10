@@ -1,6 +1,6 @@
 <img src="public/ECM-logo-6.svg" alt="ECM - Earth Construction & Mining" width="100%" />
 
-<img src="divider.svg" width="100%" />
+<img src="divider.png" width="100%" />
 
 # ECM - Daily Report Platform
 
@@ -26,7 +26,7 @@ A mobile-first PWA that works offline in remote job sites, syncs automatically w
 
 **[Live Site](https://ecm-jobs.vercel.app/)**
 
-<img src="divider.svg" width="100%" />
+<img src="divider.png" width="100%" />
 
 ## AI Adoption Strategy
 
@@ -40,7 +40,7 @@ This app is the first step in a broader AI integration strategy for construction
 
 **The bigger picture** -- Industries that have been slow to digitize can't benefit from AI without first building the digital infrastructure to give it context. Earthwork construction is one of these industries — and this app is the bridge. It meets foremen where they are, replaces a familiar paper workflow with something faster, and quietly builds the structured dataset and integrated system that makes every future AI capability possible.
 
-<img src="divider.svg" width="100%" />
+<img src="divider.png" width="100%" />
 
 ## Architecture
 
@@ -80,7 +80,7 @@ This app is the first step in a broader AI integration strategy for construction
 4. **Offline edits** are persisted in IndexedDB immediately, queued for upload, and sent when connectivity returns
 5. **AI requests** are proxied through a Vercel serverless function to keep the Anthropic API key server-side. All Airtable calls go directly from the client.
 
-<img src="divider.svg" width="100%" />
+<img src="divider.png" width="100%" />
 
 ## Key Features
 
@@ -124,7 +124,7 @@ This app is the first step in a broader AI integration strategy for construction
 - **Dark/light theme** with system preference detection
 - **Custom WebGL Bayer noise background** on login page
 
-<img src="divider.svg" width="100%" />
+<img src="divider.png" width="100%" />
 
 ## Tech Stack
 
@@ -138,7 +138,7 @@ This app is the first step in a broader AI integration strategy for construction
 ![Vercel](https://img.shields.io/badge/Vercel-351F09?style=flat-square&logo=vercel&logoColor=white)
 ![PWA](https://img.shields.io/badge/PWA_(Workbox)-351F09?style=flat-square&logo=pwa&logoColor=white)
 
-<img src="divider.svg" width="100%" />
+<img src="divider.png" width="100%" />
 
 ## Project Structure
 
@@ -156,7 +156,7 @@ api/
   claude.ts          # Vercel serverless proxy for Anthropic API
 ```
 
-<img src="divider.svg" width="100%" />
+<img src="divider.png" width="100%" />
 
 ## Database Schema
 
@@ -170,7 +170,7 @@ api/
 
 The schema is at version 8, with migrations handling cost code restructuring, Airtable field type conversions, and the labor cost code hours junction table.
 
-<img src="divider.svg" width="100%" />
+<img src="divider.png" width="100%" />
 
 ## Development
 
@@ -189,7 +189,7 @@ VITE_AIRTABLE_BASE_ID=your_airtable_base_id
 ANTHROPIC_API_KEY=your_anthropic_api_key  # Server-side only (Vercel)
 ```
 
-<img src="divider.svg" width="100%" />
+<img src="divider.png" width="100%" />
 
 <p align="center">
   <img src="ecm-logo-readme.svg" alt="ECM" width="100%" />
