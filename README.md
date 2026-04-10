@@ -20,7 +20,7 @@ A mobile-first PWA that works offline in remote job sites, syncs automatically w
 
 **[Live Demo](https://ecm-jobs.vercel.app/)**
 
----
+<img src="divider.svg" width="100%" />
 
 ## AI Adoption Strategy
 
@@ -34,7 +34,7 @@ This app is the first step in a broader AI integration strategy for construction
 
 **The bigger picture** -- Industries that have been slow to digitize can't benefit from AI without first building the digital infrastructure to give it context. Earthwork construction is one of these industries — and this app is the bridge. It meets foremen where they are, replaces a familiar paper workflow with something faster, and quietly builds the structured dataset and integrated system that makes every future AI capability possible.
 
----
+<img src="divider.svg" width="100%" />
 
 ## Architecture
 
@@ -42,28 +42,28 @@ This app is the first step in a broader AI integration strategy for construction
                         Offline-First Architecture
 
                                           Airtable (REST API)
-                                     +--------------------------+
+                                     +<img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" />--+
                           Pull       |                          |
                        Master Data   |  Master Data (read-only) |
-                    +----------------|  Jobs, Employees,        |
+                    +<img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" />-|  Jobs, Employees,        |
                     |                |  Equipment, Cost Codes,  |
                     v                |  Subcontractors          |
-   +-----------------------+         |                          |
+   +<img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" />--+         |                          |
    |    React + Vite PWA   |         |  Transaction Data        |
    |                       | Upload  |  Daily Reports,          |
-   |  +-----------------+  | Queue   |  Labor Entries,          |
-   |  |     Dexie       |--|-------->|  CC Hours, Diary,        |
+   |  +<img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" />--+  | Queue   |  Labor Entries,          |
+   |  |     Dexie       |--|<img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" />-->|  CC Hours, Diary,        |
    |  |   (IndexedDB)   |  |         |  Subs, Deliveries,       |
    |  |                 |  |  Pull   |  Edit History            |
-   |  |  Primary store  |<-|---------|                          |
-   |  |  for all data   |  |         +--------------------------+
-   |  +-----------------+  |
+   |  |  Primary store  |<-|<img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" />|                          |
+   |  |  for all data   |  |         +<img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" />--+
+   |  +<img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" />--+  |
    |                       |
-   |    Service Worker     |         +--------------------------+
+   |    Service Worker     |         +<img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" />--+
    |    (Workbox PWA)      |         |    Anthropic API         |
-   +-----------------------+  Proxy  |    (Claude 4.6 Sonnet)   |
-   |  Vercel Serverless    |-------->|                          |
-   +-----------------------+         +--------------------------+
+   +<img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" />--+  Proxy  |    (Claude 4.6 Sonnet)   |
+   |  Vercel Serverless    |<img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" />-->|                          |
+   +<img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" />--+         +<img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" /><img src="divider.svg" width="100%" />--+
 ```
 
 ### Data Flow
@@ -74,7 +74,7 @@ This app is the first step in a broader AI integration strategy for construction
 4. **Offline edits** are persisted in IndexedDB immediately, queued for upload, and sent when connectivity returns
 5. **AI requests** are proxied through a Vercel serverless function to keep the Anthropic API key server-side. All Airtable calls go directly from the client.
 
----
+<img src="divider.svg" width="100%" />
 
 ## Key Features
 
@@ -118,23 +118,21 @@ This app is the first step in a broader AI integration strategy for construction
 - **Dark/light theme** with system preference detection
 - **Custom WebGL Bayer noise background** on login page
 
----
+<img src="divider.svg" width="100%" />
 
 ## Tech Stack
 
-| Layer | Technology |
-|-------|-----------|
-| Framework | React 19, TypeScript 5.9, Vite 7 |
-| Styling | Tailwind CSS 4, shadcn/ui, Radix UI |
-| Local DB | Dexie 4 (IndexedDB) with reactive queries |
-| Remote DB | Airtable (REST API + Meta API) |
-| AI | Claude 4.6 Sonnet via Anthropic API |
-| PWA | vite-plugin-pwa, Workbox |
-| Deployment | Vercel (static + serverless API proxy) |
-| PDF | jsPDF |
-| Signatures | react-signature-canvas |
+![React](https://img.shields.io/badge/React_19-351F09?style=flat-square&logo=react&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript_5.9-351F09?style=flat-square&logo=typescript&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite_7-351F09?style=flat-square&logo=vite&logoColor=white)
+![Tailwind](https://img.shields.io/badge/Tailwind_CSS_4-351F09?style=flat-square&logo=tailwindcss&logoColor=white)
+![Dexie](https://img.shields.io/badge/Dexie_(IndexedDB)-351F09?style=flat-square&logoColor=white)
+![Airtable](https://img.shields.io/badge/Airtable-351F09?style=flat-square&logo=airtable&logoColor=white)
+![Claude](https://img.shields.io/badge/Claude_4.6_Sonnet-351F09?style=flat-square&logo=anthropic&logoColor=white)
+![Vercel](https://img.shields.io/badge/Vercel-351F09?style=flat-square&logo=vercel&logoColor=white)
+![PWA](https://img.shields.io/badge/PWA_(Workbox)-351F09?style=flat-square&logo=pwa&logoColor=white)
 
----
+<img src="divider.svg" width="100%" />
 
 ## Project Structure
 
@@ -152,7 +150,7 @@ api/
   claude.ts          # Vercel serverless proxy for Anthropic API
 ```
 
----
+<img src="divider.svg" width="100%" />
 
 ## Database Schema
 
@@ -166,7 +164,7 @@ api/
 
 The schema is at version 8, with migrations handling cost code restructuring, Airtable field type conversions, and the labor cost code hours junction table.
 
----
+<img src="divider.svg" width="100%" />
 
 ## Development
 
@@ -185,7 +183,7 @@ VITE_AIRTABLE_BASE_ID=your_airtable_base_id
 ANTHROPIC_API_KEY=your_anthropic_api_key  # Server-side only (Vercel)
 ```
 
----
+<img src="divider.svg" width="100%" />
 
 <p align="center">
   <img src="ecm-logo-readme.svg" alt="ECM" width="100%" />
