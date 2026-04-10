@@ -1,4 +1,4 @@
-<img src="ecm-logo-top.svg" alt="ECM - Earth Construction & Mining" width="100%" />
+<img src="ecm-logo-top.png" alt="ECM - Earth Construction & Mining" width="100%" />
 
 <img src="divider.svg" width="100%" />
 
@@ -192,5 +192,5 @@ ANTHROPIC_API_KEY=your_anthropic_api_key  # Server-side only (Vercel)
 <img src="divider.svg" width="100%" />
 
 <p align="center">
-  <img src="ecm-logo-bottom.svg" alt="ECM" width="100%" />
+  <img src="ecm-logo-bottom.png" alt="ECM" width="100%" />
 </p>
