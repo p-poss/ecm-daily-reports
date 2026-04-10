@@ -184,3 +184,9 @@ VITE_AIRTABLE_API_KEY=your_airtable_personal_access_token
 VITE_AIRTABLE_BASE_ID=your_airtable_base_id
 ANTHROPIC_API_KEY=your_anthropic_api_key  # Server-side only (Vercel)
 ```
+
+---
+
+<p align="center">
+  <img src="public/ECM-LOGO.svg" alt="ECM" width="100%" />
+</p>
