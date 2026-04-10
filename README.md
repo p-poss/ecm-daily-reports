@@ -34,7 +34,7 @@ This app is the first step in a broader AI integration strategy for construction
 
 **Today** -- An embedded AI assistant (Claude 4.6 Sonnet) helps foremen fill out reports faster using natural language and voice input. It understands the form context and uses tool calls to populate labor entries, cost codes, diary notes, and more.
 
-**Near-term** -- With structured, higher-quality daily report data flowing into Airtable, the next layer is automated insights: cost code budget burn-rate alerts, labor productivity trends across jobs, weather-adjusted scheduling recommendations, and anomaly detection (e.g., flagging unusually high equipment idle hours).
+**Near-term** -- Structured daily report data makes it easy to search and cross-reference against payroll, purchase orders, and invoices — things that currently live in silos. When a supplier's invoice doesn't match what the foreman reported on-site, that discrepancy is instantly visible instead of buried in a filing cabinet. An AI assistant that can compare reports against incoming bills and flag mismatches is a natural next step. Beyond cross-referencing: cost code budget burn-rate alerts, labor productivity trends across jobs, weather-adjusted scheduling recommendations, and anomaly detection (e.g., flagging unusually high equipment idle hours).
 
 **Long-term** -- The data pipeline this app establishes feeds into predictive models for project cost forecasting, resource allocation optimization, job bidding, and automated compliance reporting. Every report submitted builds the dataset that gives future ECM AI agents greater context and accuracy.
 
