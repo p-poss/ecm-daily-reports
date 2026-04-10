@@ -1,6 +1,6 @@
 # ECM Daily Reports
 
-A Progressive Web App for construction field crews to digitize superintendent daily reports. Built for **ECM (Earth Construction Mining)**, replacing handwritten paper forms with an offline-first mobile application that syncs to Airtable for office review and payroll processing.
+A Progressive Web App for construction field crews to digitize superintendent daily reports. Built for **ECM (Earth Construction Mining)**, replacing handwritten paper forms with an offline-first mobile application that syncs to Airtable for office review and payroll processing. Part of a broader AI adoption strategy — digitizing field data to create the structured foundation for predictive analytics, cost forecasting, and automated compliance reporting.
 
 ## The Problem
 
@@ -9,6 +9,20 @@ Construction foremen fill out daily reports on paper forms tracking labor hours,
 ## The Solution
 
 A mobile-first PWA that works offline in remote job sites, syncs automatically when connectivity returns, and structures data for direct export to payroll software.
+
+---
+
+## AI Adoption Strategy
+
+This app is the first step in a broader AI integration strategy for construction operations. Digitizing daily reports creates the **structured data foundation** that makes downstream AI applications possible.
+
+**Today** -- An embedded AI assistant (Claude 4.6 Sonnet) helps foremen fill out reports faster using natural language and voice input. It understands the form context and uses tool calls to populate labor entries, cost codes, diary notes, and more.
+
+**Near-term** -- With structured daily report data flowing into Airtable, the next layer is automated insights: cost code budget burn-rate alerts, labor productivity trends across jobs, weather-adjusted scheduling recommendations, and anomaly detection (e.g., flagging unusually high equipment idle hours).
+
+**Long-term** -- The data pipeline this app establishes feeds into predictive models for project cost forecasting, resource allocation optimization, and automated compliance reporting. Every report submitted today trains the dataset that makes tomorrow's AI tools more accurate.
+
+The key insight: **AI in construction doesn't start with models -- it starts with data capture.** Paper forms are a dead end. This app turns every foreman's daily routine into a structured data stream that compounds in value over time.
 
 ---
 
