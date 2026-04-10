@@ -1,6 +1,6 @@
 <img src="divider.svg" width="100%" />
 
-# ECM Daily Report Platform
+# ECM — Daily Report Platform
 
 A Progressive Web App for construction field crews to digitize superintendent daily reports. Built for **ECM (Earth Construction Mining)**, replacing handwritten paper forms with an offline-first mobile application that syncs to Airtable for office review and payroll processing. Part of a broader AI adoption strategy — digitizing field data to create the structured foundation for predictive analytics, cost forecasting, project bidding, and automated compliance reporting.
 
