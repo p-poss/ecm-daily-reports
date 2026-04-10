@@ -1,6 +1,4 @@
-<p align="center">
-  <img src="public/ECM-logo-3.svg" alt="ECM - Earth Construction & Mining" width="33%" />
-</p>
+<img src="public/ECM-logo-3.svg" alt="ECM - Earth Construction & Mining" width="33%" />
 
 <img src="divider.svg" width="100%" />
 
