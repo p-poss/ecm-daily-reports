@@ -10,6 +10,10 @@ A Progressive Web App for construction field crews to digitize superintendent da
 
 Construction foremen fill out daily reports on paper forms tracking labor hours, equipment usage, cost code allocations, subcontractor work, materials delivered, and job diary entries. These forms are error-prone, hard to read, and require manual collection + data entry into payroll systems. Reports must be submitted daily by 5pm the next day, with payroll summaries due Monday at noon.
 
+<p align="center">
+  <img src="problem-readme.png" alt="Paper daily report form" width="600" />
+</p>
+
 ## The Solution
 
 A mobile-first PWA that works offline in remote job sites, syncs automatically when connectivity returns, and structures data for direct export to payroll software.
