@@ -234,6 +234,49 @@ export function DailyReportPage() {
 
       setQuiet('laborEntries', copiedLaborEntries);
 
+      // Copy diary entries with new IDs
+      const sourceDiary = await db.jobDiaryEntries
+        .where('dailyReportId')
+        .equals(sourceReportId)
+        .toArray();
+      const copiedDiary: JobDiaryEntry[] = sourceDiary.map((e, i) => ({
+        ...e,
+        id: generateId(),
+        dailyReportId: reportId,
+        airtableId: undefined,
+        itemNumber: i + 1,
+      }));
+      setQuiet('diaryEntries', copiedDiary);
+
+      // Copy subcontractor work with new IDs
+      const sourceSubs = await db.subcontractorWork
+        .where('dailyReportId')
+        .equals(sourceReportId)
+        .toArray();
+      const copiedSubs: SubcontractorWork[] = sourceSubs.map((e) => ({
+        ...e,
+        id: generateId(),
+        dailyReportId: reportId,
+        airtableId: undefined,
+      }));
+      setQuiet('subcontractorEntries', copiedSubs);
+
+      // Copy materials delivered with new IDs
+      const sourceDeliveries = await db.materialsDelivered
+        .where('dailyReportId')
+        .equals(sourceReportId)
+        .toArray();
+      const copiedDeliveries: MaterialDelivered[] = sourceDeliveries.map((e) => ({
+        ...e,
+        id: generateId(),
+        dailyReportId: reportId,
+        airtableId: undefined,
+      }));
+      setQuiet('deliveryEntries', copiedDeliveries);
+
+      // Copy comments
+      if (sourceReport.comments) setQuiet('comments', sourceReport.comments);
+
       // Set copied from date for display
       setCopiedFrom(sourceReport.date);
     } catch (error) {
