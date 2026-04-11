@@ -521,36 +521,7 @@ export function DailyReportPage() {
         // field, and Airtable attachments can't accept base64 directly.
         // Photos remain local-only until that infrastructure is built.
 
-        // Record edit history — capture a snapshot of the current state
-        // and diff it against the previous snapshot (if any).
-        const currentSnapshot = await captureSnapshot(reportIdToSubmit);
-        if (currentSnapshot) {
-          const prevSnapshot = await getPreviousSnapshot(reportIdToSubmit);
-          const changes = await diffSnapshots(prevSnapshot, currentSnapshot);
-          const historyEntry: EditHistory = {
-            id: generateId(),
-            dailyReportId: reportIdToSubmit,
-            timestamp: now(),
-            editorId: foreman.id,
-            changes: JSON.stringify(changes),
-            snapshot: JSON.stringify(currentSnapshot),
-          };
-          await db.editHistory.add(historyEntry);
-          await addToQueue('editHistory', historyEntry.id, 'create', {
-            dailyReportId: reportIdToSubmit,
-            editorId: foreman.id,
-            'Daily Report (old)': `${foreman.name} - ${new Date(historyEntry.timestamp).toLocaleString()}`,
-            'Timestamp': historyEntry.timestamp,
-            'Changes': changes.map((c) =>
-              c.oldValue != null && c.newValue != null
-                ? `${c.field}: ${c.oldValue} → ${c.newValue}`
-                : c.oldValue != null
-                ? `${c.field}: removed ${c.oldValue}`
-                : `${c.field}: ${c.newValue || ''}`
-            ).join('\n'),
-            'Snapshot': historyEntry.snapshot,
-          });
-        }
+        // Edit history entry was already created by saveDraftWithoutAlert above.
       }
 
       alert('Report submitted successfully!');
@@ -691,6 +662,42 @@ export function DailyReportPage() {
       await db.photoAttachments.bulkPut(
         photos.map((p) => ({ ...p, dailyReportId: report.id }))
       );
+    }
+
+    // Record edit history — capture a snapshot and diff against the
+    // previous snapshot. Skip if there are no meaningful changes so we
+    // don't spam the history with no-op saves.
+    if (foreman) {
+      const currentSnapshot = await captureSnapshot(report.id);
+      if (currentSnapshot) {
+        const prevSnapshot = await getPreviousSnapshot(report.id);
+        const changes = await diffSnapshots(prevSnapshot, currentSnapshot);
+        if (changes.length > 0) {
+          const historyEntry: EditHistory = {
+            id: generateId(),
+            dailyReportId: report.id,
+            timestamp: now(),
+            editorId: foreman.id,
+            changes: JSON.stringify(changes),
+            snapshot: JSON.stringify(currentSnapshot),
+          };
+          await db.editHistory.add(historyEntry);
+          await addToQueue('editHistory', historyEntry.id, 'create', {
+            dailyReportId: report.id,
+            editorId: foreman.id,
+            'Daily Report (old)': `${foreman.name} - ${new Date(historyEntry.timestamp).toLocaleString()}`,
+            'Timestamp': historyEntry.timestamp,
+            'Changes': changes.map((c) =>
+              c.oldValue != null && c.newValue != null
+                ? `${c.field}: ${c.oldValue} → ${c.newValue}`
+                : c.oldValue != null
+                ? `${c.field}: removed ${c.oldValue}`
+                : `${c.field}: ${c.newValue || ''}`
+            ).join('\n'),
+            'Snapshot': historyEntry.snapshot,
+          });
+        }
+      }
     }
   }
 
