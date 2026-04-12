@@ -26,7 +26,7 @@ But AI changes the math. It's not just about efficiency anymore - it's about cre
 
 A mobile-first PWA that turns paper forms into structured data that an AI assistant can fill out through conversation and connect directly to the office's accounting systems. Works offline in remote job sites, syncs automatically when connectivity returns.
 
-**[Live Site](https://ecm-jobs.vercel.app/)**
+**[Video Walkthrough](https://www.loom.com/share/b3cbee53c51442029e81eaf27b7fa1e8)** | **[Live Site](https://ecm-jobs.vercel.app/)**
 
 <img src="divider.svg" width="100%" />
 
